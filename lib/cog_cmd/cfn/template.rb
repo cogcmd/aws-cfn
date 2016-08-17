@@ -1,4 +1,13 @@
+#!/usr/bin/env ruby
+
+require 'cog/command'
+require 'aws-sdk'
+require_relative 'helpers'
+
 class CogCmd::Cfn::Template < Cog::Command
+
+  include CogCmd::Cfn::Helpers
+
   def run_command
     case request.args[0]
     when "list"
@@ -17,13 +26,19 @@ class CogCmd::Cfn::Template < Cog::Command
   end
 
   def list
+    s3 = Aws::S3::Client.new()
+    templates = s3.list_objects_v2(bucket: template_url[:bucket], prefix: template_url[:prefix])
+                .contents
+                .find_all { |obj|
+                  obj.key.end_with?(".json")
+                }
+                .map { |obj|
+                  { "name": strip_json(strip_prefix(obj.key)),
+                    "last_modified": obj.last_modified }
+                }
+
     response.content = {
-      "templates": [
-        {
-          "name": "template1",
-          "last_modified": "2016-08-12 00:00:00"
-        }
-      ]
+      "templates": templates
     }
   end
 

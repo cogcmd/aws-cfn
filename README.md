@@ -65,3 +65,6 @@ Actions:
 ## Configuration
 
 CFN_TEMPLATE_URL="s3://bucket/path"
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION="us-east-1"
