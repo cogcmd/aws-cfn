@@ -16,10 +16,19 @@ module CogCmd::Cfn::Helpers
   def template_url(template_name)
     "#{cfn_template_url}#{template_name}.json"
   end
+
+  def policy_url(policy_name)
+    "#{cfn_policy_url}#{policy_name}.json"
+  end
+
   private
 
   def cfn_template_url
     append_slash(env_var("CFN_TEMPLATE_URL", required: true))
+  end
+
+  def cfn_policy_url
+    append_slash(env_var("CFN_POLICY_URL", required: true))
   end
 
   # So things will be consitant we add a slash to the end of cfn urls if one
