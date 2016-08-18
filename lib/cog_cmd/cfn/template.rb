@@ -27,7 +27,7 @@ class CogCmd::Cfn::Template < Cog::Command
 
   def list
     s3 = Aws::S3::Client.new()
-    templates = s3.list_objects_v2(bucket: template_url[:bucket], prefix: template_url[:prefix])
+    templates = s3.list_objects_v2(bucket: template_root[:bucket], prefix: template_root[:prefix])
                 .contents
                 .find_all { |obj|
                   obj.key.end_with?(".json")
