@@ -62,9 +62,30 @@ Actions:
 { ... GetTemplateSummary struct ... }
 ```
 
+### `cfn:create`
+
+**Usage**
+
+```
+cfn:create <name> <s3_template_name>
+
+Options:
+  --param, -p "Key1=Value1"
+  --param, -p "Key2=Value2"
+  --tag, -t "Name1=Value1"
+  --tag, -t "Name2=Value2"
+  --policy, -o <s3_policy_name>
+  --notify, -n "sns_topic_arn1"
+  --notify, -n "sns_topic_arn2"
+  --on-failure, -f <rollback *|delete|keep>
+  --timeout, -e <minutes>
+  --capabilities, -c <iam|named_iam>
+```
+
 ## Configuration
 
-CFN_TEMPLATE_URL="s3://bucket/path"
-AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
-AWS_REGION="us-east-1"
+* CFN_TEMPLATE_URL="s3://bucket/path"
+* CFN_POLICY_URL="s3://mybucket/aws-cfn/policies"
+* AWS_ACCESS_KEY_ID=...
+* AWS_SECRET_ACCESS_KEY=...
+* AWS_REGION="us-east-1"
