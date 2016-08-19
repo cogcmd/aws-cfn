@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'cog/command'
 require_relative 'helpers'
 
 class CogCmd::Cfn::Create < Cog::Command

@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'cog/command'
-require 'aws-sdk'
 require_relative 'helpers'
 
 class CogCmd::Cfn::Template < Cog::Command
