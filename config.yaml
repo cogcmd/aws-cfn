@@ -2,20 +2,15 @@
 cog_bundle_version: 3
 name: cfn
 description: "AWS CloudFormation"
-version: "0.0.2"
+version: "0.0.3"
 docker:
   image: cogcmd/aws-cfn
   tag: "0.0.2"
 commands:
   template:
     executable: /home/bundle/cog-command
-    description: "Pass through only the first N results"
-    documentation: |
-      format:head [count] - pass through the first [count] results
-
-      `count` must be a non-zero positive integer. The default value
-      is `10` if none is provided.
-
+    description: "List available CloudFormation templates"
+    documentation: "cfn:template list - list available CloudFormation templates"
     rules:
     - "must have cfn:view"
   create:
