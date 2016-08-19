@@ -2,7 +2,7 @@
 cog_bundle_version: 3
 name: cfn
 description: "AWS CloudFormation"
-version: "0.0.3"
+version: "0.0.4"
 docker:
   image: cogcmd/aws-cfn
   tag: "0.0.2"
@@ -47,6 +47,12 @@ commands:
         short_flag: c
     rules:
       - "must have cfn:create"
+  show:
+    executable: /home/bundle/cog-command
+    description: "Show details of a CloudFormation stack"
+    documentation: "cfn:show <stack> - show details for CloudFormation stack with name <stack>"
+    rules:
+    - "must have cfn:view"
 permissions:
   - cfn:view
   - cfn:create
