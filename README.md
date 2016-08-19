@@ -88,7 +88,7 @@ Options:
 
 The `cfn` bundle makes use of CloudFormation stack templates and stack policies that are defined in JSON documents and stored in pre-defined S3 locations. These locations are defined in the configuration variables below:
 
-* CFN_TEMPLATE_URL="s3://bucket/templates"
+* CFN_TEMPLATE_PREFIX="s3://bucket/templates"
 * CFN_POLICY_URL="s3://bucket/policies"
 
 ### AWS Credential Configuration

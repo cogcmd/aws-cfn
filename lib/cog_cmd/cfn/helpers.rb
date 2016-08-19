@@ -21,18 +21,30 @@ module CogCmd::Cfn::Helpers
   end
 
   def template_root
-    cfn_template_url.match(/((?<scheme>[^:]+):\/\/)?(?<bucket>[^\/]+)\/(?<prefix>.*)/)
+    parse_s3_url(cfn_template_url)
+  end
+
+  def policy_root
+    parse_s3_url(cfn_policy_url)
   end
 
   def template_url(template_name)
-    "#{cfn_template_url}#{template_name}.json"
+    [ "https://#{template_root['bucket']}.s3.amazonaws.com",
+      "#{template_root['prefix']}#{template_name}.json" ].join('/')
   end
 
   def policy_url(policy_name)
-    "#{cfn_policy_url}#{policy_name}.json"
+    return nil if policy_name.nil?
+
+    [ "https://#{policy_root['bucket']}.s3.amazonaws.com",
+      "#{policy_root['prefix']}#{policy_name}.json" ].join('/')
   end
 
   private
+
+  def parse_s3_url(url)
+    url.match(/((?<scheme>[^:]+):\/\/)?(?<bucket>[^\/]+)\/(?<prefix>.*)/)
+  end
 
   def cfn_template_url
     append_slash(env_var("CFN_TEMPLATE_URL", required: true))

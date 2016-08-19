@@ -44,21 +44,23 @@ END
 
   def create
     cloudform = Aws::CloudFormation::Client.new()
-    cf_params = [
-      [ :stack_name, request.args[0] ],
-      [ :template_url, template_url(request.args[1]) ],
-      param_or_nil([ :parameters, get_parameters(request.options["param"]) ]),
-      param_or_nil([ :tags, get_tags(request.options["tag"]) ]),
-      param_or_nil([ :stack_policy_url, policy_url(request.options["policy"]) ]),
-      param_or_nil([ :notification_arns, request.options["notify"] ]),
-      param_or_nil([ :on_failure, get_on_failure(request.options["on-failure"]) ]),
-      param_or_nil([ :timeout_in_minutes, request.options["timeout"] ]),
-      param_or_nil([ :capabilities, get_capabilities(request.options["capabilities"]) ])
-    ].compact
+    cf_params = Hash[
+      [
+        [ :stack_name, request.args[0] ],
+        [ :template_url, template_url(request.args[1]) ],
+        param_or_nil([ :parameters, get_parameters(request.options["param"]) ]),
+        param_or_nil([ :tags, get_tags(request.options["tag"]) ]),
+        param_or_nil([ :stack_policy_url, policy_url(request.options["policy"]) ]),
+        param_or_nil([ :notification_arns, request.options["notify"] ]),
+        param_or_nil([ :on_failure, get_on_failure(request.options["on-failure"]) ]),
+        param_or_nil([ :timeout_in_minutes, request.options["timeout"] ]),
+        param_or_nil([ :capabilities, get_capabilities(request.options["capabilities"]) ])
+      ].compact
+    ]
 
     begin
       response.content = {
-        stack_id: cloudform.create_stack(Hash[ cf_params ]).stack_id
+        stack_id: cloudform.create_stack(cf_params).stack_id
       }
     rescue Aws::CloudFormation::Errors::AccessDenied
       msg = <<-END.gsub(/^ {5}|\n/, '')
