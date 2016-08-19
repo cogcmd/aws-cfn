@@ -35,9 +35,7 @@ class CogCmd::Cfn::Template < Cog::Command
                     "last_modified": obj.last_modified }
                 }
 
-    response.content = {
-      "templates": templates
-    }
+    response.content = templates
   end
 
   def describe

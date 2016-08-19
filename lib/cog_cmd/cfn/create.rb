@@ -59,9 +59,9 @@ END
     ]
 
     begin
-      response.content = {
-        stack_id: cloudform.create_stack(cf_params).stack_id
-      }
+      stack_id = cloudform.create_stack(cf_params).stack_id
+      stack = cloudform.describe_stacks(stack_name: request.args[0]).stacks[0]
+      response.content = stack.to_h
     rescue Aws::CloudFormation::Errors::AccessDenied
       msg = <<-END.gsub(/^ {5}|\n/, '')
       Access Denied. Make sure that you have the proper permissions with AWS
