@@ -5,7 +5,7 @@ require_relative 'helpers'
 require_relative 'exceptions'
 require_relative 'changeset/create'
 require_relative 'changeset/delete'
-
+require_relative 'changeset/list'
 class CogCmd::Cfn::Changeset < Cog::Command
 
   include CogCmd::Cfn::Helpers
@@ -24,7 +24,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
     --help, -h    Show usage
   END
 
-  SUBCOMMANDS = %w(create delete)
+  SUBCOMMANDS = %w(create delete list)
 
   def run_command
     if request.options["help"]
@@ -66,8 +66,8 @@ class CogCmd::Cfn::Changeset < Cog::Command
             Create::USAGE
           when "delete"
             Delete::USAGE
-          else
-            USAGE
+          when "list"
+            List::USAGE
           end
 
     msg = msg.gsub(/^ {4}/, '')
