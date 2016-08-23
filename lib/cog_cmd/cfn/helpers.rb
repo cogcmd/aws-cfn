@@ -40,6 +40,10 @@ module CogCmd::Cfn::Helpers
       "#{policy_root['prefix']}#{policy_name}.json" ].join('/')
   end
 
+  def error(msg)
+    "cfn: Error: #{msg}"
+  end
+
   private
 
   def parse_s3_url(url)
