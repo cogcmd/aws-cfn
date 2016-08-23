@@ -1,7 +1,7 @@
 class CogCmd::Cfn::Changeset < Cog::Command
   module Create
 
-    USAGE = <<-END
+    USAGE = <<-END.gsub(/^ {4}/, '')
     Usage: cfn:changeset create <stack name> [options]
 
     Options:

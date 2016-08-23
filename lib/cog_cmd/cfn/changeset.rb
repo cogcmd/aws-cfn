@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require_relative 'helpers'
 require_relative 'exceptions'
 require_relative 'changeset/create'
@@ -12,7 +10,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
 
   include CogCmd::Cfn::Helpers
 
-  USAGE = <<-END
+  USAGE = <<-END.gsub(/^ {2}/, '')
   Usage: cfn:changeset <subcommand> [options]
 
   Subcommands:
@@ -30,6 +28,8 @@ class CogCmd::Cfn::Changeset < Cog::Command
 
   def run_command
     if request.options["help"]
+      # If the user passes the '--help' flag we just call usage passing the first
+      # argument. The first arg should be the subcommand.
       usage(request.args[0])
     else
       subcommand
@@ -42,9 +42,11 @@ class CogCmd::Cfn::Changeset < Cog::Command
     begin
       if SUBCOMMANDS.include?(request.args[0])
         execute_request(request.args[0].to_sym)
+      else
+        raise CogCmd::Cfn::ArgumentError, "A subcommand must be specified."
       end
     rescue CogCmd::Cfn::ArgumentError => error
-      usage(request.args[0], error("Missing required arguments."))
+      usage(request.args[0], error)
     rescue Aws::CloudFormation::Errors::ValidationError => error
       fail(error)
     end
@@ -52,16 +54,20 @@ class CogCmd::Cfn::Changeset < Cog::Command
 
   def execute_request(method)
     # We verify that we have at least the first arg. All subcommands require
-    # at least one argument. If we don't have it, we show the error message
-    # along with the usage.
+    # at least one argument. If we don't have it, we raise and abort returning
+    # usage info.
     unless request.args[1]
-      raise CogCmd::Cfn::ArgumentError
+      raise CogCmd::Cfn::ArgumentError, "Missing required arguments."
     end
 
     resp = self.send(method, Aws::CloudFormation::Client.new(), request)
     response.content = resp
   end
 
+  # usage sets the response body to the usage info for the corresponding subcommand,
+  # or the parent command if now subcommand is passed, and appends an optional error
+  # message. If an error message is passed the command is aborted, otherwise it returns
+  # normally.
   def usage(usage_for, err_msg = nil)
     msg = case usage_for
           when "create"
@@ -78,7 +84,6 @@ class CogCmd::Cfn::Changeset < Cog::Command
             USAGE
           end
 
-    msg = msg.gsub(/^ {4}/, '')
     if err_msg
       response['body'] = "```#{msg}```\n#{error(err_msg)}"
       # Abort if there is an error message
