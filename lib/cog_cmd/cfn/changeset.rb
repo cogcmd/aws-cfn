@@ -3,6 +3,7 @@
 require 'cog/command'
 require_relative 'helpers'
 require_relative 'exceptions'
+require_relative 'changeset/create'
 
 class CogCmd::Cfn::Changeset < Cog::Command
 
@@ -22,7 +23,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
     --help, -h    Show usage
   END
 
-  SUBCOMMANDS = %w()
+  SUBCOMMANDS = %w(create)
 
   def run_command
     if request.options["help"]
