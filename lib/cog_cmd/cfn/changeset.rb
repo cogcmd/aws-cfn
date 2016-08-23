@@ -1,12 +1,13 @@
 #!/usr/bin/env ruby
 
-require 'cog/command'
 require_relative 'helpers'
 require_relative 'exceptions'
 require_relative 'changeset/create'
 require_relative 'changeset/delete'
 require_relative 'changeset/list'
 require_relative 'changeset/show'
+require_relative 'changeset/apply'
+
 class CogCmd::Cfn::Changeset < Cog::Command
 
   include CogCmd::Cfn::Helpers
@@ -25,7 +26,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
     --help, -h    Show usage
   END
 
-  SUBCOMMANDS = %w(create delete list show)
+  SUBCOMMANDS = %w(create delete list show apply)
 
   def run_command
     if request.options["help"]
@@ -71,6 +72,10 @@ class CogCmd::Cfn::Changeset < Cog::Command
             List::USAGE
           when "show"
             Show::USAGE
+          when "apply"
+            Apply::USAGE
+          else
+            USAGE
           end
 
     msg = msg.gsub(/^ {4}/, '')
