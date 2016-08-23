@@ -53,6 +53,45 @@ commands:
     documentation: "cfn:show <stack> - show details for CloudFormation stack with name <stack>"
     rules:
     - "must have cfn:view"
+  changeset:
+    executable: /home/bundle/cog-command
+    description: "Manage CloudFormation changesets"
+    documentation: "cfn:changeset <subcommand> [options] - Manage CloudFormation changesets"
+    options:
+      help:
+        type: bool
+        required: false
+        short_flag: h
+      param:
+        type: list
+        required: false
+        short_flag: p
+      tag:
+        type: list
+        required: false
+        short_flag: t
+      template:
+        type: string
+        required: false
+        short_flag: m
+      notify:
+        type: list
+        required: false
+        short_flag: n
+      capabilities:
+        type: list
+        required: false
+        short_flag: c
+      description:
+        type: string
+        required: false
+        short_flag: d
+      changeset-name:
+        type: string
+        required: false
+    rules:
+      - "must have cfn:update"
 permissions:
   - cfn:view
   - cfn:create
+  - cfn:update
