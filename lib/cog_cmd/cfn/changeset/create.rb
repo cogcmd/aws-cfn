@@ -11,7 +11,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
       --notify, -n "NotifyArn"                (Can be specified multiple times)
       --capabilities, -c <iam | named_iam>
       --description, -d "Description"
-      --changeset-name "ChangesetName"        (Defaults to 'changeset<num>')
+      --change-set-name "ChangeSetName"        (Defaults to 'change-set<num>')
 
     Examples:
       cfn:changeset create mystack --param "Key1=Value1" --param "Key2=Value2"
@@ -23,7 +23,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
     stack_name = request.args[1]
 
     changesets = client.list_change_sets({ stack_name: stack_name }).summaries
-    changeset_name = request.options['changeset-name'] || "changeset#{changesets.length}"
+    changeset_name = request.options['change-set-name'] || "change-set#{changesets.length}"
     # Checking the template name and setting it accordingly. If a user passes 'UsePreviousTemplate' they
     # should get their expected results now.
     scanner = StringScanner.new(request.options['template'] || '')

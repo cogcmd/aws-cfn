@@ -1,7 +1,7 @@
 class CogCmd::Cfn::Changeset < Cog::Command
   module Show
     USAGE = <<-END.gsub(/^ {4}/, '')
-    Usage: cfn:changeset show <changeset id> | <changeset name> <stack name>
+    Usage: cfn:changeset show <change set id> | <change set name> <stack name>
     END
   end
 

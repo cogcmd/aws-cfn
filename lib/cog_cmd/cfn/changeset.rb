@@ -15,10 +15,10 @@ class CogCmd::Cfn::Changeset < Cog::Command
 
   Subcommands:
     create <stack name>
-    delete <changeset id> | <changeset name> <stack name>
+    delete <change set id> | <change set name> <stack name>
     list <stack name>
-    show <changeset id> | <changeset name> <stack name>
-    apply <changeset id> | <changeset name> <stack name>
+    show <change set id> | <change set name> <stack name>
+    apply <change set id> | <change set name> <stack name>
 
   Options:
     --help, -h    Show usage

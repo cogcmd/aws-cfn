@@ -1,7 +1,7 @@
 class CogCmd::Cfn::Changeset < Cog::Command
   module Delete
     USAGE = <<-END.gsub(/^ {4}/, '')
-    Usage: cfn:changeset delete <changeset id> | <changeset name> <stack name>
+    Usage: cfn:changeset delete <change set id> | <change set name> <stack name>
     END
   end
 
@@ -16,7 +16,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
     client.delete_change_set(cs_params)
 
     { status: "deleted",
-      changeset_name_or_id: request.args[1],
+      change_set_name_or_id: request.args[1],
       stack_name: request.args[2] }
   end
 

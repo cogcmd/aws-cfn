@@ -1,7 +1,7 @@
 class CogCmd::Cfn::Changeset < Cog::Command
   module Apply
     USAGE = <<-END.gsub(/^ {4}/, '')
-    Usage: cfn:changeset apply <changeset id> | <changeset name> <stack name>
+    Usage: cfn:changeset apply <change set id> | <change set name> <stack name>
     END
   end
 
@@ -15,7 +15,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
 
     client.execute_change_set(cs_params)
     { status: "applied" ,
-      changeset_name_or_id: request.args[1],
+      change_set_name_or_id: request.args[1],
       stack_name: request.args[2] }
   end
 end
