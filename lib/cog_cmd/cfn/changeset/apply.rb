@@ -2,6 +2,10 @@ class CogCmd::Cfn::Changeset < Cog::Command
   module Apply
     USAGE = <<-END.gsub(/^ {4}/, '')
     Usage: cfn:changeset apply <change set id> | <change set name> <stack name>
+
+    Apply a changeset to a stack. Returns a map with status set to "applied" along with the change set name AND stack name OR the change set id, depending on which was provided to apply.
+
+    Note: This command returns the same regardless of success or failure. Use the cfn:event command to view the results of the apply.
     END
   end
 

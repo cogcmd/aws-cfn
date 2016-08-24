@@ -15,6 +15,8 @@ class CogCmd::Cfn::Changeset < Cog::Command
 
     Examples:
       cfn:changeset create mystack --param "Key1=Value1" --param "Key2=Value2"
+
+    Returns a map containing the id of the newly created changeset.
     END
 
   end

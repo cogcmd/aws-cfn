@@ -2,6 +2,8 @@ class CogCmd::Cfn::Changeset < Cog::Command
   module Show
     USAGE = <<-END.gsub(/^ {4}/, '')
     Usage: cfn:changeset show <change set id> | <change set name> <stack name>
+
+    Show changeset details. Returns a map equivalent to the response object documented here, http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Client.html#describe_change_set-instance_method
     END
   end
 
