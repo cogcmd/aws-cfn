@@ -31,17 +31,12 @@ class CogCmd::Cfn::Changeset < Cog::Command
     else
       changeset_name = request.options['change-set-name']
     end
-    # Checking the template name and setting it accordingly. If a user passes 'UsePreviousTemplate' they
-    # should get their expected results now.
-    scanner = StringScanner.new(request.options['template'] || '')
-    template_name = scanner.match?(/UsePreviousTemplate/i) ? nil : request.options['template']
 
     cs_params = Hash[
       [
         [ :stack_name, stack_name ],
-        [ :use_previous_template, template_name ? false : true ],
         [ :change_set_name, changeset_name ],
-        param_or_nil([ :template_url, template_url(template_name) ]),
+        process_template(request.options['template']),
         param_or_nil([ :parameters, process_parameters(request.options['param']) ]),
         param_or_nil([ :tags, process_tags(request.options['tag']) ]),
         param_or_nil([ :notification_arns, request.options['notify'] ]),
@@ -51,5 +46,20 @@ class CogCmd::Cfn::Changeset < Cog::Command
     ]
 
     client.create_change_set(cs_params).to_h
+  end
+
+  private
+
+  def process_template(template)
+    # Checking the template name and setting it accordingly. If a user passes 'UsePreviousTemplate' they
+    # should get their expected results now.
+    scanner = StringScanner.new(template || '')
+    template_name = scanner.match?(/UsePreviousTemplate/i) ? nil : request.options['template']
+
+    if template_name
+      [ :template_url, template_url(template_name) ]
+    else
+      [ :use_previous_template, true ]
+    end
   end
 end
