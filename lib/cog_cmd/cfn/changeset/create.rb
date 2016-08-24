@@ -11,7 +11,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
       --notify, -n "NotifyArn"                (Can be specified multiple times)
       --capabilities, -c <iam | named_iam>
       --description, -d "Description"
-      --change-set-name "ChangeSetName"        (Defaults to 'change-set<num>')
+      --change-set-name "ChangeSetName"        (Defaults to 'changeset<num>')
 
     Examples:
       cfn:changeset create mystack --param "Key1=Value1" --param "Key2=Value2"
@@ -27,7 +27,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
     unless request.options['change-set-name']
       # We just need the number of changesets already created so we can postfix the changeset name
       num_of_changesets = client.list_change_sets({ stack_name: stack_name }).summaries.length
-      changeset_name = "change-set#{num_of_changesets}"
+      changeset_name = "changeset#{num_of_changesets}"
     else
       changeset_name = request.options['change-set-name']
     end
