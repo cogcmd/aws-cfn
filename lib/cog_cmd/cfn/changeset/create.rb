@@ -22,8 +22,15 @@ class CogCmd::Cfn::Changeset < Cog::Command
   def create(client, request)
     stack_name = request.args[1]
 
-    changesets = client.list_change_sets({ stack_name: stack_name }).summaries
-    changeset_name = request.options['change-set-name'] || "change-set#{changesets.length}"
+    # If the user doesn't specify a change-set-name then we generate one based on the number
+    # of changesets already created.
+    unless request.options['change-set-name']
+      # We just need the number of changesets already created so we can postfix the changeset name
+      num_of_changesets = client.list_change_sets({ stack_name: stack_name }).summaries.length
+      changeset_name = "change-set#{num_of_changesets}"
+    else
+      changeset_name = request.options['change-set-name']
+    end
     # Checking the template name and setting it accordingly. If a user passes 'UsePreviousTemplate' they
     # should get their expected results now.
     scanner = StringScanner.new(request.options['template'] || '')
