@@ -47,7 +47,7 @@ module CogCmd::Cfn::Helpers
     param
   end
 
-  def get_parameters(params)
+  def process_parameters(params)
     return unless params
     params.map do |p|
       param = p.strip.split("=")
@@ -56,7 +56,7 @@ module CogCmd::Cfn::Helpers
     end
   end
 
-  def get_tags(tags)
+  def process_tags(tags)
     return unless tags
     tags.map do |t|
       tag = t.strip.split("=")
@@ -65,7 +65,7 @@ module CogCmd::Cfn::Helpers
     end
   end
 
-  def get_on_failure(on_failure)
+  def process_on_failure(on_failure)
     return unless on_failure
 
     case on_failure.upcase
@@ -82,7 +82,7 @@ module CogCmd::Cfn::Helpers
     end
   end
 
-  def get_capabilities(capabilities)
+  def process_capabilities(capabilities)
     return unless capabilities
 
     capabilities.map { |c| capability(c) }.compact

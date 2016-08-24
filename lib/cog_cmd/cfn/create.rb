@@ -48,13 +48,13 @@ END
       [
         [ :stack_name, request.args[0] ],
         [ :template_url, template_url(request.args[1]) ],
-        param_or_nil([ :parameters, get_parameters(request.options["param"]) ]),
-        param_or_nil([ :tags, get_tags(request.options["tag"]) ]),
+        param_or_nil([ :parameters, process_parameters(request.options["param"]) ]),
+        param_or_nil([ :tags, process_tags(request.options["tag"]) ]),
         param_or_nil([ :stack_policy_url, policy_url(request.options["policy"]) ]),
         param_or_nil([ :notification_arns, request.options["notify"] ]),
-        param_or_nil([ :on_failure, get_on_failure(request.options["on-failure"]) ]),
+        param_or_nil([ :on_failure, process_on_failure(request.options["on-failure"]) ]),
         param_or_nil([ :timeout_in_minutes, request.options["timeout"] ]),
-        param_or_nil([ :capabilities, get_capabilities(request.options["capabilities"]) ])
+        param_or_nil([ :capabilities, process_capabilities(request.options["capabilities"]) ])
       ].compact
     ]
 

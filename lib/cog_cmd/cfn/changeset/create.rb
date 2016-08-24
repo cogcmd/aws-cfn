@@ -35,10 +35,10 @@ class CogCmd::Cfn::Changeset < Cog::Command
         [ :use_previous_template, template_name ? false : true ],
         [ :change_set_name, changeset_name ],
         param_or_nil([ :template_url, template_url(template_name) ]),
-        param_or_nil([ :parameters, get_parameters(request.options['param']) ]),
-        param_or_nil([ :tags, get_tags(request.options['tag']) ]),
+        param_or_nil([ :parameters, process_parameters(request.options['param']) ]),
+        param_or_nil([ :tags, process_tags(request.options['tag']) ]),
         param_or_nil([ :notification_arns, request.options['notify'] ]),
-        param_or_nil([ :capabilities, get_capabilities(request.options['capabilities']) ]),
+        param_or_nil([ :capabilities, process_capabilities(request.options['capabilities']) ]),
         param_or_nil([ :description, request.options['description'] ])
       ].compact
     ]
