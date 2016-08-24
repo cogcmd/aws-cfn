@@ -42,8 +42,11 @@ class CogCmd::Cfn::Changeset < Cog::Command
     begin
       if SUBCOMMANDS.include?(request.args[0])
         execute_request(request.args[0].to_sym)
-      else
+      elsif request.args[0] == nil
         raise CogCmd::Cfn::ArgumentError, "A subcommand must be specified."
+      else
+        msg = "Unknown subcommand '#{request.args[0]}'. Please specify one of '#{SUBCOMMANDS.join(', ')}'."
+        raise CogCmd::Cfn::ArgumentError, msg
       end
     rescue CogCmd::Cfn::ArgumentError => error
       usage(request.args[0], error)
@@ -69,20 +72,12 @@ class CogCmd::Cfn::Changeset < Cog::Command
   # message. If an error message is passed the command is aborted, otherwise it returns
   # normally.
   def usage(usage_for, err_msg = nil)
-    msg = case usage_for
-          when "create"
-            Create::USAGE
-          when "delete"
-            Delete::USAGE
-          when "list"
-            List::USAGE
-          when "show"
-            Show::USAGE
-          when "apply"
-            Apply::USAGE
-          else
-            USAGE
-          end
+
+    if SUBCOMMANDS.include?(usage_for)
+      msg = Object.const_get("CogCmd::Cfn::Changeset::#{usage_for.capitalize}::USAGE")
+    else
+      msg = USAGE
+    end
 
     if err_msg
       # TODO: When we get templates back up and running we need to move the
