@@ -6,12 +6,10 @@ class CogCmd::Cfn::Changeset < Cog::Command
   end
 
   def delete(client, request)
-    cs_params = Hash[
-      [
-        [ :change_set_name, request.args[1] ],
-        param_or_nil([ :stack_name, request.args[2] ])
-      ].compact
-    ]
+    cs_params = { change_set_name: request.args[1] }
+    if stack_name = request.args[2]
+      cs_params[:stack_name] = stack_name
+    end
 
     client.delete_change_set(cs_params)
 
