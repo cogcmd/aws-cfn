@@ -85,11 +85,14 @@ class CogCmd::Cfn::Changeset < Cog::Command
           end
 
     if err_msg
+      # TODO: When we get templates back up and running we need to move the
+      # formatting we are doing here into said template.
       response['body'] = "```#{msg}```\n#{error(err_msg)}"
       # Abort if there is an error message
       response.abort
     else
       # Otherwise usage was requested, so just return it
+      # TODO: Ditto about moving formatting to the template.
       response['body'] = "```#{msg}```"
     end
   end
