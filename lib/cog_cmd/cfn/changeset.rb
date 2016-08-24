@@ -50,6 +50,8 @@ class CogCmd::Cfn::Changeset < Cog::Command
       end
     rescue CogCmd::Cfn::ArgumentError => error
       usage(request.args[0], error)
+    rescue Aws::CloudFormation::Errors::ChangeSetNotFound => error
+      fail(error)
     rescue Aws::CloudFormation::Errors::ValidationError => error
       fail(error)
     end
