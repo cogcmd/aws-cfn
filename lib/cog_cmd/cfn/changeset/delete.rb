@@ -3,7 +3,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
     USAGE = <<-END.gsub(/^ {4}/, '')
     Usage: cfn:changeset delete <change set id> | <change set name> <stack name>
 
-    Delete a changeset. Returns a map with the status "deleted" along with the change set name AND stack name OR the change set id, depending on which was provided to apply.
+    Delete a changeset. Returns a map with containing the change set name AND stack name OR the change set id, depending on which was provided to apply.
 
     Note: This command returns the same regardless of success or failure. Use the cfn:event command to view the results of the delete.
     END
@@ -17,7 +17,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
 
     client.delete_change_set(cs_params)
 
-    { status: "deleted",
+    { status: "delete initiated",
       change_set_name_or_id: request.args[1],
       stack_name: request.args[2] }
   end
