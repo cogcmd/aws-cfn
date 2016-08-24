@@ -58,13 +58,6 @@ class CogCmd::Cfn::Changeset < Cog::Command
   end
 
   def execute_request(method)
-    # We verify that we have at least the first arg. All subcommands require
-    # at least one argument. If we don't have it, we raise and abort returning
-    # usage info.
-    unless request.args[1]
-      raise CogCmd::Cfn::ArgumentError, "Missing required arguments."
-    end
-
     resp = self.send(method, Aws::CloudFormation::Client.new(), request)
     response.content = resp
   end

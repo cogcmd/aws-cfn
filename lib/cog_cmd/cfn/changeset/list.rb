@@ -8,6 +8,10 @@ class CogCmd::Cfn::Changeset < Cog::Command
   end
 
   def list(client, request)
+    unless request.args[1]
+      raise CogCmd::Cfn::ArgumentError, "You must specify the stack name."
+    end
+
     stack_name = request.args[1]
 
     changesets = client.list_change_sets({ stack_name: stack_name })

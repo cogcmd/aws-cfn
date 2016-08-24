@@ -22,6 +22,10 @@ class CogCmd::Cfn::Changeset < Cog::Command
   end
 
   def create(client, request)
+    unless request.args[1]
+      raise CogCmd::Cfn::ArgumentError, "You must specify the stack name."
+    end
+
     stack_name = request.args[1]
 
     # If the user doesn't specify a change-set-name then we generate one based on the number
