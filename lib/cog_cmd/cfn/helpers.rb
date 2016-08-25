@@ -13,6 +13,9 @@ if ENV['AWS_STS_ROLE_ARN']
 end
 
 module CogCmd::Cfn::Helpers
+
+  DOCUMENTATION_URL = "https://github.com/cogcmd/aws-cfn"
+
   def strip_prefix(str)
     str.sub(template_root[:prefix], "")
   end
@@ -91,6 +94,14 @@ module CogCmd::Cfn::Helpers
 
   def error(msg)
     "cfn: Error: #{msg}"
+  end
+
+  def access_denied_msg
+    <<-END.gsub(/^ {3}|\n/, '')
+    Access Denied. Make sure that you have the proper permissions with AWS
+    to create a CloudFormation stack, and that your credentials have been
+    configured properly with Cog. #{DOCUMENTATION_URL}#configuration
+    END
   end
 
   private

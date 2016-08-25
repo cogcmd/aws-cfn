@@ -15,49 +15,50 @@ class Cog
     # that bit if we move aggregate command up to cog-rb.
     include CogCmd::Cfn::Helpers
 
+    def initialize
+      @subcommand_string = request.args.shift
+      @subcommands = self.class.const_get("SUBCOMMANDS")
+    end
+
     # Since Cog::AggregateCommand inherits from Cog::Command we define run_command
     # run_command is invoked when the command in executed.
     def run_command
-      # First we check to see if the user is requesting usage info. If they are
-      # then we don't even bother running the command, we just return usage.
-      if request.options['help']
-        usage
-      else
-        prepare_and_run
-      end
-    end
-
-    private
-
-    def prepare_and_run
-      subcommand = request.args.shift
-      subcommands = self.class.const_get("SUBCOMMANDS")
-
       begin
-        # If the subcommand is valid then we save the class in @subcommand
-        # and call 'run_subcommand'. 'run_subcommand' should be defined in
-        # the child class.
-        if subcommands.include?(subcommand)
-          subcommand_class = subcommand.gsub(/(\A|_)([a-z])/) { $2.upcase }
-          @subcommand = self.class.const_get(subcommand_class)
-          run_subcommand
+        # If the subcommand is valid then we call either call 'run_subcommand'
+        # or, if the user requested it, get the usage info for the subcommand.
+        # 'run_subcommand' should be defined in the child class.
+        if create_subcommand_class
+          request.options['help'] ? usage : run_subcommand
         # If there are no arguments we throw an argument error
-        elsif subcommand == nil
+        elsif @subcommand_string == nil
           raise CogCmd::Cfn::ArgumentError, "A subcommand must be specified."
         # If the subcommand is unknown, we throw an argument error
         else
-          msg = "Unknown subcommand '#{subcommand}'. Please specify one of '#{subcommands.join(', ')}'."
+          msg = "Unknown subcommand '#{subcommand}'. Please specify one of '#{@subcommands.join(', ')}'."
           raise CogCmd::Cfn::ArgumentError, msg
         end
-      # Argument errors are rescued here so we can show the usage message along with
+      # Argument errors are rescued here so we can show the usage a message along with
       # the error.
       rescue CogCmd::Cfn::ArgumentError => error
         usage(error)
       end
     end
 
+    private
+
     def subcommand
       @subcommand_inst ||= @subcommand.new(request)
+    end
+
+    def create_subcommand_class
+      @subcommand = nil
+
+      if @subcommands.include?(@subcommand_string)
+        subcommand_class = @subcommand_string.gsub(/(\A|_)([a-z])/) { $2.upcase }
+        @subcommand = self.class.const_get(subcommand_class)
+      end
+
+      @subcommand
     end
 
     # usage accepts an optional error message. If an error message is passed
