@@ -1,7 +1,10 @@
+require_relative 'helpers'
 require_relative 'exceptions'
 
 class Cog
   class AggregateCommand < Cog::Command
+
+    include CogCmd::Cfn::Helpers
 
     def initialize
       subcommand = request.args.shift
