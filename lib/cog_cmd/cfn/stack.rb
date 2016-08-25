@@ -15,14 +15,15 @@ class CogCmd::Cfn::Stack < Cog::AggregateCommand
     list
     show <stack name>
     delete <stack name>
+
+  Options:
+    --help, -h     Show usage
   END
 
   def run_subcommand
     begin
       resp = subcommand.run
       response.content = resp
-    rescue CogCmd::Cfn::ArgumentError => error
-      usage(error)
     rescue Aws::CloudFormation::Errors::ValidationError => error
       fail(error)
     rescue Aws::CloudFormation::Errors::AccessDenied
