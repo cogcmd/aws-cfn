@@ -17,6 +17,10 @@ commands:
     executable: /home/bundle/cog-command
     description: "Manage CloudFormation stacks"
     options:
+      help:
+        type: bool
+        required: false
+        short_flag: h
       param:
         type: list
         required: false
