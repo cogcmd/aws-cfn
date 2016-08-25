@@ -1,13 +1,11 @@
 require_relative 'aggregate_command'
 require_relative 'subcommand'
-require_relative 'stack/create'
-require_relative 'stack/list'
 
 class CogCmd::Cfn::Stack < Cog::AggregateCommand
 
   DOCUMENTATION_URL = "https://github.com/cogcmd/aws-cfn"
 
-  SUBCOMMANDS = %w(create list)
+  SUBCOMMANDS = %w(create list show)
 
   USAGE = <<-END.gsub(/^ {2}/, '')
   Usage: cfn:stack <subcommand> [options]
@@ -15,6 +13,7 @@ class CogCmd::Cfn::Stack < Cog::AggregateCommand
   Subcommands:
     create <stack name>
     list
+    show <stack name>
   END
 
   def run_subcommand
@@ -36,3 +35,7 @@ class CogCmd::Cfn::Stack < Cog::AggregateCommand
   end
 
 end
+
+require_relative 'stack/create'
+require_relative 'stack/list'
+require_relative 'stack/show'
