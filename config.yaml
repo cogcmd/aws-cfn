@@ -21,6 +21,9 @@ commands:
         type: bool
         required: false
         short_flag: h
+      filter:
+        type: list
+        required: false
       param:
         type: list
         required: false
