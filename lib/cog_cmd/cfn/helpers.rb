@@ -1,5 +1,6 @@
 require 'aws-sdk'
 require 'cog/command'
+require_relative 'exceptions'
 
 # If an AWS STS ROLE is defined, configure the AWS SDK to assume it
 if ENV['AWS_STS_ROLE_ARN']
@@ -112,11 +113,19 @@ module CogCmd::Cfn::Helpers
   end
 
   def cfn_template_url
-    append_slash(env_var("CFN_TEMPLATE_URL", required: true))
+    if template_url = ENV['CFN_TEMPLATE_URL']
+      append_slash(template_url)
+    else
+      raise CogCmd::Cfn::EnvVarError, "Required environment variable 'CFN_TEMPLATE_URL' missing"
+    end
   end
 
   def cfn_policy_url
-    append_slash(env_var("CFN_POLICY_URL", required: true))
+    if policy_url = ENV['CFN_POLICY_URL']
+      append_slash(policy_url)
+    else
+      raise CogCmd::Cfn::EnvVarError, "Required environment variable 'CFN_POLICY_URL' missing"
+    end
   end
 
   # So things will be consitant we add a slash to the end of cfn urls if one
