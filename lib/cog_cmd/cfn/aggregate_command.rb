@@ -20,8 +20,10 @@ class Cog
     def run_command
       if request.options['help']
         usage
-      else
+      elsif @subcommand
         run_subcommand
+      else
+        usage("You must specify a subcommand")
       end
     end
 
