@@ -24,6 +24,9 @@ commands:
       filter:
         type: list
         required: false
+      limit:
+        type: int
+        required: false
       param:
         type: list
         required: false

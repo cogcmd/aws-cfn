@@ -9,6 +9,7 @@ class CogCmd::Cfn::Stack::List < Cog::SubCommand
 
   Options:
     --filter "status filter"    (Can be specified multiple times) (Defaults to 'ACTIVE')
+    --limit <int>
 
   Notes:
     The filter string can be one or more cloudformation stack status strings which include:
@@ -37,7 +38,11 @@ class CogCmd::Cfn::Stack::List < Cog::SubCommand
 
     stack_summaries = cloudform.list_stacks(cf_params).stack_summaries
 
-    stack_summaries.map(&:to_h)
+    if limit = request.options['limit'].to_i
+      stack_summaries.slice(0, limit).map(&:to_h)
+    else
+      stack_summaries.map(&:to_h)
+    end
   end
 
   private
