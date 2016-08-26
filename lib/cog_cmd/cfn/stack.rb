@@ -3,7 +3,7 @@ require_relative 'subcommand'
 
 class CogCmd::Cfn::Stack < Cog::AggregateCommand
 
-  SUBCOMMANDS = %w(create list show delete)
+  SUBCOMMANDS = %w(create list show delete event)
 
   USAGE = <<-END.gsub(/^ {2}/, '')
   Usage: cfn:stack <subcommand> [options]
@@ -13,6 +13,7 @@ class CogCmd::Cfn::Stack < Cog::AggregateCommand
     list
     show <stack name>
     delete <stack name>
+    event <stack name>
 
   Options:
     --help, -h     Show usage
@@ -35,3 +36,4 @@ require_relative 'stack/create'
 require_relative 'stack/list'
 require_relative 'stack/show'
 require_relative 'stack/delete'
+require_relative 'stack/event'
