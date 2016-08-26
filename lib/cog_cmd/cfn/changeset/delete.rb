@@ -5,7 +5,7 @@ class CogCmd::Cfn::Changeset < Cog::Command
 
     Delete a changeset. Returns a map with containing the change set name AND stack name OR the change set id, depending on which was provided to apply.
 
-    Note: This command returns the same regardless of success or failure. Use the cfn:event command to view the results of the delete.
+    Note: This command returns the same regardless of success or failure. Use the 'cfn:stack event' command to view the results of the delete.
     END
   end
 

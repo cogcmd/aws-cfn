@@ -12,11 +12,21 @@ commands:
     description: "List available CloudFormation templates"
     documentation: "cfn:template list - list available CloudFormation templates"
     rules:
-    - "must have cfn:view"
-  create:
+    - "must have cfn:template"
+  stack:
     executable: /home/bundle/cog-command
-    description: "Deploy a new CloudFormation stack using an existing Template"
+    description: "Manage CloudFormation stacks"
     options:
+      help:
+        type: bool
+        required: false
+        short_flag: h
+      filter:
+        type: list
+        required: false
+      limit:
+        type: int
+        required: false
       param:
         type: list
         required: false
@@ -46,13 +56,7 @@ commands:
         required: false
         short_flag: c
     rules:
-      - "must have cfn:create"
-  show:
-    executable: /home/bundle/cog-command
-    description: "Show details of a CloudFormation stack"
-    documentation: "cfn:show <stack> - show details for CloudFormation stack with name <stack>"
-    rules:
-    - "must have cfn:view"
+      - "must have cfn:stack"
   changeset:
     executable: /home/bundle/cog-command
     description: "Manage CloudFormation changesets"
@@ -90,8 +94,8 @@ commands:
         type: string
         required: false
     rules:
-      - "must have cfn:update"
+      - "must have cfn:changeset"
 permissions:
-  - cfn:view
-  - cfn:create
-  - cfn:update
+  - cfn:stack
+  - cfn:changeset
+  - cfn:template
