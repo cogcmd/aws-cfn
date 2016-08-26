@@ -34,7 +34,7 @@ class Cog
           raise CogCmd::Cfn::ArgumentError, "A subcommand must be specified."
         # If the subcommand is unknown, we throw an argument error
         else
-          msg = "Unknown subcommand '#{subcommand}'. Please specify one of '#{@subcommands.join(', ')}'."
+          msg = "Unknown subcommand '#{@subcommand_string}'. Please specify one of '#{@subcommands.join(', ')}'."
           raise CogCmd::Cfn::ArgumentError, msg
         end
       # Argument errors are rescued here so we can show the usage a message along with
@@ -47,26 +47,26 @@ class Cog
     private
 
     def subcommand
-      @subcommand_inst ||= @subcommand.new(request)
+      @subcommand_inst ||= @subcommand_class.new(request)
     end
 
     def create_subcommand_class
-      @subcommand = nil
+      @subcommand_class = nil
 
       if @subcommands.include?(@subcommand_string)
         subcommand_class = @subcommand_string.gsub(/(\A|_)([a-z])/) { $2.upcase }
-        @subcommand = self.class.const_get(subcommand_class)
+        @subcommand_class = self.class.const_get(subcommand_class)
       end
 
-      @subcommand
+      @subcommand_class
     end
 
     # usage accepts an optional error message. If an error message is passed
     # then we abort. If an error is not passed we assume the user requested
     # the usage info and carry on as normal.
     def usage(err_msg = nil)
-      if @subcommand
-        msg = @subcommand.const_defined?(:USAGE) ? @subcommand::USAGE : ''
+      if @subcommand_class
+        msg = @subcommand_class.const_defined?(:USAGE) ? @subcommand_class::USAGE : ''
       else
         msg = self.class.const_defined?(:USAGE) ? self.class::USAGE : ''
       end
