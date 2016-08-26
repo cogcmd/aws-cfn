@@ -7,6 +7,8 @@ class CogCmd::Cfn::Stack::List < Cog::SubCommand
   USAGE = <<-END.gsub(/^ {2}/, '')
   Usage: cfn:stack list [options]
 
+  List stack summaries
+
   Options:
     --filter "status filter"    (Can be specified multiple times) (Defaults to 'ACTIVE')
     --limit <int>
@@ -17,8 +19,6 @@ class CogCmd::Cfn::Stack::List < Cog::SubCommand
 
     Additionally a few special filter strings that correspond to a subset of the standard filter strings may be used:
     ACTIVE, COMPLETE, FAILED, DELETED, IN_PROGRESS
-
-  Returns a list of stack summaries.
   END
 
   SPECIAL_FILTERS = %w(ACTIVE COMPLETE FAILED DELETED IN_PROGRESS)

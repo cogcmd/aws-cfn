@@ -7,11 +7,14 @@ class CogCmd::Cfn::Template < Cog::AggregateCommand
   SUBCOMMANDS = %w(list show)
 
   USAGE = <<-END.gsub(/^ {2}/, '')
-  Usage: cfn:template <subcommand>
+  Usage: cfn:template <subcommand> [options]
 
   Subcommands:
     list
     show <template name> | -s <stack name>
+
+  Options:
+    --help, -h     Show Usage
   END
 
   def run_subcommand
