@@ -3,9 +3,12 @@ cog_bundle_version: 3
 name: cfn
 description: "AWS CloudFormation"
 version: "0.0.5"
+docker:
+  image: cogcmd/aws-cfn
+  tag: "0.0.5"
 commands:
   template:
-    executable: /Users/mpeck/op/cogcmds/aws-cfn/cog-command
+    executable: /home/bundle/cog-command
     description: "List available CloudFormation templates"
     documentation: "cfn:template list - list available CloudFormation templates"
     options:
@@ -20,7 +23,7 @@ commands:
     rules:
     - "must have cfn:template"
   stack:
-    executable: /Users/mpeck/op/cogcmds/aws-cfn/cog-command
+    executable: /home/bundle/cog-command
     description: "Manage CloudFormation stacks"
     options:
       help:
@@ -64,7 +67,7 @@ commands:
     rules:
       - "must have cfn:stack"
   changeset:
-    executable: /Users/mpeck/op/cogcmds/aws-cfn/cog-command
+    executable: /home/bundle/cog-command
     description: "Manage CloudFormation changesets"
     documentation: "cfn:changeset <subcommand> [options] - Manage CloudFormation changesets"
     options:
