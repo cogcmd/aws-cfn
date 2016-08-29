@@ -5,7 +5,7 @@ class CogCmd::Cfn::Changeset::Show < Cog::SubCommand
   USAGE = <<~END
   Usage: cfn:changeset show <change set id> | <change set name> <stack name>
 
-  Show changeset details. Returns a map equivalent to the response object documented here, http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Client.html#describe_change_set-instance_method
+  Shows changeset details. Returns a map equivalent to the response object documented here, http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Client.html#describe_change_set-instance_method
   END
 
   def run(client)

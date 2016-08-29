@@ -8,7 +8,7 @@ class CogCmd::Cfn::Stack::Show < Cog::SubCommand
   USAGE = <<~END
   Usage: cfn:stack show <stack name>
 
-  Returns the specified stack.
+  Shows details for a stack. Returns the specified stack.
   END
 
   def run

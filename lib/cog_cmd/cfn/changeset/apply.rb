@@ -4,7 +4,7 @@ class CogCmd::Cfn::Changeset::Apply < Cog::SubCommand
   USAGE = <<~END
   Usage: cfn:changeset apply <change set id> | <change set name> <stack name>
 
-  Apply a changeset to a stack. Returns a map containing the change set name AND stack name OR the change set id, depending on which was provided to apply.
+  Applies a changeset to a stack. Returns a map containing the change set name AND stack name OR the change set id, depending on which was provided to apply.
 
   Note: This command returns the same regardless of success or failure. Use the 'cfn:stack event' command to view the results of the apply.
   END

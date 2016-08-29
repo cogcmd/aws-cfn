@@ -7,7 +7,7 @@ class CogCmd::Cfn::Template::List < Cog::SubCommand
   USAGE = <<~END
   Usage: cfn:template list
 
-  Returns the list of templates in the configured s3 bucket.
+  Lists cloudformation templates in the configured s3 bucket.
   END
 
   def run

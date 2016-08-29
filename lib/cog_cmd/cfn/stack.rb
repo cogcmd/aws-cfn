@@ -11,6 +11,8 @@ class CogCmd::Cfn::Stack < Cog::AggregateCommand
   USAGE = <<~END
   Usage: cfn:stack <subcommand> [options]
 
+  Manages stacks.
+
   Subcommands:
     create <stack name> <template name>
     list

@@ -9,6 +9,8 @@ class CogCmd::Cfn::Template < Cog::AggregateCommand
   USAGE = <<~END
   Usage: cfn:template <subcommand> [options]
 
+  Get information on CloudFormation templates.
+
   Subcommands:
     list
     show <template name> | -s <stack name>

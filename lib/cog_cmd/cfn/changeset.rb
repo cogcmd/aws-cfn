@@ -11,6 +11,8 @@ class CogCmd::Cfn::Changeset < Cog::AggregateCommand
   USAGE = <<~END
   Usage: cfn:changeset <subcommand> [options]
 
+  Manages changesets.
+
   Subcommands:
     create <stack name>
     delete <change set id> | <change set name> <stack name>

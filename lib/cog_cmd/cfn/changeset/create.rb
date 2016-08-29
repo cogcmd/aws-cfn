@@ -8,7 +8,7 @@ class CogCmd::Cfn::Changeset::Create < Cog::SubCommand
   USAGE = <<~END
   Usage: cfn:changeset create <stack name> [options]
 
-  Create a changeset for a stack. Returns the changeset
+  Creates a changeset for a stack. Returns a map with changeset details.
 
   Options:
     --param, -p "Key1=Value1"               (Can be specified multiple times)

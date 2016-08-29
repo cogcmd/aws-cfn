@@ -8,6 +8,8 @@ class CogCmd::Cfn::Template::Show < Cog::SubCommand
   USAGE = <<~END
   Usage: cfn:template show <template name> | -s <stack name>
 
+  Shows template data.
+
   Options:
     --stack, -s    Specify a stack name instead of a template name
 

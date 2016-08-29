@@ -5,7 +5,7 @@ class CogCmd::Cfn::Stack::Resource < Cog::SubCommand
   USAGE = <<~END
   Usage: cfn:stack resource <stack name>
 
-  Returns the list of stack resources.
+  Lists stack resources. Returns the list of stack resources.
   END
 
   def run

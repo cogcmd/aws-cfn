@@ -6,7 +6,7 @@ class CogCmd::Cfn::Stack::Template < Cog::SubCommand
   USAGE = <<~END
   Usage: cfn:stack template <stack name>
 
-  Returns the template body for the specified stack.
+  Shows the template for a stack. Returns the template body for the specified stack.
   END
 
   def run

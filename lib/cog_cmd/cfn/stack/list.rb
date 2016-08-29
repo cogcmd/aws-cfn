@@ -7,7 +7,7 @@ class CogCmd::Cfn::Stack::List < Cog::SubCommand
   USAGE = <<~END
   Usage: cfn:stack list [options]
 
-  List stack summaries
+  Lists stack summaries.
 
   Options:
     --filter "status filter"    (Can be specified multiple times) (Defaults to 'ACTIVE')
