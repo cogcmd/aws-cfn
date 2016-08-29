@@ -1,12 +1,17 @@
 require_relative 'aggregate_command'
 require_relative 'subcommand'
+require_relative 'helpers'
 
 class CogCmd::Cfn::Stack < Cog::AggregateCommand
 
-  SUBCOMMANDS = %w(create list show delete event resource)
+  include CogCmd::Cfn::Helpers
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  SUBCOMMANDS = %w(create list show delete event resource template)
+
+  USAGE = <<~END
   Usage: cfn:stack <subcommand> [options]
+
+  Manages stacks.
 
   Subcommands:
     create <stack name> <template name>
@@ -15,6 +20,7 @@ class CogCmd::Cfn::Stack < Cog::AggregateCommand
     delete <stack name>
     event <stack name>
     resource <stack name>
+    template <stack name>
 
   Options:
     --help, -h     Show usage
@@ -39,3 +45,4 @@ require_relative 'stack/show'
 require_relative 'stack/delete'
 require_relative 'stack/event'
 require_relative 'stack/resource'
+require_relative 'stack/template'

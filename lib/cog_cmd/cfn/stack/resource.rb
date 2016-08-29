@@ -2,10 +2,10 @@ require_relative '../exceptions'
 
 class CogCmd::Cfn::Stack::Resource < Cog::SubCommand
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:stack resource <stack name>
 
-  Returns the list of stack resources.
+  Lists stack resources. Returns the list of stack resources.
   END
 
   def run

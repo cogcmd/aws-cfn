@@ -5,10 +5,10 @@ class CogCmd::Cfn::Stack::Create < Cog::SubCommand
 
   include CogCmd::Cfn::Helpers
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:stack create <stack name> <template name> [options]
 
-  Creates a new stack based on an existing template
+  Creates a new stack based on an existing template and returns the newly created stack.
 
   Options:
     --param, -p "Key1=Value1"                   (Can be specified multiple times)
@@ -18,8 +18,6 @@ class CogCmd::Cfn::Stack::Create < Cog::SubCommand
     --on-failure, -f <rollback | delete | keep>
     --timeout, -e <minutes>
     --capabilities, -c <iam | named_iam>
-
-  Returns the newly created stack.
   END
 
   def run

@@ -2,7 +2,7 @@ require_relative '../exceptions'
 
 class CogCmd::Cfn::Stack::Delete < Cog::SubCommand
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:stack delete <stack name>
 
   Deletes a stack. Returns a map with the stack name and status.
