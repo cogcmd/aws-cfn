@@ -2,7 +2,7 @@ require_relative '../exceptions'
 
 class CogCmd::Cfn::Changeset::Delete < Cog::SubCommand
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:changeset delete <change set id> | <change set name> <stack name>
 
   Delete a changeset. Returns a map with containing the change set name AND stack name OR the change set id, depending on which was provided to apply.

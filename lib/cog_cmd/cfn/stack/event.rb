@@ -2,7 +2,7 @@ require_relative '../exceptions'
 
 class CogCmd::Cfn::Stack::Event < Cog::SubCommand
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:stack event <stack name>
 
   Returns all stack related events for a specified stack in reverse chronological order.

@@ -8,7 +8,7 @@ class CogCmd::Cfn::Stack < Cog::AggregateCommand
 
   SUBCOMMANDS = %w(create list show delete event resource template)
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:stack <subcommand> [options]
 
   Subcommands:

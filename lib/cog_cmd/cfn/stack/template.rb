@@ -3,7 +3,7 @@ require_relative '../exceptions'
 
 class CogCmd::Cfn::Stack::Template < Cog::SubCommand
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:stack template <stack name>
 
   Returns the template body for the specified stack.

@@ -6,7 +6,7 @@ class CogCmd::Cfn::Template < Cog::AggregateCommand
 
   SUBCOMMANDS = %w(list show)
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:template <subcommand> [options]
 
   Subcommands:

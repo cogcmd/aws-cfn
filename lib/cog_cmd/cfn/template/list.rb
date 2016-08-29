@@ -4,7 +4,7 @@ class CogCmd::Cfn::Template::List < Cog::SubCommand
 
   include CogCmd::Cfn::Helpers
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:template list
 
   Returns the list of templates in the configured s3 bucket.

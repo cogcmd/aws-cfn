@@ -5,7 +5,7 @@ class CogCmd::Cfn::Stack::Show < Cog::SubCommand
 
   include CogCmd::Cfn::Helpers
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:stack show <stack name>
 
   Returns the specified stack.

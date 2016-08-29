@@ -5,7 +5,7 @@ class CogCmd::Cfn::Changeset::Create < Cog::SubCommand
 
   include CogCmd::Cfn::Helpers
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:changeset create <stack name> [options]
 
   Create a changeset for a stack. Returns the changeset

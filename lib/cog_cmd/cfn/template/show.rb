@@ -5,11 +5,11 @@ class CogCmd::Cfn::Template::Show < Cog::SubCommand
 
   include CogCmd::Cfn::Helpers
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:template show <template name> | -s <stack name>
 
   Options:
-    --stack, -s    "Specify a stack name instead of a template name"
+    --stack, -s    Specify a stack name instead of a template name
 
   Example:
     cfn:template show mytemplate

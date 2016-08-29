@@ -1,7 +1,7 @@
 require_relative '../exceptions'
 
 class CogCmd::Cfn::Changeset::Apply < Cog::SubCommand
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:changeset apply <change set id> | <change set name> <stack name>
 
   Apply a changeset to a stack. Returns a map containing the change set name AND stack name OR the change set id, depending on which was provided to apply.

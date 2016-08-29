@@ -8,7 +8,7 @@ class CogCmd::Cfn::Changeset < Cog::AggregateCommand
 
   SUBCOMMANDS = %w(create delete list show apply)
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:changeset <subcommand> [options]
 
   Subcommands:

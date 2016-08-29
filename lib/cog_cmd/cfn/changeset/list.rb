@@ -2,7 +2,7 @@ require_relative '../exceptions'
 
 class CogCmd::Cfn::Changeset::List < Cog::SubCommand
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:changeset list <stack name>
 
   List changesets for a stack. Returns a list of changeset summaries equivalent to resp.summaries documented here, http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Client.html#list_change_sets-instance_method

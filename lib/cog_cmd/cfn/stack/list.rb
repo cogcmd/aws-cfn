@@ -4,7 +4,7 @@ class CogCmd::Cfn::Stack::List < Cog::SubCommand
 
   include CogCmd::Cfn::Helpers
 
-  USAGE = <<-END.gsub(/^ {2}/, '')
+  USAGE = <<~END
   Usage: cfn:stack list [options]
 
   List stack summaries
