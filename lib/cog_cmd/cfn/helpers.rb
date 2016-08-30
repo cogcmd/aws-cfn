@@ -104,6 +104,27 @@ module CogCmd::Cfn::Helpers
     END
   end
 
+  def usage(msg, err_msg = nil)
+    if err_msg
+      response['body'] = "```#{msg}```\n#{error(err_msg)}"
+      response.abort
+    else
+      response['body'] = "```#{msg}```"
+    end
+  end
+
+  def no_subcommand_error
+    if request.options['help']
+      usage(self.class::USAGE)
+    else
+      usage(self.class::USAGE, "You must specify a subcommand")
+    end
+  end
+
+  def unknown_subcommand_error(subcommand, subcommands)
+    usage(self.class::USAGE, "Unknown subcommand '#{subcommand}'. Please specify one of '#{subcommands.join(', ')}'")
+  end
+
   private
 
   def capability(cp)
