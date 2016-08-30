@@ -1,6 +1,4 @@
 require_relative 'helpers'
-require_relative 'aggregate_command'
-require_relative 'exceptions'
 
 class CogCmd::Cfn::Changeset < Cog::AggregateCommand
 
@@ -24,21 +22,5 @@ class CogCmd::Cfn::Changeset < Cog::AggregateCommand
     --help, -h    Show usage
   END
 
-  def run_subcommand
-    begin
-      client = Aws::CloudFormation::Client.new()
-      resp = subcommand.run(client)
-      response.content = resp
-    rescue Aws::CloudFormation::Errors::ValidationError => error
-      fail(error)
-    rescue Aws::CloudFormation::Errors::AccessDenied
-      fail(access_denied_msg)
-    end
-  end
 end
 
-require_relative 'changeset/create'
-require_relative 'changeset/delete'
-require_relative 'changeset/list'
-require_relative 'changeset/show'
-require_relative 'changeset/apply'
