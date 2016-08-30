@@ -24,20 +24,4 @@ class CogCmd::Cfn::Stack < Cog::AggregateCommand
     --help, -h     Show usage
   END
 
-  def run_command
-    return if response.aborted
-
-    if request.options['help']
-      usage(subcommand.class::USAGE)
-    else
-      super
-    end
-  rescue Aws::CloudFormation::Errors::ValidationError => error
-    fail(error)
-  rescue Aws::CloudFormation::Errors::AccessDenied
-    fail(access_denied_msg)
-  rescue CogCmd::Cfn::ArgumentError => error
-    usage(subcommand.class::USAGE, error)
-  end
-
 end

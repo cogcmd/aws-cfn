@@ -113,6 +113,22 @@ module CogCmd::Cfn::Helpers
     end
   end
 
+  def run_command
+    return if response.aborted
+
+    if request.options['help']
+      usage(subcommand.class::USAGE)
+    else
+      super
+    end
+  rescue Aws::CloudFormation::Errors::ValidationError => error
+    fail(error)
+  rescue Aws::CloudFormation::Errors::AccessDenied
+    fail(access_denied_msg)
+  rescue CogCmd::Cfn::ArgumentError => error
+    usage(subcommand.class::USAGE, error)
+  end
+
   def no_subcommand_error
     if request.options['help']
       usage(self.class::USAGE)
