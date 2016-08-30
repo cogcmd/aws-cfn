@@ -10,7 +10,7 @@ class CogCmd::Cfn::Template::List < Cog::SubCommand
   Lists cloudformation templates in the configured s3 bucket.
   END
 
-  def run
+  def run_command
     s3 = Aws::S3::Client.new()
 
     s3.list_objects_v2(bucket: template_root[:bucket], prefix: template_root[:prefix])

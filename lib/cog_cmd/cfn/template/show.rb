@@ -21,7 +21,7 @@ class CogCmd::Cfn::Template::Show < Cog::SubCommand
     ...<template summary>...
   END
 
-  def run
+  def run_command
     is_stack_name = request.options['stack']
 
     unless request.args[0]
