@@ -8,7 +8,7 @@ class CogCmd::Cfn::Stack::Resource < Cog::SubCommand
   Lists stack resources. Returns the list of stack resources.
   END
 
-  def run
+  def run_command
     unless request.args[0]
       raise CogCmd::Cfn::ArgumentError, "You must specify a stack name."
     end

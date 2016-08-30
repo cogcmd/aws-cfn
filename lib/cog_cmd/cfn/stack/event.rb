@@ -11,7 +11,7 @@ class CogCmd::Cfn::Stack::Event < Cog::SubCommand
     --limit <int>
   END
 
-  def run
+  def run_command
     unless request.args[0]
       raise CogCmd::Cfn::ArgumentError, "You must specify a stack name."
     end
@@ -19,8 +19,8 @@ class CogCmd::Cfn::Stack::Event < Cog::SubCommand
     cloudform = Aws::CloudFormation::Client.new()
     stack_events = cloudform.describe_stack_events(stack_name: request.args[0]).stack_events
 
-    if limit = request.options['limit'].to_i
-      stack_events.slice(0, limit).map(&:to_h)
+    if limit = request.options['limit']
+      stack_events.slice(0, limit.to_i).map(&:to_h)
     else
       stack_events.map(&:to_h)
     end

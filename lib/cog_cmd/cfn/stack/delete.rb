@@ -10,7 +10,7 @@ class CogCmd::Cfn::Stack::Delete < Cog::SubCommand
   Note: This command returns the same regardless of success or failure. Use the cfn:event command to view the results of the delete.
   END
 
-  def run
+  def run_command
     unless request.args[0]
       raise CogCmd::Cfn::ArgumentError, "You must specify a stack name."
     end

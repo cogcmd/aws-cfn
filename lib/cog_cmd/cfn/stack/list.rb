@@ -29,7 +29,7 @@ class CogCmd::Cfn::Stack::List < Cog::SubCommand
   DELETED = %w(DELETE_IN_PROGRESS DELETE_COMPLETE)
   IN_PROGRESS = %w(CREATE_IN_PROGRESS ROLLBACK_IN_PROGRESS DELETE_IN_PROGRESS UPDATE_IN_PROGRESS UPDATE_COMPLETE_CLEANUP_IN_PROGRESS UPDATE_ROLLBACK_IN_PROGRESS UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS)
 
-  def run
+  def run_command
     cloudform = Aws::CloudFormation::Client.new()
     cf_params = {}
 
@@ -38,8 +38,8 @@ class CogCmd::Cfn::Stack::List < Cog::SubCommand
 
     stack_summaries = cloudform.list_stacks(cf_params).stack_summaries
 
-    if limit = request.options['limit'].to_i
-      stack_summaries.slice(0, limit).map(&:to_h)
+    if limit = request.options['limit']
+      stack_summaries.slice(0, limit.to_i).map(&:to_h)
     else
       stack_summaries.map(&:to_h)
     end
