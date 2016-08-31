@@ -106,39 +106,10 @@ module CogCmd::Cfn::Helpers
 
   def usage(msg, err_msg = nil)
     if err_msg
-      response['body'] = "```#{msg}```\n#{error(err_msg)}"
-      response.abort
+      "```#{msg}```\n#{error(err_msg)}"
     else
-      response['body'] = "```#{msg}```"
+      "```#{msg}```"
     end
-  end
-
-  def run_command
-    return if response.aborted
-
-    if request.options['help']
-      usage(subcommand.class::USAGE)
-    else
-      super
-    end
-  rescue Aws::CloudFormation::Errors::ValidationError => error
-    fail(error)
-  rescue Aws::CloudFormation::Errors::AccessDenied
-    fail(access_denied_msg)
-  rescue CogCmd::Cfn::ArgumentError => error
-    usage(subcommand.class::USAGE, error)
-  end
-
-  def no_subcommand_error
-    if request.options['help']
-      usage(self.class::USAGE)
-    else
-      usage(self.class::USAGE, "You must specify a subcommand")
-    end
-  end
-
-  def unknown_subcommand_error(subcommand, subcommands)
-    usage(self.class::USAGE, "Unknown subcommand '#{subcommand}'. Please specify one of '#{subcommands.join(', ')}'")
   end
 
   private

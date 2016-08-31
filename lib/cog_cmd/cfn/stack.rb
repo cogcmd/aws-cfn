@@ -1,6 +1,6 @@
 require_relative 'helpers'
 
-class CogCmd::Cfn::Stack < Cog::AggregateCommand
+class CogCmd::Cfn::Stack < CogCmd::Cfn::AggregateCommand
 
   include CogCmd::Cfn::Helpers
 
