@@ -104,6 +104,14 @@ module CogCmd::Cfn::Helpers
     END
   end
 
+  def usage(msg, err_msg = nil)
+    if err_msg
+      "```#{msg}```\n#{error(err_msg)}"
+    else
+      "```#{msg}```"
+    end
+  end
+
   private
 
   def capability(cp)

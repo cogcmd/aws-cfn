@@ -10,10 +10,12 @@ class CogCmd::Cfn::Changeset::Delete < Cog::SubCommand
   Note: This command returns the same regardless of success or failure. Use the 'cfn:stack event' command to view the results of the delete.
   END
 
-  def run(client)
+  def run_command
     unless request.args[0]
       raise CogCmd::Cfn::ArgumentError, "You must specify either the change set id OR the change set name AND stack name."
     end
+
+    client = Aws::CloudFormation::Client.new()
 
     cs_params = { change_set_name: request.args[0] }
     if stack_name = request.args[1]

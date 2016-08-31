@@ -20,7 +20,7 @@ class CogCmd::Cfn::Stack::Create < Cog::SubCommand
     --capabilities, -c <iam | named_iam>
   END
 
-  def run
+  def run_command
     unless request.args.length >= 2
       raise CogCmd::Cfn::ArgumentError, "You must specify a stack name AND a template name."
     end

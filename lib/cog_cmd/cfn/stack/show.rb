@@ -11,7 +11,7 @@ class CogCmd::Cfn::Stack::Show < Cog::SubCommand
   Shows details for a stack. Returns the specified stack.
   END
 
-  def run
+  def run_command
     unless request.args[0]
       raise CogCmd::Cfn::ArgumentError, "You must specify a stack name."
     end

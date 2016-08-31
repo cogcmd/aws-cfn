@@ -10,10 +10,12 @@ class CogCmd::Cfn::Changeset::Apply < Cog::SubCommand
   END
 
 
-  def run(client)
+  def run_command
     unless request.args[0]
       raise CogCmd::Cfn::ArgumentError, "You must specify either the change set id OR the change set name AND stack name."
     end
+
+    client = Aws::CloudFormation::Client.new()
 
     cs_params = { change_set_name: request.args[0] }
     if stack_name = request.args[1]
