@@ -1,11 +1,11 @@
 require_relative '../exceptions'
 
-class CogCmd::Cfn::Stack::Resource < Cog::SubCommand
+class CogCmd::Cfn::Stack::Resources < Cog::SubCommand
 
   USAGE = <<~END
-  Usage: cfn:stack resource <stack name>
+  Usage: cfn:stack resources <stack name>
 
-  Lists stack resources. Returns the list of stack resources.
+  Lists stack resources.
   END
 
   def run_command
