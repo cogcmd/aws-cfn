@@ -42,12 +42,14 @@ class CogCmd::Cfn::Changeset::Create < Cog::SubCommand
       changeset_name = request.options['change-set-name']
     end
 
+    template_summary = client.get_template_summary(stack_name: stack_name)
+
     cs_params = Hash[
       [
         [ :stack_name, stack_name ],
         [ :change_set_name, changeset_name ],
+        [ :parameters, process_parameters(template_summary.parameters, request.options['param']) ],
         process_template(request.options['template']),
-        param_or_nil([ :parameters, process_parameters(request.options['param']) ]),
         param_or_nil([ :tags, process_tags(request.options['tag']) ]),
         param_or_nil([ :notification_arns, request.options['notify'] ]),
         param_or_nil([ :capabilities, process_capabilities(request.options['capabilities']) ]),
@@ -73,4 +75,26 @@ class CogCmd::Cfn::Changeset::Create < Cog::SubCommand
       [ :use_previous_template, true ]
     end
   end
+
+  def process_parameters(template_params, params)
+    params ||= []
+    params = params.map do |p|
+      param = p.strip.split("=")
+      { parameter_key: param[0],
+        parameter_value: param[1] }
+    end
+
+    template_params.map do |tp|
+      param = { parameter_key: tp.parameter_key }
+
+      if val = params.find { |p| p[:parameter_key] == tp.parameter_key }
+        param[:parameter_value] = val[:parameter_value]
+      else
+        param[:use_previous_value] = true
+      end
+
+      param
+    end
+  end
+
 end
