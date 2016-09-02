@@ -1,9 +1,9 @@
 require_relative '../exceptions'
 
-class CogCmd::Cfn::Stack::Event < Cog::SubCommand
+class CogCmd::Cfn::Stack::Events < Cog::SubCommand
 
   USAGE = <<~END
-  Usage: cfn:stack event <stack name>
+  Usage: cfn:stack events <stack name>
 
   Lists events for a stack. Returns all stack related events for a specified stack in reverse chronological order.
 
