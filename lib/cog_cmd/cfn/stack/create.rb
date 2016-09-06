@@ -21,15 +21,20 @@ class CogCmd::Cfn::Stack::Create < Cog::SubCommand
   END
 
   def run_command
-    unless request.args.length >= 2
+    unless stack_name = request.args[0]
       raise CogCmd::Cfn::ArgumentError, "You must specify a stack name AND a template name."
     end
 
-    cloudform = Aws::CloudFormation::Client.new()
+    unless template_name = request.args[1]
+      raise CogCmd::Cfn::ArgumentError, "You must specify a stack name AND a template name."
+    end
+
+    client = Aws::CloudFormation::Client.new()
+
     cf_params = Hash[
       [
-        [ :stack_name, request.args[0] ],
-        [ :template_url, template_url(request.args[1]) ],
+        [ :stack_name, stack_name ],
+        [ :template_url, template_url(template_name) ],
         param_or_nil([ :parameters, process_parameters(request.options["param"]) ]),
         param_or_nil([ :tags, process_tags(request.options["tag"]) ]),
         param_or_nil([ :stack_policy_url, policy_url(request.options["policy"]) ]),
@@ -40,8 +45,18 @@ class CogCmd::Cfn::Stack::Create < Cog::SubCommand
       ].compact
     ]
 
-    cloudform.create_stack(cf_params)
-    cloudform.describe_stacks(stack_name: request.args[0]).stacks[0].to_h
+    client.create_stack(cf_params)
+    client.describe_stacks(stack_name: stack_name).stacks[0].to_h
+  end
+
+  private
+
+  def process_parameters(params)
+    params.map do |p|
+      param = p.strip.split('=')
+      { parameter_key: param[0],
+        parameter_value: param[1] }
+    end
   end
 
 end
