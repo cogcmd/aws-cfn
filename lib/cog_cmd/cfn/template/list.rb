@@ -1,26 +1,27 @@
-require_relative '../helpers'
+require_relative 'base'
 
-class CogCmd::Cfn::Template::List < Cog::Command
+module CogCmd::Cfn::Template
+  class List < Base
+    USAGE = <<~END
+    Usage: cfn:template list
 
-  include CogCmd::Cfn::Helpers
+    Lists cloudformation templates in the configured s3 bucket.
+    END
 
-  USAGE = <<~END
-  Usage: cfn:template list
+    def run_command
+      s3 = Aws::S3::Client.new()
 
-  Lists cloudformation templates in the configured s3 bucket.
-  END
+      objects = s3.list_objects_v2(bucket: template_root[:bucket], prefix: template_root[:prefix]).contents
+      results =
+        objects.find_all do |obj|
+          obj.key.end_with?(".json")
+        end.map do |obj|
+          { "name": strip_json(strip_prefix(obj.key)),
+            "last_modified": obj.last_modified }
+        end
 
-  def run_command
-    s3 = Aws::S3::Client.new()
-
-    s3.list_objects_v2(bucket: template_root[:bucket], prefix: template_root[:prefix])
-    .contents
-    .find_all { |obj|
-      obj.key.end_with?(".json")
-    }
-    .map { |obj|
-      { "name": strip_json(strip_prefix(obj.key)),
-        "last_modified": obj.last_modified }
-    }
+      response.template = 'template_table'
+      response.content = results
+    end
   end
 end

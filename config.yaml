@@ -1,30 +1,35 @@
 ---
-cog_bundle_version: 3
+cog_bundle_version: 4
 name: cfn
-description: "AWS CloudFormation"
-version: "0.0.8"
+description: AWS CloudFormation
+version: 0.0.9
 docker:
   image: cogcmd/aws-cfn
-  tag: "0.0.8"
+  tag: 0.0.9
 commands:
-  template:
-    executable: /home/bundle/cog-command
-    description: "List available CloudFormation templates"
-    documentation: "cfn:template list - list available CloudFormation templates"
+  template-list:
+    executable: "/home/bundle/cog-command"
+    description: List available CloudFormation templates
     options:
-      help:
-        type: bool
-        required: false
-        short_flag: h
       stack:
         type: bool
         required: false
         short_flag: s
     rules:
-    - "must have cfn:template"
+    - must have cfn:template
+  template-show:
+    executable: "/home/bundle/cog-command"
+    description: Show summary information for a CloudFormation template
+    options:
+      stack:
+        type: bool
+        required: false
+        short_flag: s
+    rules:
+    - must have cfn:template
   stack:
-    executable: /home/bundle/cog-command
-    description: "Manage CloudFormation stacks"
+    executable: "/home/bundle/cog-command"
+    description: Manage CloudFormation stacks
     options:
       help:
         type: bool
@@ -65,11 +70,11 @@ commands:
         required: false
         short_flag: c
     rules:
-      - "must have cfn:stack"
+    - must have cfn:stack
   changeset:
-    executable: /home/bundle/cog-command
-    description: "Manage CloudFormation changesets"
-    documentation: "cfn:changeset <subcommand> [options] - Manage CloudFormation changesets"
+    executable: "/home/bundle/cog-command"
+    description: Manage CloudFormation changesets
+    documentation: cfn:changeset <subcommand> [options] - Manage CloudFormation changesets
     options:
       help:
         type: bool
@@ -103,8 +108,15 @@ commands:
         type: string
         required: false
     rules:
-      - "must have cfn:changeset"
+    - must have cfn:changeset
 permissions:
-  - cfn:stack
-  - cfn:changeset
-  - cfn:template
+- cfn:stack
+- cfn:changeset
+- cfn:template
+templates:
+  template_table:
+    body: |
+      | Name | Last Modified |
+      | ---- | ------------- |
+      ~each var=$results as=template~| ~$template.name~ | ~$template.last_modified~ |
+      ~end~

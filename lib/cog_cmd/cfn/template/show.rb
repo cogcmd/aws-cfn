@@ -1,10 +1,6 @@
-require_relative '../exceptions'
-require_relative '../helpers'
+require_relative 'base'
 
-class CogCmd::Cfn::Template::Show < Cog::Command
-
-  include CogCmd::Cfn::Helpers
-
+class CogCmd::Cfn::Template::Show < CogCmd::Cfn::Template::Base
   USAGE = <<~END
   Usage: cfn:template show <template name> | -s <stack name>
 

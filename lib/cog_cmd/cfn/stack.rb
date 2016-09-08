@@ -1,6 +1,6 @@
 require_relative 'helpers'
 
-class CogCmd::Cfn::Stack < CogCmd::Cfn::AggregateCommand
+class CogCmd::Cfn::Stack < Cog::Command
 
   include CogCmd::Cfn::Helpers
 
@@ -23,5 +23,8 @@ class CogCmd::Cfn::Stack < CogCmd::Cfn::AggregateCommand
   Options:
     --help, -h     Show usage
   END
+
+  def run_command
+  end
 
 end
