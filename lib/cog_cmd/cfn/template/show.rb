@@ -1,7 +1,7 @@
 require_relative '../exceptions'
 require_relative '../helpers'
 
-class CogCmd::Cfn::Template::Show < Cog::SubCommand
+class CogCmd::Cfn::Template::Show < Cog::Command
 
   include CogCmd::Cfn::Helpers
 

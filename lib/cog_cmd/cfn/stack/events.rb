@@ -1,6 +1,6 @@
 require_relative '../exceptions'
 
-class CogCmd::Cfn::Stack::Events < Cog::SubCommand
+class CogCmd::Cfn::Stack::Events < Cog::Command
 
   USAGE = <<~END
   Usage: cfn:stack events <stack name>

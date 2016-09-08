@@ -1,6 +1,6 @@
 require_relative '../exceptions'
 
-class CogCmd::Cfn::Changeset::Delete < Cog::SubCommand
+class CogCmd::Cfn::Changeset::Delete < Cog::Command
 
   USAGE = <<~END
   Usage: cfn:changeset delete <change set id> | <change set name> <stack name>

@@ -1,6 +1,6 @@
 require_relative '../exceptions'
 
-class CogCmd::Cfn::Stack::Delete < Cog::SubCommand
+class CogCmd::Cfn::Stack::Delete < Cog::Command
 
   USAGE = <<~END
   Usage: cfn:stack delete <stack name>

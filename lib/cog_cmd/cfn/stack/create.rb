@@ -1,7 +1,7 @@
 require_relative '../exceptions'
 require_relative '../helpers'
 
-class CogCmd::Cfn::Stack::Create < Cog::SubCommand
+class CogCmd::Cfn::Stack::Create < Cog::Command
 
   include CogCmd::Cfn::Helpers
 
