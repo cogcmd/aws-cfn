@@ -1,7 +1,9 @@
-require_relative 'base'
+require_relative '../helpers'
 
 module CogCmd::Cfn::Template
-  class List < Base
+  class List < Cog::Command
+    include  CogCmd::Cfn::Helpers
+
     USAGE = <<~END
     Usage: cfn:template list
 
@@ -22,6 +24,10 @@ module CogCmd::Cfn::Template
 
       response.template = 'template_table'
       response.content = results
+    rescue Aws::S3::Errors::NoSuchBucket => error
+      docs = "#{CogCmd::Cfn::Helpers::DOCUMENTATION_URL}#configuration"
+      msg = "#{error} - Make sure you have the proper url set for templates. #{docs}"
+      fail(msg)
     end
   end
 end
