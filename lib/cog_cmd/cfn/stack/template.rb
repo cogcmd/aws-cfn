@@ -1,7 +1,7 @@
 require 'json'
 require_relative '../exceptions'
 
-class CogCmd::Cfn::Stack::Template < Cog::SubCommand
+class CogCmd::Cfn::Stack::Template < Cog::Command
 
   USAGE = <<~END
   Usage: cfn:stack template <stack name>

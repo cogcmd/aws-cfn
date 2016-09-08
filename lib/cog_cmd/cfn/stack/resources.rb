@@ -1,6 +1,6 @@
 require_relative '../exceptions'
 
-class CogCmd::Cfn::Stack::Resources < Cog::SubCommand
+class CogCmd::Cfn::Stack::Resources < Cog::Command
 
   USAGE = <<~END
   Usage: cfn:stack resources <stack name>

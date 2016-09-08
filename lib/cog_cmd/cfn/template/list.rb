@@ -1,6 +1,6 @@
 require_relative '../helpers'
 
-class CogCmd::Cfn::Template::List < Cog::SubCommand
+class CogCmd::Cfn::Template::List < Cog::Command
 
   include CogCmd::Cfn::Helpers
 

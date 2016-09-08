@@ -1,6 +1,6 @@
 require_relative '../exceptions'
 
-class CogCmd::Cfn::Changeset::List < Cog::SubCommand
+class CogCmd::Cfn::Changeset::List < Cog::Command
 
   USAGE = <<~END
   Usage: cfn:changeset list <stack name>
