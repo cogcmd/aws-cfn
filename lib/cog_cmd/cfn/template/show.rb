@@ -37,7 +37,11 @@ module CogCmd::Cfn::Template
         cf_params[:template_url] = template_url(request.args[0])
       end
 
-      cloudform.get_template_summary(cf_params).to_h
+      results = cloudform.get_template_summary(cf_params).to_h
+      results.merge!({ "source": cf_params[:template_url] || cf_params[:stack_name] })
+
+      response.template = "template_show"
+      response.content = results
     rescue Aws::S3::Errors::NoSuchBucket => error
       docs = "#{CogCmd::Cfn::Helpers::DOCUMENTATION_URL}#configuration"
       msg = "#{error} - Make sure you have the proper url set for templates. #{docs}"

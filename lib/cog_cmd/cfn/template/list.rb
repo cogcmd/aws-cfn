@@ -14,7 +14,7 @@ module CogCmd::Cfn::Template
       s3 = Aws::S3::Client.new()
 
       objects = s3.list_objects_v2(bucket: template_root[:bucket], prefix: template_root[:prefix]).contents
-      results =
+      templates =
         objects.find_all do |obj|
           obj.key.end_with?(".json")
         end.map do |obj|
@@ -22,8 +22,8 @@ module CogCmd::Cfn::Template
             "last_modified": obj.last_modified }
         end
 
-      response.template = 'template_table'
-      response.content = results
+      response.template = 'template_list'
+      response.content = templates
     rescue Aws::S3::Errors::NoSuchBucket => error
       docs = "#{CogCmd::Cfn::Helpers::DOCUMENTATION_URL}#configuration"
       msg = "#{error} - Make sure you have the proper url set for templates. #{docs}"

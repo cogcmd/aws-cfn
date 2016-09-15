@@ -1,7 +1,6 @@
 GIT
   remote: git://github.com/operable/cog-rb.git
-  revision: 2754976da636a19f7c085b8fab402ae0e6b758c0
-  branch: imbriaco/remove-subcommands
+  revision: a56c8e78be5dab2dafc3caeb003910994d95d549
   specs:
     cog-rb (0.3.0)
       rake (~> 11.2)
