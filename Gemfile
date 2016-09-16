@@ -1,7 +1,7 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
-gem 'cog-rb', '~> 0.3.0'
-gem 'aws-sdk', '~> 2.5'
+gem "cog-rb", github: "operable/cog-rb"
+gem "aws-sdk", "~> 2.5"
 
 group "development", "test" do
   gem "rspec"

@@ -1,6 +1,6 @@
 require_relative 'helpers'
 
-class CogCmd::Cfn::Changeset < CogCmd::Cfn::AggregateCommand
+class CogCmd::Cfn::Changeset < Cog::Command
 
   include CogCmd::Cfn::Helpers
 
@@ -23,4 +23,3 @@ class CogCmd::Cfn::Changeset < CogCmd::Cfn::AggregateCommand
   END
 
 end
-
