@@ -2,7 +2,7 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.0.95
+version: 0.0.98
 docker:
   image: cogcmd/aws-cfn
   tag: 0.0.8
@@ -77,6 +77,26 @@ commands:
     description: Lists events for a stack. Returns all stack related events for a
       specified stack in reverse chronological order.
     arguments: "<stack_name>"
+    rules:
+    - must have cfn:stack
+  stack-list:
+    executable: "/home/bundle/cog-command"
+    description: Lists stack summaries.
+    long_description: |-
+      Lists stack summaries.
+      The filter string can be one or more cloudformation stack status strings which include:
+      CREATE_IN_PROGRESS, CREATE_FAILED, CREATE_COMPLETE, ROLLBACK_IN_PROGRESS, ROLLBACK_FAILED, ROLLBACK_COMPLETE, DELETE_IN_PROGRESS, DELETE_FAILED, DELETE_COMPLETE, UPDATE_IN_PROGRESS, UPDATE_COMPLETE_CLEANUP_IN_PROGRESS, UPDATE_COMPLETE, UPDATE_ROLLBACK_IN_PROGRESS, UPDATE_ROLLBACK_FAILED, UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS, UPDATE_ROLLBACK_COMPLETE
+
+      Additionally a few special filter strings that correspond to a subset of the standard filter strings may be used:
+      ACTIVE, COMPLETE, FAILED, DELETED, IN_PROGRESS
+    options:
+      filter:
+        type: list
+        required: false
+        short_flag: f
+        description: Filter results based on a filter string. Acceptable filter strings
+          are listed in the description. Can be specified more than once. Defaults
+          to 'ACTIVE'.
     rules:
     - must have cfn:stack
   stack:
@@ -208,9 +228,18 @@ templates:
   stack_event_list:
     body: |
       ~attachment title="Events for stack"~
-      | Timestamp | Status | Logical Resource ID |
-      |-----------|--------|---------------------|
+      | Timestamp | Status | Resource Type |
+      |-----------|--------|---------------|
       ~each var=$results as=event~
-      | ~$event.timestamp~ | ~$event.resource_status~ | ~$event.logical_resource_id~ |
+      | ~$event.timestamp~ | ~$event.resource_status~ | ~$event.resource_type~ |
+      ~end~
+      ~end~
+  stack_list:
+    body: |
+      ~attachment title="Stacks" color="darkblue"~
+      | Name | Status |
+      |------|--------|
+      ~each var=$results as=stack~
+      | ~$stack.stack_name~ | ~$stack.stack_status~ |
       ~end~
       ~end~

@@ -1,0 +1,7 @@
+~attachment title="Stacks" color="darkblue"~
+| Name | Status |
+|------|--------|
+~each var=$results as=stack~
+| ~$stack.stack_name~ | ~$stack.stack_status~ |
+~end~
+~end~
