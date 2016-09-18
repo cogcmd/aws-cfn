@@ -1,3 +1,12 @@
 ~each var=$results as=stack~
-~json var=$stack~
+~attachment title=$stack.stack_name color="mediumblue"~
+~$stack.stack_status~
+~end~
+~attachment title="Parameters" color="darkblue"~
+| Key | Value |
+|-----|-------|
+~each var=$stack.parameters as=param~
+| ~$param.parameter_key~ | ~$param.parameter_value~ |
+~end~
+~end~
 ~end~
