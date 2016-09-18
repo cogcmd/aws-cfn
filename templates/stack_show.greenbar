@@ -1,0 +1,3 @@
+~each var=$results as=stack~
+~json var=$stack~
+~end~
