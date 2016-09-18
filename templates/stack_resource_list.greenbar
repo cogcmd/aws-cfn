@@ -1,0 +1,5 @@
+| Type | Status | Logical ID |
+|------|--------|------------|
+~each var=$results as=resource~
+| ~$resource.resource_type~ | ~$resource.resource_status~ | ~$resource.logical_resource_id~ |
+~end~

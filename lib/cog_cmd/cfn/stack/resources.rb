@@ -1,21 +1,31 @@
-require_relative '../exceptions'
+require 'cog_cmd/cfn/helpers'
 
-class CogCmd::Cfn::Stack::Resources < Cog::Command
+module CogCmd::Cfn::Stack
+  class Resources < Cog::Command
 
-  USAGE = <<~END
-  Usage: cfn:stack resources <stack name>
+    attr_reader :stack_name
 
-  Lists stack resources.
-  END
-
-  def run_command
-    unless request.args[0]
-      raise CogCmd::Cfn::ArgumentError, "You must specify a stack name."
+    def initialize
+      @stack_name = request.args[0]
     end
 
-    cloudform = Aws::CloudFormation::Client.new()
+    def run_command
+      raise(Cog::Error, "You must specify a stack name.") unless stack_name
 
-    resp = cloudform.list_stack_resources(stack_name: request.args[0])
-    resp.stack_resource_summaries.map(&:to_h)
+      response.template = 'stack_resource_list'
+      response.content = list_resources
+    end
+
+    private
+
+    def list_resources
+      client = Aws::CloudFormation::Client.new()
+
+      client.
+        list_stack_resources(stack_name: stack_name).
+        stack_resource_summaries.
+        map(&:to_h)
+    end
+
   end
 end
