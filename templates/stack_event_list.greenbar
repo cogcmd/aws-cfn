@@ -1,7 +1,5 @@
-~attachment title="Events for stack"~
 | Timestamp | Status | Resource Type |
 |-----------|--------|---------------|
 ~each var=$results as=event~
 | ~$event.timestamp~ | ~$event.resource_status~ | ~$event.resource_type~ |
-~end~
 ~end~
