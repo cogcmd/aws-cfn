@@ -111,50 +111,6 @@ commands:
     arguments: "<stack_name>"
     rules:
     - must have cfn:stack
-  stack:
-    executable: "/home/bundle/cog-command"
-    description: Manage CloudFormation stacks
-    options:
-      help:
-        type: bool
-        required: false
-        short_flag: h
-      filter:
-        type: list
-        required: false
-      limit:
-        type: int
-        required: false
-      param:
-        type: list
-        required: false
-        short_flag: p
-      tag:
-        type: list
-        required: false
-        short_flag: t
-      policy:
-        type: string
-        required: false
-        short_flag: o
-      notify:
-        type: list
-        required: false
-        short_flag: n
-      on-failure:
-        type: string
-        required: false
-        short_flag: f
-      timeout:
-        type: int
-        required: false
-        short_flag: e
-      capabilities:
-        type: list
-        required: false
-        short_flag: c
-    rules:
-    - must have cfn:stack
   changeset:
     executable: "/home/bundle/cog-command"
     description: Manage CloudFormation changesets
