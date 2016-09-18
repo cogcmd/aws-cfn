@@ -2,7 +2,7 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.0.86
+version: 0.0.93
 docker:
   image: cogcmd/aws-cfn
   tag: 0.0.8
@@ -64,6 +64,12 @@ commands:
         required: false
         short_flag: c
         description: Can be one of: iam or named_iam.
+    rules:
+    - must have cfn:stack
+  stack-delete:
+    executable: "/home/bundle/cog-command"
+    description: Deletes a stack.
+    arguments: "<stack_name>"
     rules:
     - must have cfn:stack
   stack:
@@ -181,5 +187,14 @@ templates:
   stack_show:
     body: |
       ~each var=$results as=stack~
-      ~json var=$stack~
+      ~attachment title=$stack.stack_name color="mediumblue"~
+      ~$stack.stack_status~
+      ~end~
+      ~attachment title="Parameters" color="darkblue"~
+      | Key | Value |
+      |-----|-------|
+      ~each var=$stack.parameters as=param~
+      | ~$param.parameter_key~ | ~$param.parameter_value~ |
+      ~end~
+      ~end~
       ~end~
