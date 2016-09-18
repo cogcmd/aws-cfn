@@ -2,7 +2,7 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.0.93
+version: 0.0.95
 docker:
   image: cogcmd/aws-cfn
   tag: 0.0.8
@@ -69,6 +69,13 @@ commands:
   stack-delete:
     executable: "/home/bundle/cog-command"
     description: Deletes a stack.
+    arguments: "<stack_name>"
+    rules:
+    - must have cfn:stack
+  stack-events:
+    executable: "/home/bundle/cog-command"
+    description: Lists events for a stack. Returns all stack related events for a
+      specified stack in reverse chronological order.
     arguments: "<stack_name>"
     rules:
     - must have cfn:stack
@@ -196,5 +203,14 @@ templates:
       ~each var=$stack.parameters as=param~
       | ~$param.parameter_key~ | ~$param.parameter_value~ |
       ~end~
+      ~end~
+      ~end~
+  stack_event_list:
+    body: |
+      ~attachment title="Events for stack"~
+      | Timestamp | Status | Logical Resource ID |
+      |-----------|--------|---------------------|
+      ~each var=$results as=event~
+      | ~$event.timestamp~ | ~$event.resource_status~ | ~$event.logical_resource_id~ |
       ~end~
       ~end~
