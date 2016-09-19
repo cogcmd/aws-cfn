@@ -175,6 +175,12 @@ commands:
     arguments: "<changeset_id> | <changeset_name> <stack_name>"
     rules:
     - must have cfn:changeset
+  changeset-apply:
+    executable: "/home/bundle/cog-command"
+    description: Applies a cloudformation changeset.
+    arguments: "<changeset_name> <stack_name>"
+    rules:
+    - must have cfn:changeset
   changeset:
     executable: "/home/bundle/cog-command"
     description: Manage CloudFormation changesets
