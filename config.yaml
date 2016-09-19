@@ -2,7 +2,7 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.0.101
+version: 0.0.8
 docker:
   image: cogcmd/aws-cfn
   tag: 0.0.8
@@ -26,19 +26,22 @@ commands:
     - must have cfn:template
   stack-create:
     executable: "/home/bundle/cog-command"
-    description: Creates a new stack based on an existing template and returns the newly created stack.
+    description: Creates a new stack based on an existing template and returns the
+      newly created stack.
     arguments: "<stack_name> <template_name>"
     options:
       param:
         type: list
         required: false
         short_flag: p
-        description: Key-value pairs specified as 'key=value', that specify input parameters for your stack. Can be specified multiple times.
+        description: Key-value pairs specified as 'key=value', that specify input
+          parameters for your stack. Can be specified multiple times.
       tag:
         type: list
         required: false
         short_flag: t
-        description: Key-value pairs to associate with this stack. Can be specified multiple times.
+        description: Key-value pairs to associate with this stack. Can be specified
+          multiple times.
       policy:
         type: string
         required: false
@@ -48,22 +51,25 @@ commands:
         type: list
         required: false
         short_flag: n
-        description: The Simple Notification Service (SNS) topic ARNs to publish stack related events. Can be specified multiple times.
+        description: The Simple Notification Service (SNS) topic ARNs to publish stack
+          related events. Can be specified multiple times.
       on-failure:
         type: string
         required: false
         short_flag: f
-        description: Determines what action will be taken if stack creation fails. Can be one of: rollback, delete or keep.
+        description: 'Determines what action will be taken if stack creation fails.
+          Can be one of: rollback, delete or keep.'
       timeout:
         type: int
         required: false
         short_flag: e
-        description: The amount of time, specified in minutes, that can pass before the stack status becomes CREATE_FAILED.
+        description: The amount of time, specified in minutes, that can pass before
+          the stack status becomes CREATE_FAILED.
       capabilities:
         type: list
         required: false
         short_flag: c
-        description: Can be one of: iam or named_iam.
+        description: 'Can be one of: iam or named_iam.'
     rules:
     - must have cfn:stack
   stack-delete:
@@ -195,10 +201,10 @@ templates:
       ~end~
   stack_event_list:
     body: |
-      | Timestamp | Status | Resource Type |
-      |-----------|--------|---------------|
+      | Timestamp | Status | Resource Type | Logical ID |
+      |-----------|--------|---------------|------------|
       ~each var=$results as=event~
-      | ~$event.timestamp~ | ~$event.resource_status~ | ~$event.resource_type~ |
+      | ~$event.timestamp~ | ~$event.resource_status~ | ~$event.resource_type~ | ~$event.logical_resource_id~ |
       ~end~
   stack_list:
     body: |
@@ -209,8 +215,8 @@ templates:
       ~end~
   stack_resource_list:
     body: |
-      | Type | Status | Logical ID |
-      |------|--------|------------|
+      | Type | Status | Logical ID | Physical ID |
+      |------|--------|------------|-------------|
       ~each var=$results as=resource~
-      | ~$resource.resource_type~ | ~$resource.resource_status~ | ~$resource.logical_resource_id~ |
+      | ~$resource.resource_type~ | ~$resource.resource_status~ | ~$resource.logical_resource_id~ | ~$resource.physical_resource_id~ |
       ~end~

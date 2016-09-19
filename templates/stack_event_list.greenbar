@@ -1,5 +1,5 @@
-| Timestamp | Status | Resource Type |
-|-----------|--------|---------------|
+| Timestamp | Status | Resource Type | Logical ID |
+|-----------|--------|---------------|------------|
 ~each var=$results as=event~
-| ~$event.timestamp~ | ~$event.resource_status~ | ~$event.resource_type~ |
+| ~$event.timestamp~ | ~$event.resource_status~ | ~$event.resource_type~ | ~$event.logical_resource_id~ |
 ~end~
