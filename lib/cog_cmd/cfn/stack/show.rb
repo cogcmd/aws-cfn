@@ -1,23 +1,29 @@
-require_relative '../exceptions'
-require_relative '../helpers'
+require 'cog_cmd/cfn/helpers'
 
-class CogCmd::Cfn::Stack::Show < Cog::Command
+module CogCmd::Cfn::Stack
+  class Show < Cog::Command
 
-  include CogCmd::Cfn::Helpers
+    include CogCmd::Cfn::Helpers
 
-  USAGE = <<~END
-  Usage: cfn:stack show <stack name>
+    attr_reader :stack_name
 
-  Shows details for a stack. Returns the specified stack.
-  END
-
-  def run_command
-    unless request.args[0]
-      raise CogCmd::Cfn::ArgumentError, "You must specify a stack name."
+    def initialize
+      @stack_name = request.args[0]
     end
 
-    cloudform = Aws::CloudFormation::Client.new()
-    cloudform.describe_stacks(stack_name: request.args[0]).stacks[0].to_h
-  end
+    def run_command
+      raise(Cog::Error, "You must specify a stack name.") unless stack_name
 
+      response.template = 'stack_show'
+      response.content = describe_stacks
+    end
+
+    private
+
+    def describe_stacks
+      client = Aws::CloudFormation::Client.new()
+      client.describe_stacks(stack_name: stack_name).stacks[0].to_h
+    end
+
+  end
 end

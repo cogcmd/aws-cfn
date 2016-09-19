@@ -1,28 +1,29 @@
-require_relative '../exceptions'
+require 'cog_cmd/cfn/helpers'
 
-class CogCmd::Cfn::Stack::Events < Cog::Command
+module CogCmd::Cfn::Stack
+  class Events < Cog::Command
 
-  USAGE = <<~END
-  Usage: cfn:stack events <stack name>
+    include CogCmd::Cfn::Helpers
 
-  Lists events for a stack. Returns all stack related events for a specified stack in reverse chronological order.
+  attr_reader :stack_name
 
-  Options:
-    --limit <int>
-  END
-
-  def run_command
-    unless request.args[0]
-      raise CogCmd::Cfn::ArgumentError, "You must specify a stack name."
+    def initialize
+      # args
+      @stack_name = request.args[0]
     end
 
-    cloudform = Aws::CloudFormation::Client.new()
-    stack_events = cloudform.describe_stack_events(stack_name: request.args[0]).stack_events
+    def run_command
+      raise(Cog::Error, "You must specify a stack name.") unless stack_name
 
-    if limit = request.options['limit']
-      stack_events.slice(0, limit.to_i).map(&:to_h)
-    else
-      stack_events.map(&:to_h)
+      response.template = 'stack_event_list'
+      response.content = describe_events
+    end
+
+    private
+
+    def describe_events
+      client = Aws::CloudFormation::Client.new()
+      client.describe_stack_events(stack_name: stack_name).stack_events.map(&:to_h)
     end
   end
 end

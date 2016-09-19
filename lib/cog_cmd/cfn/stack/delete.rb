@@ -1,24 +1,32 @@
-require_relative '../exceptions'
+require 'cog_cmd/cfn/helpers'
 
-class CogCmd::Cfn::Stack::Delete < Cog::Command
+module CogCmd::Cfn::Stack
+  class Delete < Cog::Command
 
-  USAGE = <<~END
-  Usage: cfn:stack delete <stack name>
+    include CogCmd::Cfn::Helpers
 
-  Deletes a stack. Returns a map with the stack name and status.
+    attr_reader :stack_name
 
-  Note: This command returns the same regardless of success or failure. Use the cfn:event command to view the results of the delete.
-  END
-
-  def run_command
-    unless request.args[0]
-      raise CogCmd::Cfn::ArgumentError, "You must specify a stack name."
+    def initialize
+      # args
+      @stack_name = request.args[0]
     end
 
-    cloudform = Aws::CloudFormation::Client.new()
-    cloudform.delete_stack(stack_name: request.args[0])
+    def run_command
+      raise(Cog::Error, "You must specify a stack name.") unless stack_name
 
-    { status: "delete initiated",
-      stack_name: request.args[0] }
+      response.template = 'stack_show'
+      response.content = delete_stack
+    end
+
+    private
+
+    def delete_stack
+      client = Aws::CloudFormation::Client.new()
+      client.delete_stack(stack_name: stack_name)
+
+      client.describe_stacks(stack_name: stack_name).stacks[0].to_h
+    end
+
   end
 end

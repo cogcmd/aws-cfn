@@ -6,7 +6,7 @@ module CogCmd::Cfn::Stack
     include CogCmd::Cfn::Helpers
 
     attr_reader :stack_name, :template_name
-    attr_reader :params, :tags, :policy, :notify, :on_failure, :timeout, :capabilities
+    attr_reader :stack_params, :tags, :policy, :notify, :on_failure, :timeout, :capabilities
 
     def initialize
       # args
@@ -14,7 +14,7 @@ module CogCmd::Cfn::Stack
       @template_name = request.args[1]
 
       # options
-      @parms = request.options['param']
+      @stack_params = request.options['param']
       @tags = request.options['tag']
       @policy = request.options['policy']
       @notify = request.options['notify']
@@ -24,9 +24,10 @@ module CogCmd::Cfn::Stack
     end
 
     def run_command
-      raise(CogCmd::Cfn::ArgumentError, "You must specify a stack name AND a template name.") unless stack_name
-      raise(CogCmd::Cfn::ArgumentError, "You must specify a stack name AND a template name.") unless template_name
+      raise(Cog::Error, "You must specify a stack name AND a template name.") unless stack_name
+      raise(Cog::Error, "You must specify a stack name AND a template name.") unless template_name
 
+      response.template = 'stack_show'
       response.content = create_stack
     end
 
@@ -38,7 +39,7 @@ module CogCmd::Cfn::Stack
       params = {
         stack_name: stack_name,
         template_url: template_url(template_name),
-        parameters: process_parameters(params),
+        parameters: process_parameters(stack_params),
         tags: process_tags(tags),
         stack_policy_url: policy_url(policy),
         notification_arns: notify,
@@ -52,6 +53,8 @@ module CogCmd::Cfn::Stack
     end
 
     def process_parameters(params)
+      return unless params
+
       params.map do |p|
         param = p.strip.split('=')
         { parameter_key: param[0],

@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/operable/cog-rb.git
-  revision: a56c8e78be5dab2dafc3caeb003910994d95d549
+  revision: fd569159093cbfc10212564db3eb98ec5db4e187
   specs:
     cog-rb (0.3.0)
       rake (~> 11.2)
