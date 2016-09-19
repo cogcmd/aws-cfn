@@ -1,33 +1,44 @@
-require_relative '../helpers'
+require 'cog_cmd/cfn/helpers'
 
 module CogCmd::Cfn::Template
   class List < Cog::Command
+
     include  CogCmd::Cfn::Helpers
 
-    USAGE = <<~END
-    Usage: cfn:template list
-
-    Lists cloudformation templates in the configured s3 bucket.
-    END
-
     def run_command
-      s3 = Aws::S3::Client.new()
-
-      objects = s3.list_objects_v2(bucket: template_root[:bucket], prefix: template_root[:prefix]).contents
-      templates =
-        objects.find_all do |obj|
-          obj.key.end_with?(".json")
-        end.map do |obj|
-          { "name": strip_json(strip_prefix(obj.key)),
-            "last_modified": obj.last_modified }
-        end
-
       response.template = 'template_list'
-      response.content = templates
+      response.content = list_templates.reduce([]) do |acc, obj|
+        acc.push(process_obj(obj)) if json_key?(obj)
+        acc
+      end
+
     rescue Aws::S3::Errors::NoSuchBucket => error
       docs = "#{CogCmd::Cfn::Helpers::DOCUMENTATION_URL}#configuration"
       msg = "#{error} - Make sure you have the proper url set for templates. #{docs}"
       fail(msg)
     end
+
+    private
+
+    def list_templates
+      client = Aws::S3::Client.new()
+
+      params = {
+        bucket: template_root[:bucket],
+        prefix: template_root[:prefix]
+      }
+
+      client.list_objects_v2(params).contents
+    end
+
+    def json_key?(obj)
+      obj.key.end_with?('.json')
+    end
+
+    def process_obj(obj)
+      { name: strip_json(strip_prefix(obj.key)),
+        last_modified: obj.last_modified }
+    end
+
   end
 end

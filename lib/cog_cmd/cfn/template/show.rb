@@ -1,43 +1,30 @@
-require_relative '../helpers'
+require 'cog_cmd/cfn/helpers'
 require_relative '../exceptions'
 
 module CogCmd::Cfn::Template
   class Show < Cog::Command
+
     include CogCmd::Cfn::Helpers
 
-    USAGE = <<~END
-    Usage: cfn:template show <template name> | -s <stack name>
+    attr_reader :template_or_stack_name
 
-    Shows template data.
-
-    Options:
-      --stack, -s    Specify a stack name instead of a template name
-
-    Example:
-      cfn:template show mytemplate
-      ...<template summary>...
-
-      cfn:template show -s mystack
-      ...<template summary>...
-    END
+    def initialize
+      # args
+      @template_or_stack_name = request.args[0]
+    end
 
     def run_command
-      is_stack_name = request.options['stack']
+      raise(Cog::Error, bad_arg_msg) unless @template_or_stack_name
 
-      unless request.args[0]
-        msg = is_stack_name ? "You must specify a stack name or id." : "You must specify a template name."
-        raise CogCmd::Cfn::ArgumentError, msg
-      end
-
-      cloudform = Aws::CloudFormation::Client.new()
+      client = Aws::CloudFormation::Client.new()
       cf_params = {}
-      if is_stack_name
-        cf_params[:stack_name] = request.args[0]
+      if is_stack_name?
+        cf_params[:stack_name] = template_or_stack_name
       else
-        cf_params[:template_url] = template_url(request.args[0])
+        cf_params[:template_url] = template_url(template_or_stack_name)
       end
 
-      results = cloudform.get_template_summary(cf_params).to_h
+      results = client.get_template_summary(cf_params).to_h
       results.merge!({ "source": cf_params[:template_url] || cf_params[:stack_name] })
 
       response.template = "template_show"
@@ -46,6 +33,20 @@ module CogCmd::Cfn::Template
       docs = "#{CogCmd::Cfn::Helpers::DOCUMENTATION_URL}#configuration"
       msg = "#{error} - Make sure you have the proper url set for templates. #{docs}"
       fail(msg)
+    end
+
+    private
+
+    def is_stack_name?
+      request.options['stack']
+    end
+
+    def bad_arg_msg
+      if is_stack_name?
+        "You must specify a stack name or id." 
+      else
+        "You must specify a template name."
+      end
     end
   end
 end
