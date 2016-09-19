@@ -260,3 +260,42 @@ templates:
       ~each var=$results as=resource~
       | ~$resource.resource_type~ | ~$resource.resource_status~ | ~$resource.logical_resource_id~ | ~$resource.physical_resource_id~ |
       ~end~
+  changeset_show:
+    body: |
+      ~each var=$results as=changeset~
+
+      ~attachment title=$changeset.change_set_name color=darkblue~
+      **Stack**: ~$changeset.stack_name~
+      **Status**: ~$changeset.status~
+      **Creation Time**: ~$changeset.creation_time~
+      ~br~
+      ~$changeset.description~
+      ~end~
+
+      ~attachment title="Parameters" color=blue~
+      | Key | Value |
+      |-----|-------|
+      ~each var=$changeset.parameters as=param~
+      | ~$param.parameter_key~ | ~$param.parameter_value~ |
+      ~end~
+      ~end~
+
+      ~if cond=$changeset.tags not_empty?~
+      ~attachment title="Tags" color=blue~
+      | Key | Value |
+      |-----|-------|
+      ~each var=$changeset.tags as=tag~
+      | ~$tag.key~ | ~$tag.value~ |
+      ~end~
+      ~end~
+      ~end~
+
+      ~if cond=$changeset.capabilities not_empty?~
+      ~attachment title="Capabilities" color=blue~
+      ~each var=$changeset.capabilities as=capability~
+      * ~$capability~
+      ~end~
+      ~end~
+      ~end~
+
+      ~end~
