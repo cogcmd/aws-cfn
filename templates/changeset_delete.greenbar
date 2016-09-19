@@ -1,0 +1,3 @@
+~each var=$results as=changeset~
+Successfully deleted '~$changeset.changeset_name_or_id~'
+~end~
