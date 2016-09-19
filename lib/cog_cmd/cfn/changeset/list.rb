@@ -1,25 +1,31 @@
-require_relative '../exceptions'
+require 'cog_cmd/cfn/helpers'
 
-class CogCmd::Cfn::Changeset::List < Cog::Command
+module CogCmd::Cfn::Changeset
+  class List < Cog::Command
 
-  USAGE = <<~END
-  Usage: cfn:changeset list <stack name>
+    attr_reader :stack_name
 
-  Lists changesets for a stack. Returns a list of changeset summaries equivalent to resp.summaries documented here, http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Client.html#list_change_sets-instance_method
-  END
-
-  def run_command
-    unless request.args[0]
-      raise CogCmd::Cfn::ArgumentError, "You must specify the stack name."
+    def initialize
+      @stack_name = request.args[0]
     end
 
-    client = Aws::CloudFormation::Client.new()
+    def run_command
+      raise(Cog::Error, "You must specify the stack name.") unless stack_name
 
-    stack_name = request.args[0]
+      response.template = 'changeset_list'
+      response.content = list_change_sets
+    end
 
-    changesets = client.list_change_sets({ stack_name: stack_name })
+    private
 
-    changesets.summaries.map(&:to_h)
+    def list_change_sets
+      client = Aws::CloudFormation::Client.new()
+
+      client.
+        list_change_sets({ stack_name: stack_name }).
+        summaries.
+        map(&:to_h)
+    end
+
   end
-
 end
