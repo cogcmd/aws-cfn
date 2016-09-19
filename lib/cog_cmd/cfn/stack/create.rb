@@ -24,8 +24,8 @@ module CogCmd::Cfn::Stack
     end
 
     def run_command
-      raise(CogCmd::Cfn::ArgumentError, "You must specify a stack name AND a template name.") unless stack_name
-      raise(CogCmd::Cfn::ArgumentError, "You must specify a stack name AND a template name.") unless template_name
+      raise(Cog::Error, "You must specify a stack name AND a template name.") unless stack_name
+      raise(Cog::Error, "You must specify a stack name AND a template name.") unless template_name
 
       response.template = 'stack_show'
       response.content = create_stack
@@ -53,7 +53,7 @@ module CogCmd::Cfn::Stack
     end
 
     def process_parameters(params)
-      return nil unless params
+      return unless params
 
       params.map do |p|
         param = p.strip.split('=')
