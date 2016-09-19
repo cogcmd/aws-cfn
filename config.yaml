@@ -2,7 +2,7 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.0.17
+version: 0.0.18
 docker:
   image: cogcmd/aws-cfn
   tag: 0.0.8
@@ -166,6 +166,12 @@ commands:
   changeset-delete:
     executable: "/home/bundle/cog-command"
     description: Deletes cloudformation changesets.
+    arguments: "<changeset_id> | <changeset_name> <stack_name>"
+    rules:
+    - must have cfn:changeset
+  changeset-show:
+    executable: "/home/bundle/cog-command"
+    description: Shows a cloudformation changeset.
     arguments: "<changeset_id> | <changeset_name> <stack_name>"
     rules:
     - must have cfn:changeset
