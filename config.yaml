@@ -117,6 +117,46 @@ commands:
     arguments: "<stack_name>"
     rules:
     - must have cfn:stack
+  changeset-create:
+    executable: "/home/bundle/cog-command"
+    description: Creates a changeset for a stack.
+    arguments: "<stack_name>"
+    options:
+      param:
+        type: list
+        required: false
+        short_flag: p
+        description: Parameter, specified as 'key=value', that specify input parameters
+          for the change set. Can be specified multiple times.
+      tag:
+        type: list
+        required: false
+        short_flag: t
+        description: Key-value pairs, specified as 'key=value', to associate with
+          this stack.
+      notify:
+        type: list
+        required: false
+        short_flag: n
+        description: The Amazon Resource Names (ARNs) of Amazon Simple Notification
+          Service (Amazon SNS) topics that AWS CloudFormation associates with the
+          stack.
+      capabilities:
+        type: list
+        required: false
+        short_flag: c
+        description: 'Can be one of: iam or named_iam.'
+      description:
+        type: string
+        required: false
+        short_flag: d
+        description: 'A description to help you identify this change set. '
+      changeset-name:
+        type: string
+        required: false
+        description: The name of your changeset. Defaults to 'changeset<num>'
+    rules:
+    - must have cfn:changeset
   changeset:
     executable: "/home/bundle/cog-command"
     description: Manage CloudFormation changesets
