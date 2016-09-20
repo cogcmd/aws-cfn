@@ -2,10 +2,10 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.0.8
+version: 0.0.9
 docker:
   image: cogcmd/aws-cfn
-  tag: 0.0.8
+  tag: 0.0.9
 commands:
   template-list:
     executable: "/home/bundle/cog-command"
@@ -117,42 +117,68 @@ commands:
     arguments: "<stack_name>"
     rules:
     - must have cfn:stack
-  changeset:
+  changeset-create:
     executable: "/home/bundle/cog-command"
-    description: Manage CloudFormation changesets
-    documentation: cfn:changeset <subcommand> [options] - Manage CloudFormation changesets
+    description: Creates a changeset for a stack.
+    arguments: "<stack_name>"
     options:
-      help:
-        type: bool
-        required: false
-        short_flag: h
       param:
         type: list
         required: false
         short_flag: p
+        description: Parameter, specified as 'key=value', that specify input parameters
+          for the change set. Can be specified multiple times.
       tag:
         type: list
         required: false
         short_flag: t
-      template:
-        type: string
-        required: false
-        short_flag: m
+        description: Key-value pairs, specified as 'key=value', to associate with
+          this stack.
       notify:
         type: list
         required: false
         short_flag: n
+        description: The Amazon Resource Names (ARNs) of Amazon Simple Notification
+          Service (Amazon SNS) topics that AWS CloudFormation associates with the
+          stack.
       capabilities:
         type: list
         required: false
         short_flag: c
+        description: 'Can be one of: iam or named_iam.'
       description:
         type: string
         required: false
         short_flag: d
+        description: 'A description to help you identify this change set. '
       changeset-name:
         type: string
         required: false
+        description: The name of your changeset. Defaults to 'changeset<num>'
+    rules:
+    - must have cfn:changeset
+  changeset-list:
+    executable: "/home/bundle/cog-command"
+    description: Lists cloudformation changesets.
+    arguments: "<stack_name>"
+    rules:
+    - must have cfn:changeset
+  changeset-delete:
+    executable: "/home/bundle/cog-command"
+    description: Deletes cloudformation changesets.
+    arguments: "<changeset_name> <stack_name>"
+    rules:
+    - must have cfn:changeset
+  changeset-show:
+    executable: "/home/bundle/cog-command"
+    description: Shows a cloudformation changeset.
+    arguments: "<changeset_name> <stack_name>"
+    rules:
+    - must have cfn:changeset
+  changeset-apply:
+    executable: "/home/bundle/cog-command"
+    description: Applies a cloudformation changeset.
+    arguments: "<changeset_name> <stack_name>"
     rules:
     - must have cfn:changeset
 permissions:
@@ -219,4 +245,55 @@ templates:
       |------|--------|------------|-------------|
       ~each var=$results as=resource~
       | ~$resource.resource_type~ | ~$resource.resource_status~ | ~$resource.logical_resource_id~ | ~$resource.physical_resource_id~ |
+      ~end~
+  changeset_list:
+    body: |
+      | Change Set Name | Status | Creation Time | Description |
+      |-----------------|--------|---------------|-------------|
+      ~each var=$results as=changeset~
+      | ~$changeset.change_set_name~ | ~$changeset.status~ | ~$changeset.creation_time~ | ~$changeset.description~ |
+      ~end~
+  changeset_show:
+    body: |
+      ~each var=$results as=changeset~
+
+      ~attachment title=$changeset.change_set_name color=darkblue~
+      **Stack**: ~$changeset.stack_name~
+      **Status**: ~$changeset.status~
+      **Creation Time**: ~$changeset.creation_time~
+      ~br~
+      ~$changeset.description~
+      ~end~
+
+      ~attachment title="Parameters" color=blue~
+      | Key | Value |
+      |-----|-------|
+      ~each var=$changeset.parameters as=param~
+      | ~$param.parameter_key~ | ~$param.parameter_value~ |
+      ~end~
+      ~end~
+
+      ~if cond=$changeset.tags not_empty?~
+      ~attachment title="Tags" color=blue~
+      | Key | Value |
+      |-----|-------|
+      ~each var=$changeset.tags as=tag~
+      | ~$tag.key~ | ~$tag.value~ |
+      ~end~
+      ~end~
+      ~end~
+
+      ~if cond=$changeset.capabilities not_empty?~
+      ~attachment title="Capabilities" color=blue~
+      ~each var=$changeset.capabilities as=capability~
+      * ~$capability~
+      ~end~
+      ~end~
+      ~end~
+
+      ~end~
+  changeset_delete:
+    body: |
+      ~each var=$results as=changeset~
+      Successfully deleted '~$changeset.changeset_name~'
       ~end~

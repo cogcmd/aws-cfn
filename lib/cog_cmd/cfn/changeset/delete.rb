@@ -1,32 +1,38 @@
-require_relative '../exceptions'
+require 'cog_cmd/cfn/helpers'
 
-class CogCmd::Cfn::Changeset::Delete < Cog::Command
+module CogCmd::Cfn::Changeset
+  class Delete < Cog::Command
 
-  USAGE = <<~END
-  Usage: cfn:changeset delete <change set id> | <change set name> <stack name>
+    attr_reader :changeset_name, :stack_name
 
-  Deletes a changeset. Returns a map with containing the change set name AND stack name OR the change set id, depending on which was provided to apply.
-
-  Note: This command returns the same regardless of success or failure. Use the 'cfn:stack event' command to view the results of the delete.
-  END
-
-  def run_command
-    unless request.args[0]
-      raise CogCmd::Cfn::ArgumentError, "You must specify either the change set id OR the change set name AND stack name."
+    def initialize
+      @changeset_name = request.args[0]
+      @stack_name = request.args[1]
     end
 
-    client = Aws::CloudFormation::Client.new()
+    def run_command
+      raise(Cog::Error, "You must specify the change set name.") unless changeset_name
+      raise(Cog::Error, "You must specify stack name.") unless stack_name
 
-    cs_params = { change_set_name: request.args[0] }
-    if stack_name = request.args[1]
-      cs_params[:stack_name] = stack_name
+      response.template = 'changeset_delete'
+      response.content = delete_changeset
     end
 
-    client.delete_change_set(cs_params)
+    private
 
-    { status: "delete initiated",
-      change_set_name_or_id: request.args[0],
-      stack_name: request.args[1] }
+    def delete_changeset
+      client = Aws::CloudFormation::Client.new()
+
+      cs_params = {
+        change_set_name: changeset_name,
+        stack_name: stack_name
+      }.reject { |_key, value| value.nil? }
+
+      client.delete_change_set(cs_params)
+
+      { changeset_name: changeset_name,
+        stack_name: stack_name }
+    end
+
   end
-
 end

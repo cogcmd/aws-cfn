@@ -1,30 +1,37 @@
-require_relative '../exceptions'
+require 'cog_cmd/cfn/helpers'
 
-class CogCmd::Cfn::Changeset::Apply < Cog::Command
-  USAGE = <<~END
-  Usage: cfn:changeset apply <change set id> | <change set name> <stack name>
+module CogCmd::Cfn::Changeset
+  class Apply < Cog::Command
 
-  Applies a changeset to a stack. Returns a map containing the change set name AND stack name OR the change set id, depending on which was provided to apply.
+    attr_reader :changeset_name, :stack_name
 
-  Note: This command returns the same regardless of success or failure. Use the 'cfn:stack event' command to view the results of the apply.
-  END
-
-
-  def run_command
-    unless request.args[0]
-      raise CogCmd::Cfn::ArgumentError, "You must specify either the change set id OR the change set name AND stack name."
+    def initialize
+      @changeset_name = request.args[0]
+      @stack_name = request.args[1]
     end
 
-    client = Aws::CloudFormation::Client.new()
 
-    cs_params = { change_set_name: request.args[0] }
-    if stack_name = request.args[1]
-      cs_params[:stack_name] = stack_name
+    def run_command
+      raise(Cog::Error, "You must specify the change set name.") unless changeset_name
+      raise(Cog::Error, "You must specify stack name.") unless stack_name
+
+      response.template = 'stack_show'
+      response.content = apply_changeset
     end
 
-    client.execute_change_set(cs_params)
-    { status: "apply initiated" ,
-      change_set_name_or_id: request.args[0],
-      stack_name: request.args[1] }
+    private
+
+    def apply_changeset
+      client = Aws::CloudFormation::Client.new()
+
+      cs_params = {
+        change_set_name: changeset_name,
+        stack_name: stack_name
+      }
+
+      client.execute_change_set(cs_params)
+      client.describe_stacks(stack_name: stack_name).stacks[0].to_h
+    end
+
   end
 end

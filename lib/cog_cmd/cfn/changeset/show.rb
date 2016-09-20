@@ -1,25 +1,35 @@
-require_relative '../exceptions'
+require 'cog_cmd/cfn/helpers'
 
-class CogCmd::Cfn::Changeset::Show < Cog::Command
+module CogCmd::Cfn::Changeset
+  class Show < Cog::Command
 
-  USAGE = <<~END
-  Usage: cfn:changeset show <change set id> | <change set name> <stack name>
+    attr_reader :changeset_name, :stack_name
 
-  Shows changeset details. Returns a map equivalent to the response object documented here, http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Client.html#describe_change_set-instance_method
-  END
-
-  def run_command
-    unless request.args[0]
-      raise CogCmd::Cfn::ArgumentError, "You must specify either the change set id OR the change set name AND stack name."
+    def initialize
+      @changeset_name = request.args[0]
+      @stack_name = request.args[1]
     end
 
-    client = Aws::CloudFormation::Client.new()
+    def run_command
+      raise(Cog::Error, "You must specify the change set name.") unless changeset_name
+      raise(Cog::Error, "You must specify stack name.") unless stack_name
 
-    cs_params = { change_set_name: request.args[0] }
-    if stack_name = request.args[1]
-      cs_params[:stack_name] = stack_name
+      response.template = 'changeset_show'
+      response.content = show_changeset
     end
 
-    client.describe_change_set(cs_params).to_h
+    private
+
+    def show_changeset
+      client = Aws::CloudFormation::Client.new()
+
+      cs_params = {
+        change_set_name: changeset_name,
+        stack_name: stack_name
+      }
+
+      client.describe_change_set(cs_params).to_h
+    end
+
   end
 end
