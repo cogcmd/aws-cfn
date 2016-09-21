@@ -1,6 +1,5 @@
 require 'aws-sdk'
 require 'cog/command'
-require_relative 'exceptions'
 
 # If an AWS STS ROLE is defined, configure the AWS SDK to assume it
 if ENV['AWS_STS_ROLE_ARN']
