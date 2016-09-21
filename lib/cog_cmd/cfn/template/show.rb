@@ -1,5 +1,4 @@
 require 'cog_cmd/cfn/helpers'
-require_relative '../exceptions'
 
 module CogCmd::Cfn::Template
   class Show < Cog::Command
@@ -29,10 +28,6 @@ module CogCmd::Cfn::Template
 
       response.template = "template_show"
       response.content = results
-    rescue Aws::S3::Errors::NoSuchBucket => error
-      docs = "#{CogCmd::Cfn::Helpers::DOCUMENTATION_URL}#configuration"
-      msg = "#{error} - Make sure you have the proper url set for templates. #{docs}"
-      fail(msg)
     end
 
     private

@@ -24,6 +24,18 @@ commands:
         description: Show template information for the specified stack.
     rules:
     - must have cfn:template
+  template-body:
+    executable: "/home/bundle/cog-command"
+    description: Show the json body of the template
+    arguments: "<template_name> | -s <stack_name>"
+    options:
+      stack:
+        type: bool
+        required: false
+        short_flag: s
+        description: Show the template body for the specified stack.
+    rules:
+    - must have cfn:template
   stack-create:
     executable: "/home/bundle/cog-command"
     description: Creates a new stack based on an existing template and returns the
@@ -196,7 +208,7 @@ templates:
       ~end~
   template_show:
     body: |
-      ~attachment title="CloudFormation Template Details" color="#1E5775" title_link=$results[0].source~~end~
+      ~attachment title="CloudFormation Template Details" color="#1E5775" title_url=$results[0].source~~end~
 
       ~attachment title="Resource Types" color="#2681A3"~
       ~each var=$results[0].resource_types as=item~
@@ -297,3 +309,5 @@ templates:
       ~each var=$results as=changeset~
       Successfully deleted '~$changeset.changeset_name~'
       ~end~
+  template_body:
+    body: "~json var=$results[0]~\n"

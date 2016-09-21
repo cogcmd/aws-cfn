@@ -1,4 +1,4 @@
-~attachment title="CloudFormation Template Details" color="#1E5775" title_link=$results[0].source~~end~
+~attachment title="CloudFormation Template Details" color="#1E5775" title_url=$results[0].source~~end~
 
 ~attachment title="Resource Types" color="#2681A3"~
 ~each var=$results[0].resource_types as=item~
