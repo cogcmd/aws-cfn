@@ -1,9 +1,6 @@
 ~each var=$results as=changeset~
 
-~attachment title=$changeset.change_set_name footer=$changeset.creation_time color=darkblue~
-**Stack**: ~$changeset.stack_name~
-**Status**: ~$changeset.status~
-~br~
+~attachment title=$changeset.change_set_name timestamp=$changeset.creation_time stack=$changeset.stack_name status=$changeset.status color=darkblue~
 ~$changeset.description~
 ~end~
 
