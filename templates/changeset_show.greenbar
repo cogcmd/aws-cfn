@@ -40,4 +40,9 @@
 ~end~
 ~end~
 
+~attachment color=lightblue~
+To apply this changeset, run:
+cfn:changeset-apply ~$changeset.change_set_name~ ~$changeset.stack_name~
+~end~
+
 ~end~
