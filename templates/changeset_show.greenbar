@@ -1,10 +1,6 @@
 ~each var=$results as=changeset~
 
-~attachment title=$changeset.change_set_name color=darkblue~
-**Stack**: ~$changeset.stack_name~
-**Status**: ~$changeset.status~
-**Creation Time**: ~$changeset.creation_time~
-~br~
+~attachment title=$changeset.change_set_name timestamp=$changeset.creation_time stack=$changeset.stack_name status=$changeset.status color=darkblue~
 ~$changeset.description~
 ~end~
 
@@ -13,6 +9,16 @@
 |-----|-------|
 ~each var=$changeset.parameters as=param~
 | ~$param.parameter_key~ | ~$param.parameter_value~ |
+~end~
+~end~
+
+~if cond=$changeset.changes not_empty?~
+~attachment title="Changes" color=blue~
+| Physical ID | Logical ID | Replacement |
+|-------------|------------|-------------|
+~each var=$changeset.changes as=change~
+| ~$change.resource_change.physical_resource_id~ | ~$change.resource_change.logical_resource_id~ | ~$change.resource_change.replacement~ |
+~end~
 ~end~
 ~end~
 
