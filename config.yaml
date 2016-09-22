@@ -10,6 +10,7 @@ commands:
   template-list:
     executable: "/home/bundle/cog-command"
     description: List available CloudFormation templates
+    arguments: "[template_prefix]"
     rules:
     - must have cfn:template
   template-show:
