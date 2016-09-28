@@ -19,10 +19,6 @@ module CogCmd::Cfn::Helpers
     str.sub(template_root[:prefix], "")
   end
 
-  def strip_json(str)
-    str.sub(/\.json$/, "")
-  end
-
   def template_root
     parse_s3_url(cfn_template_url)
   end
@@ -31,18 +27,18 @@ module CogCmd::Cfn::Helpers
     parse_s3_url(cfn_policy_url)
   end
 
-  def template_url(template_name)
-    return unless template_name
+  def template_url(template_file)
+    return unless template_file
 
     [ "https://#{template_root['bucket']}.s3.amazonaws.com",
-      "#{template_root['prefix']}#{template_name}.json" ].join('/')
+      "#{template_root['prefix']}#{template_file}" ].join('/')
   end
 
-  def policy_url(policy_name)
-    return nil if policy_name.nil?
+  def policy_url(policy_file)
+    return nil if policy_file.nil?
 
     [ "https://#{policy_root['bucket']}.s3.amazonaws.com",
-      "#{policy_root['prefix']}#{policy_name}.json" ].join('/')
+      "#{policy_root['prefix']}#{policy_file}" ].join('/')
   end
 
   def param_or_nil(param)

@@ -1,5 +1,6 @@
 require 'cog_cmd/cfn/helpers'
 require 'json'
+require 'yaml'
 
 module CogCmd::Cfn::Template
   class Body < Cog::Command
@@ -38,15 +39,15 @@ module CogCmd::Cfn::Template
       client = Aws::CloudFormation::Client.new
 
       resp = client.get_template(stack_name: template_or_stack_name)
-      JSON.parse(resp.template_body)
+      YAML.load(resp.template_body)
     end
 
     def get_from_s3
       client = Aws::S3::Client.new
 
-      key = "#{template_root[:prefix]}#{template_or_stack_name}.json"
+      key = "#{template_root[:prefix]}#{template_or_stack_name}"
       resp = client.get_object(bucket: template_root[:bucket], key: key)
-      JSON.parse(resp.body.read)
+      YAML.load(resp.body.read)
     end
 
     def is_stack_name?
