@@ -14,7 +14,7 @@ module CogCmd::Cfn::Template
     def run_command
       response.template = 'template_list'
       response.content = list_templates.reduce([]) do |acc, obj|
-        acc.push(process_obj(obj)) if json_key?(obj)
+        acc.push(process_obj(obj)) if template_object?(obj)
         acc
       end
 
@@ -37,12 +37,12 @@ module CogCmd::Cfn::Template
       client.list_objects_v2(params).contents
     end
 
-    def json_key?(obj)
-      obj.key.end_with?('.json')
+    def template_object?(obj)
+      obj.key.match(/\.(json)|(ya?ml)$/)
     end
 
     def process_obj(obj)
-      { name: strip_json(strip_prefix(obj.key)),
+      { name: strip_prefix(obj.key),
         last_modified: obj.last_modified }
     end
 
