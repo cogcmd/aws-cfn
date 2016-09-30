@@ -2,10 +2,10 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.0.15
+version: 0.0.16
 docker:
   image: cogcmd/aws-cfn
-  tag: 0.0.15
+  tag: 0.0.16
 commands:
   template-list:
     executable: "/home/bundle/cog-command"
