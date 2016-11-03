@@ -1,7 +1,10 @@
 require 'cfn/command'
+require 'cfn/branch_option'
 
 module CogCmd::Cfn::Defaults
   class Create < Cfn::Command
+    include Cfn::BranchOption
+
     NAME_FORMAT = /\A[\w-]*\z/
 
     input :accumulate
@@ -37,12 +40,6 @@ module CogCmd::Cfn::Defaults
       end
     end
 
-    def require_branch_exists!
-      unless git_client.branch_exists?(branch)
-        raise(Cog::Error, "Branch #{branch} does not exist. Create a branch and push it to your repository's origin and try again.")
-      end
-    end
-
     def name
       request.args[0]
     end
@@ -53,10 +50,6 @@ module CogCmd::Cfn::Defaults
 
     def body
       input[0]
-    end
-
-    def branch
-      request.options['branch'] || 'master'
     end
   end
 end
