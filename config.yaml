@@ -2,10 +2,10 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.0.16
+version: 0.0.17
 docker:
   image: cogcmd/aws-cfn
-  tag: 0.0.16
+  tag: 0.0.17
 commands:
   template-list:
     executable: "/home/bundle/cog-command"
@@ -169,7 +169,7 @@ commands:
         required: false
         description: The name of your changeset. Defaults to 'changeset<num>'
     rules:
-    - must have cfn:changeset
+      - must have cfn:changeset
   changeset-list:
     executable: "/home/bundle/cog-command"
     description: Lists cloudformation changesets.
@@ -194,10 +194,68 @@ commands:
     arguments: "<changeset_name> <stack_name>"
     rules:
     - must have cfn:changeset
+  defaults-create:
+    executable: "/home/bundle/cog-command"
+    description: Creates a new defaults file.
+    arguments: "<name>"
+    options:
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch of which to commit the new defaults file. Defaults to master.
+    rules:
+      - must have cfn:defaults-create
+  defaults-ls:
+    executable: "/home/bundle/cog-command"
+    description: Lists all defaults files, filtered by an optional glob pattern.
+    arguments: "[pattern]"
+    options:
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch from which to list defaults files. Defaults to master.
+      tag:
+        type: string
+        required: false
+        short_flag: t
+        description: Tag from which to list defaults files.
+      sha:
+        type: string
+        required: false
+        short_flag: s
+        description: Git commit SHA from which to list defaults files.
+    rules:
+      - allow
+  defaults-show:
+    executable: "/home/bundle/cog-command"
+    description: Shows contents of a defaults file.
+    arguments: "<name>"
+    options:
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch in which to find the defaults file. Defaults to master.
+      tag:
+        type: string
+        required: false
+        short_flag: t
+        description: Tag in which to find the defaults file.
+      sha:
+        type: string
+        required: false
+        short_flag: s
+        description: Git commit SHA in which to find the defaults file.
+    rules:
+      - must have cfn:defaults-show
 permissions:
-- cfn:stack
-- cfn:changeset
-- cfn:template
+  - cfn:stack
+  - cfn:changeset
+  - cfn:template
+  - cfn:defaults-create
+  - cfn:defaults-show
 templates:
   template_list:
     body: |
@@ -323,3 +381,20 @@ templates:
       ~end~
   template_body:
     body: "~json var=$results[0]~\n"
+  defaults_create:
+    body: |
+      ~each var=$results as=defaults~
+      Created defaults file ~$defaults.name~
+      ~end~
+  defaults_list:
+    body: |
+      ~each var=$results as=defaults~
+      ~$defaults.name~
+      ~end~
+  defaults_show:
+    body: |
+      ~each var=$results as=defaults~
+      ```
+      ~$defaults~
+      ```
+      ~end~
