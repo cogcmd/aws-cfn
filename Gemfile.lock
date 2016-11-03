@@ -25,6 +25,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.5.0)
     rspec-support (3.5.0)
+    rugged (0.24.0)
 
 PLATFORMS
   ruby
@@ -33,6 +34,7 @@ DEPENDENCIES
   aws-sdk (~> 2.5)
   cog-rb (~> 0.3.2)
   rspec
+  rugged (~> 0.24.0)
 
 BUNDLED WITH
    1.12.5
