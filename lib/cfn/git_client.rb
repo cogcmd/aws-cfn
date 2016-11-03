@@ -35,10 +35,35 @@ module Cfn
       JSON.parse(body)
     end
 
+    def list_templates(filter = '*', ref = { branch: 'master' })
+      reset_hard_ref(ref)
+      path_with_glob = workdir_path("templates/#{filter}")
+      files = Dir.glob(path_with_glob)
+      files.map do |path|
+        ext = File.extname(path)
+        { name: File.basename(path, ext) }
+      end
+    end
+
+    def show_template(name, ref = { branch: 'master' })
+      reset_hard_ref(ref)
+      absolute_path = workdir_path("templates/#{name}.{json,yml,yaml}")
+      entries = Dir.glob(absolute_path)
+      body = File.read(entries.first)
+      { name: name, body: body }
+    end
+
     def defaults_exists?(name, ref = { branch: 'master' })
       reset_hard_ref(ref)
       absolute_path = workdir_path("defaults/#{name}.json")
       File.exist?(absolute_path)
+    end
+
+    def template_exists?(name, ref = { branch: 'master' })
+      reset_hard_ref(ref)
+      absolute_path = workdir_path("templates/#{name}.{json,yml,yaml}")
+      entries = Dir.glob(absolute_path)
+      entries.any? { |e| File.exist?(e) }
     end
 
     def ref_exists?(ref)

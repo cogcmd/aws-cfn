@@ -7,36 +7,50 @@ docker:
   image: cogcmd/aws-cfn
   tag: 0.0.17
 commands:
-  template-list:
-    executable: "/home/bundle/cog-command"
-    description: List available CloudFormation templates
-    arguments: "[template_prefix]"
-    rules:
-    - must have cfn:template
   template-show:
     executable: "/home/bundle/cog-command"
-    description: Show summary information for a CloudFormation template
-    arguments: "<template_name> | -s <stack_name>"
+    description: Shows contents of a template.
+    arguments: "<name>"
     options:
-      stack:
-        type: bool
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch in which to find the template. Defaults to master.
+      tag:
+        type: string
+        required: false
+        short_flag: t
+        description: Tag in which to find the template.
+      sha:
+        type: string
         required: false
         short_flag: s
-        description: Show template information for the specified stack.
+        description: Git commit SHA in which to find the template.
     rules:
-    - must have cfn:template
-  template-body:
+      - must have cfn:template-show
+  template-ls:
     executable: "/home/bundle/cog-command"
-    description: Show the json body of the template
-    arguments: "<template_name> | -s <stack_name>"
+    description: Lists all templates, filtered by an optional glob pattern.
+    arguments: "[pattern]"
     options:
-      stack:
-        type: bool
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch from which to list templates. Defaults to master.
+      tag:
+        type: string
+        required: false
+        short_flag: t
+        description: Tag from which to list templates.
+      sha:
+        type: string
         required: false
         short_flag: s
-        description: Show the template body for the specified stack.
+        description: Git commit SHA from which to list templates.
     rules:
-    - must have cfn:template
+      - allow
   stack-create:
     executable: "/home/bundle/cog-command"
     description: Creates a new stack based on an existing template and returns the
@@ -253,34 +267,21 @@ commands:
 permissions:
   - cfn:stack
   - cfn:changeset
-  - cfn:template
+  - cfn:template-show
   - cfn:defaults-create
   - cfn:defaults-show
 templates:
   template_list:
     body: |
-      ~attachment title="CloudFormation Templates" color="#1E5775"~~end~
-      ~attachment color="#2681A3"~
       ~each var=$results as=template~
-      • ~$template.name~
-      ~end~
+      ~$template.name~
       ~end~
   template_show:
     body: |
-      ~attachment title="CloudFormation Template Details" color="#1E5775" title_url=$results[0].source~~end~
-
-      ~attachment title="Resource Types" color="#2681A3"~
-      ~each var=$results[0].resource_types as=item~
-      • ~$item~
-      ~end~
-      ~end~
-
-      ~attachment title="Parameters" color="#2681A3"~
-      | Key | Type | Default | Allowed |
-      |-----|------|---------|---------|
-      ~each var=$results[0].parameters as=item~
-      | ~$item.parameter_key~ | ~$item.parameter_type~ | ~$item.default_value~ |  ~join var=$item.parameter_constraints.allowed_values as=allowed_values with=", "~~$allowed_values~~end~ |
-      ~end~
+      ~each var=$results as=template~
+      ```
+      ~$template.body~
+      ```
       ~end~
   stack_show:
     body: |
@@ -379,8 +380,6 @@ templates:
       ~each var=$results as=changeset~
       Successfully deleted '~$changeset.changeset_name~'
       ~end~
-  template_body:
-    body: "~json var=$results[0]~\n"
   defaults_create:
     body: |
       ~each var=$results as=defaults~

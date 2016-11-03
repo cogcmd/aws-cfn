@@ -1,47 +1,86 @@
-require 'cog_cmd/cfn/helpers'
+require 'cfn/command'
 
 module CogCmd::Cfn::Template
-  class Show < Cog::Command
-
-    include CogCmd::Cfn::Helpers
-
-    attr_reader :template_or_stack_name
-
-    def initialize
-      # args
-      @template_or_stack_name = request.args[0]
-    end
+  class Show < Cfn::Command
+    NAME_FORMAT = /\A[\w-]*\z/
 
     def run_command
-      raise(Cog::Error, bad_arg_msg) unless @template_or_stack_name
+      require_git_client!
+      require_name!
+      require_name_format!
+      require_ref_exists!
+      require_template_exists!
 
-      client = Aws::CloudFormation::Client.new()
-      cf_params = {}
-      if is_stack_name?
-        cf_params[:stack_name] = template_or_stack_name
-      else
-        cf_params[:template_url] = template_url(template_or_stack_name)
-      end
+      file = git_client.show_template(name, ref)
 
-      results = client.get_template_summary(cf_params).to_h
-      results.merge!({ "source": cf_params[:template_url] || cf_params[:stack_name] })
-
-      response.template = "template_show"
-      response.content = results
+      response.template = 'template_show'
+      response.content = [file]
     end
 
-    private
-
-    def is_stack_name?
-      request.options['stack']
+    def require_name!
+      unless name
+        raise(Cog::Error, 'Name not provided. Provide a name as the first argument.')
+      end
     end
 
-    def bad_arg_msg
-      if is_stack_name?
-        "You must specify a stack name or id." 
-      else
-        "You must specify a template name."
+    def require_name_format!
+      unless NAME_FORMAT.match(name)
+        raise(Cog::Error, 'Name must only include word characters [a-zA-Z0-9_-].')
       end
+    end
+
+    def require_ref_exists!
+      unless git_client.ref_exists?(ref)
+        if branch = ref[:branch]
+          raise(Cog::Error, "Branch #{branch} does not exist. Create a branch, push it to your repository's origin, and try again.")
+        elsif sha = ref[:tag]
+          raise(Cog::Error, "Tag #{tag} does not exist. Create a tag, push it to your repository's origin, and try again.")
+        elsif sha = ref[:sha]
+          raise(Cog::Error, "Git commit SHA #{sha} does not exist. Check that the SHA you are referencing has been pushed to your repository's origin and try again.")
+        end
+      end
+    end
+
+    def require_template_exists!
+      unless git_client.template_exists?(name, ref)
+        if branch = ref[:branch]
+          additional = "Check that the template exists in the #{branch} branch and has been pushed to your repository's origin."
+        elsif sha = ref[:tag]
+          additional = "Check that the template exists in the #{tag} tag and has been pushed to your repository's origin."
+        elsif sha = ref[:sha]
+          additional = "Check that the template exists in the git commit SHA #{sha} tag and has been pushed to your repository's origin."
+        end
+
+        raise(Cog::Error, "Template does not exist. #{additional}")
+      end
+    end
+
+    def name
+      request.args[0]
+    end
+
+    def ref
+      if branch
+        { branch: branch }
+      elsif tag
+        { tag: tag }
+      elsif sha
+        { sha: sha }
+      else
+        { branch: 'master' }
+      end
+    end
+
+    def branch
+      request.options['branch']
+    end
+
+    def tag
+      request.options['tag']
+    end
+
+    def sha
+      request.options['sha']
     end
   end
 end
