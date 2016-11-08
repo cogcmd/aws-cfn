@@ -1,5 +1,6 @@
 require 'rugged'
 require 'json'
+require 'yaml'
 
 module Cfn
   class GitClient
@@ -14,8 +15,8 @@ module Cfn
       path = "defaults/#{name}.json"
 
       reset_hard_branch(branch)
-      create_file(path, body)
-      create_commit(path)
+      create_file(path, JSON.pretty_generate(body))
+      create_commit([path])
       push_repository(branch)
 
       [{ name: name, body: body }]
@@ -32,7 +33,7 @@ module Cfn
       reset_hard_ref(ref)
       absolute_path = workdir_path("defaults/#{name}.json")
       body = File.read(absolute_path)
-      JSON.parse(body)
+      { name: name, data: JSON.parse(body) }
     end
 
     def list_templates(filter = '*', ref = { branch: 'master' })
@@ -50,7 +51,42 @@ module Cfn
       absolute_path = workdir_path("templates/#{name}.{json,yml,yaml}")
       entries = Dir.glob(absolute_path)
       body = File.read(entries.first)
-      { name: name, body: body }
+      data = YAML.load(body)
+      { name: name, body: body, data: data }
+    end
+
+    def create_definition(name, definition, template, timestamp, branch = 'master')
+      path = "definitions/#{name}/#{timestamp}"
+      template_path = "#{path}/template.yaml"
+      definition_path = "#{path}/definition.yaml"
+
+      reset_hard_branch(branch)
+      create_file(template_path, template.to_yaml)
+      create_file(definition_path, definition.to_yaml)
+      create_commit([template_path, definition_path])
+      push_repository(branch)
+
+      definition
+    end
+
+    def list_definitions(filter = '*', ref = { branch: 'master' })
+      reset_hard_ref(ref)
+      path_with_glob = workdir_path("definitions/#{filter}")
+      dirs = Dir.glob(path_with_glob)
+      dirs.map { |p| { name: File.basename(p) } }
+    end
+
+    def show_definition(name, ref = { branch: 'master' })
+      reset_hard_ref(ref)
+      absolute_path = workdir_path("definitions/#{name}/*/definition.yaml")
+      entries = Dir.glob(absolute_path)
+      body = File.read(entries.first)
+      data = YAML.load(body)
+      { name: name, body: body, data: data }
+    end
+
+    def branch_sha(branch)
+      repository.branches["origin/#{branch}"].target_id
     end
 
     def defaults_exists?(name, ref = { branch: 'master' })
@@ -62,6 +98,13 @@ module Cfn
     def template_exists?(name, ref = { branch: 'master' })
       reset_hard_ref(ref)
       absolute_path = workdir_path("templates/#{name}.{json,yml,yaml}")
+      entries = Dir.glob(absolute_path)
+      entries.any? { |e| File.exist?(e) }
+    end
+
+    def definition_exists?(name, ref = { branch: 'master' })
+      reset_hard_ref(ref)
+      absolute_path = workdir_path("definitions/#{name}/*/definition.yaml")
       entries = Dir.glob(absolute_path)
       entries.any? { |e| File.exist?(e) }
     end
@@ -94,13 +137,12 @@ module Cfn
     private
 
     def create_credential(ssh_key_contents)
-      ssh_key_file = Tempfile.new('ssh_key')
-      ssh_key_file.write(ssh_key_contents)
-      ssh_key_file.close
+      ssh_key_file_path = "/home/bundle/ssh_key"
+      ssh_key_file = File.write(ssh_key_file_path, ssh_key_contents)
 
       Rugged::Credentials::SshKey.new(
         username: 'git',
-        privatekey: ssh_key_file.path
+        privatekey: ssh_key_file_path
       )
     end
 
@@ -145,15 +187,18 @@ module Cfn
     def create_file(path, body)
       absolute_path = workdir_path(path)
       FileUtils.mkdir_p(File.dirname(absolute_path))
-      File.write(absolute_path, JSON.pretty_generate(body))
+      File.write(absolute_path, body)
     end
 
-    def create_commit(path)
+    def create_commit(paths)
       index = repository.index
       parent = repository.head.target
 
-      oid = Rugged::Blob.from_workdir(repository, path)
-      index.add(path: path, oid: oid, mode: 0100644)
+      paths.each do |path|
+        oid = Rugged::Blob.from_workdir(repository, path)
+        index.add(path: path, oid: oid, mode: 0100644)
+      end
+
       commit_tree = index.write_tree(repository)
       index.write
 
@@ -167,7 +212,7 @@ module Cfn
         repository,
         author: author,
         committer: author,
-        message: "Create #{path}",
+        message: "Create #{paths.join(', ')}",
         parents: [parent],
         tree: commit_tree,
         update_ref: 'HEAD'

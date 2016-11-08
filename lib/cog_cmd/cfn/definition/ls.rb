@@ -1,7 +1,7 @@
 require 'cfn/command'
 require 'cfn/ref_options'
 
-module CogCmd::Cfn::Defaults
+module CogCmd::Cfn::Definition
   class Ls < Cfn::Command
     include Cfn::RefOptions
 
@@ -9,10 +9,10 @@ module CogCmd::Cfn::Defaults
       require_git_client!
       require_ref_exists!
 
-      defaults = git_client.list_defaults(filter, ref)
+      definitions = git_client.list_definitions(filter, ref)
 
-      response.template = 'defaults_list'
-      response.content = defaults
+      response.template = 'definition_list'
+      response.content = definitions
     end
 
     def filter

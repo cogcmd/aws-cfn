@@ -1,4 +1,5 @@
 require 'cfn/command'
+require 'cfn/ref_options'
 
 module CogCmd::Cfn::Defaults
   class Show < Cfn::Command
@@ -13,7 +14,7 @@ module CogCmd::Cfn::Defaults
       require_ref_exists!
       require_defaults_exists!
 
-      file = git_client.show_defaults(name, ref)
+      file = git_client.show_defaults(name, ref)[:data]
 
       response.template = 'defaults_show'
       response.content = [file]

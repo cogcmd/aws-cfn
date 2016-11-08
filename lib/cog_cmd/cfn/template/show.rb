@@ -1,4 +1,5 @@
 require 'cfn/command'
+require 'cfn/ref_options'
 
 module CogCmd::Cfn::Template
   class Show < Cfn::Command
