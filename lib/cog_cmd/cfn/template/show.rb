@@ -1,3 +1,4 @@
+require 'cog_cmd/cfn/template'
 require 'cfn/command'
 require 'cfn/ref_options'
 

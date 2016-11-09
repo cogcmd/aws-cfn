@@ -1,3 +1,4 @@
+require 'cog_cmd/cfn/definition'
 require 'cfn/command'
 require 'cfn/branch_option'
 require 'cfn/definition'

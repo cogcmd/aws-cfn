@@ -1,3 +1,4 @@
+require 'cog_cmd/cfn/changeset'
 require 'cog_cmd/cfn/helpers'
 
 module CogCmd::Cfn::Changeset
