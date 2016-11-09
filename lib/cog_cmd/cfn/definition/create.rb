@@ -30,44 +30,44 @@ module CogCmd::Cfn::Definition
         branch: branch
       })
 
-      # response.template = 'definition_create'
+      response.template = 'definition_create'
       response.content = [definition]
     end
 
     def require_name!
       unless name
-        raise(Cog::Error, 'Name not provided. Provide a name as the first argument.')
+        raise(Cog::Abort, 'Name not provided. Provide a name as the first argument.')
       end
     end
 
     def require_name_format!
       unless NAME_FORMAT.match(name)
-        raise(Cog::Error, 'Name must only include word characters [a-zA-Z0-9_-].')
+        raise(Cog::Abort, 'Name must only include word characters [a-zA-Z0-9_-].')
       end
     end
 
     def require_template!
       unless template
-        raise(Cog::Error, 'Template not provided. Provide a template as the second argument.')
+        raise(Cog::Abort, 'Template not provided. Provide a template as the second argument.')
       end
     end
 
     def require_template_format!
       unless NAME_FORMAT.match(template)
-        raise(Cog::Error, 'Template must only include word characters [a-zA-Z0-9_-].')
+        raise(Cog::Abort, 'Template must only include word characters [a-zA-Z0-9_-].')
       end
     end
 
     def require_template_exists!
       unless git_client.template_exists?(template, { branch: branch })
-        raise(Cog::Error, "Template does not exist. Check that the template exists in the #{branch} branch and has been pushed to your repository's origin.")
+        raise(Cog::Abort, "Template does not exist. Check that the template exists in the #{branch} branch and has been pushed to your repository's origin.")
       end
     end
 
     def require_defaults_exist!
       defaults.each do |defaults_name|
         unless git_client.defaults_exists?(defaults_name, { branch: branch })
-          raise(Cog::Error, "Defaults file does not exist. Check that the defaults file exists in the #{branch} branch and has been pushed to your repository's origin.")
+          raise(Cog::Abort, "Defaults file does not exist. Check that the defaults file exists in the #{branch} branch and has been pushed to your repository's origin.")
         end
       end
     end

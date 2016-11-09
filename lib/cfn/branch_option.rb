@@ -9,7 +9,7 @@ module Cfn::BranchOption
 
   def require_branch_exists!
     unless git_client.branch_exists?(branch)
-      raise(Cog::Error, "Branch #{branch} does not exist. Create a branch and push it to your repository's origin and try again.")
+      raise(Cog::Abort, "Branch #{branch} does not exist. Create a branch and push it to your repository's origin and try again.")
     end
   end
 

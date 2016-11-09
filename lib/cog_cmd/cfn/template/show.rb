@@ -22,13 +22,13 @@ module CogCmd::Cfn::Template
 
     def require_name!
       unless name
-        raise(Cog::Error, 'Name not provided. Provide a name as the first argument.')
+        raise(Cog::Abort, 'Name not provided. Provide a name as the first argument.')
       end
     end
 
     def require_name_format!
       unless NAME_FORMAT.match(name)
-        raise(Cog::Error, 'Name must only include word characters [a-zA-Z0-9_-].')
+        raise(Cog::Abort, 'Name must only include word characters [a-zA-Z0-9_-].')
       end
     end
 
@@ -42,7 +42,7 @@ module CogCmd::Cfn::Template
           additional = "Check that the template exists in the git commit SHA #{sha} tag and has been pushed to your repository's origin."
         end
 
-        raise(Cog::Error, "Template does not exist. #{additional}")
+        raise(Cog::Abort, "Template does not exist. #{additional}")
       end
     end
 

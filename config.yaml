@@ -470,6 +470,11 @@ templates:
       ~$defaults~
       ```
       ~end~
+  definition_create:
+    body: |
+      ~each var=$results as=definition~
+      Created definition ~$definition.name~
+      ~end~
   definition_list:
     body: |
       ~each var=$results as=definition~

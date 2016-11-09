@@ -28,25 +28,25 @@ module Cfn
 
     def require_git_remote_url!
       unless git_remote_url
-        raise(Cog::Error, '`GIT_REMOTE_URL` not set. Set the `GIT_REMOTE_URL` environment variable to the ssh or https URL of your git repository.')
+        raise(Cog::Abort, '`GIT_REMOTE_URL` not set. Set the `GIT_REMOTE_URL` environment variable to the ssh or https URL of your git repository.')
       end
     end
 
     def require_git_ssh_key!
       unless git_ssh_key
-        raise(Cog::Error, '`GIT_SSH_KEY` not set. Set the `GIT_SSH_KEY` environment variable to an ssh key that has access to your git repository.')
+        raise(Cog::Abort, '`GIT_SSH_KEY` not set. Set the `GIT_SSH_KEY` environment variable to an ssh key that has access to your git repository.')
       end
     end
 
     def require_aws_credentials!
       unless aws_access_key_id && aws_secret_access_key
-        raise(Cog::Error, '`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` not set. Set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables owned by an IAM user that has the AmazonS3FullAccess policy.')
+        raise(Cog::Abort, '`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` not set. Set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables owned by an IAM user that has the AmazonS3FullAccess policy.')
       end
     end
 
     def require_s3_stack_definition_bucket!
       unless s3_stack_definition_bucket
-        raise(Cog::Error, '`S3_STACK_DEFINITION_BUCKET` not set. Set the `S3_STACK_DEFINITION_BUCKET` environment variable to the name of the bucket used to read and write stack definitions.')
+        raise(Cog::Abort, '`S3_STACK_DEFINITION_BUCKET` not set. Set the `S3_STACK_DEFINITION_BUCKET` environment variable to the name of the bucket used to read and write stack definitions.')
       end
     end
 

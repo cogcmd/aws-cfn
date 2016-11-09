@@ -24,19 +24,19 @@ module CogCmd::Cfn::Defaults
 
     def require_name!
       unless name
-        raise(Cog::Error, 'Name not provided. Provide a name as the first argument.')
+        raise(Cog::Abort, 'Name not provided. Provide a name as the first argument.')
       end
     end
 
     def require_name_format!
       unless NAME_FORMAT.match(name)
-        raise(Cog::Error, 'Name must only include word characters [a-zA-Z0-9_-].')
+        raise(Cog::Abort, 'Name must only include word characters [a-zA-Z0-9_-].')
       end
     end
 
     def require_singular_input!
       if input.size > 1
-        raise(Cog::Error, 'Input from previous command must only include a single item.')
+        raise(Cog::Abort, 'Input from previous command must only include a single item.')
       end
     end
 

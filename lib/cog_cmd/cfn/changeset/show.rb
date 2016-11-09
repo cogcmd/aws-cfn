@@ -11,8 +11,8 @@ module CogCmd::Cfn::Changeset
     end
 
     def run_command
-      raise(Cog::Error, "You must specify the change set name.") unless changeset_name
-      raise(Cog::Error, "You must specify stack name.") unless stack_name
+      raise(Cog::Abort, "You must specify the change set name.") unless changeset_name
+      raise(Cog::Abort, "You must specify stack name.") unless stack_name
 
       response.template = 'changeset_show'
       response.content = show_changeset

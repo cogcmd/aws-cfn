@@ -12,7 +12,7 @@ module CogCmd::Cfn::Stack
     end
 
     def run_command
-      raise(Cog::Error, "You must specify a stack name.") unless stack_name
+      raise(Cog::Abort, "You must specify a stack name.") unless stack_name
 
       response.template = 'stack_show'
       response.content = describe_stacks

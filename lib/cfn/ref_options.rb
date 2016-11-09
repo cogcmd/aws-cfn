@@ -10,11 +10,11 @@ module Cfn::RefOptions
   def require_ref_exists!
     unless git_client.ref_exists?(ref)
       if branch = ref[:branch]
-        raise(Cog::Error, "Branch #{branch} does not exist. Create a branch, push it to your repository's origin, and try again.")
+        raise(Cog::Abort, "Branch #{branch} does not exist. Create a branch, push it to your repository's origin, and try again.")
       elsif sha = ref[:tag]
-        raise(Cog::Error, "Tag #{tag} does not exist. Create a tag, push it to your repository's origin, and try again.")
+        raise(Cog::Abort, "Tag #{tag} does not exist. Create a tag, push it to your repository's origin, and try again.")
       elsif sha = ref[:sha]
-        raise(Cog::Error, "Git commit SHA #{sha} does not exist. Check that the SHA you are referencing has been pushed to your repository's origin and try again.")
+        raise(Cog::Abort, "Git commit SHA #{sha} does not exist. Check that the SHA you are referencing has been pushed to your repository's origin and try again.")
       end
     end
   end
