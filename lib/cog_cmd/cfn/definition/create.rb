@@ -16,11 +16,11 @@ module CogCmd::Cfn::Definition
       require_s3_client!
       require_name!
       require_name_format!
+      require_branch_exists!
       require_template!
       require_template_format!
       require_template_exists!
       require_defaults_exist!
-      require_branch_exists!
 
       definition = Cfn::Definition.create(git_client, s3_client, {
         name: name,
@@ -68,7 +68,7 @@ module CogCmd::Cfn::Definition
     def require_defaults_exist!
       defaults.each do |defaults_name|
         unless git_client.defaults_exists?(defaults_name, { branch: branch })
-          raise(Cog::Abort, "Defaults file does not exist. Check that the defaults file exists in the #{branch} branch and has been pushed to your repository's origin.")
+          raise(Cog::Abort, "Defaults file #{defaults_name} does not exist. Check that the defaults file exists in the #{branch} branch and has been pushed to your repository's origin.")
         end
       end
     end
