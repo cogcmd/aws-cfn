@@ -2,13 +2,15 @@ require 'rugged'
 require 'json'
 require 'yaml'
 require 'tmpdir'
+require 'tempfile'
 
 module Cfn
   class GitClient
-    attr_reader :credential, :repository
+    attr_reader :credential_file, :credential, :repository
 
     def initialize(remote_url, ssh_key_contents)
-      @credential = create_credential(ssh_key_contents)
+      @credential_file = Tempfile.new('cfn-ssh-key')
+      @credential = create_credential(@credential_file, ssh_key_contents)
       @repository = clone_repository(remote_url, @credential)
     end
 
@@ -137,13 +139,13 @@ module Cfn
 
     private
 
-    def create_credential(ssh_key_contents)
-      ssh_key_file_path = "/home/bundle/ssh_key"
-      ssh_key_file = File.write(ssh_key_file_path, ssh_key_contents)
+    def create_credential(file, ssh_key_contents)
+      file.write(ssh_key_contents)
+      file.close
 
       Rugged::Credentials::SshKey.new(
         username: 'git',
-        privatekey: ssh_key_file_path
+        privatekey: file.path
       )
     end
 

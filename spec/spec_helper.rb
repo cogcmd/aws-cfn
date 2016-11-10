@@ -10,4 +10,6 @@ end
 RSpec.configure do |config|
   config.include Cog::RSpec::Setup
   config.include FixtureHelper
+
+  config.filter_run_excluding feature: true
 end
