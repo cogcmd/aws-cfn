@@ -1,6 +1,7 @@
 require 'rugged'
 require 'json'
 require 'yaml'
+require 'tmpdir'
 
 module Cfn
   class GitClient
