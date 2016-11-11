@@ -1,3 +1,4 @@
+require 'cog_cmd/cfn/stack'
 require 'cog_cmd/cfn/helpers'
 
 module CogCmd::Cfn::Stack
@@ -13,7 +14,7 @@ module CogCmd::Cfn::Stack
     end
 
     def run_command
-      raise(Cog::Error, "You must specify a stack name.") unless stack_name
+      raise(Cog::Abort, "You must specify a stack name.") unless stack_name
 
       response.template = 'stack_show'
       response.content = delete_stack

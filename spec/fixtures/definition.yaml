@@ -1,0 +1,20 @@
+---
+name: flywheel
+template:
+  name: base
+  sha: ed3469e8d35be22651bcb4a8c09ab30183d1e8e0
+defaults:
+- name: webapp
+  params:
+    port: 80
+  tags: []
+- name: staging
+  params: []
+  tags:
+    env: staging
+overrides:
+  params: []
+  tags: []
+params: []
+tags: []
+template_url: https://s3.amazonaws.com/cogcmd-aws-cfn-test/definition/flywheel/1478619282/template.yaml

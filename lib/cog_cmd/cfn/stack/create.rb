@@ -1,3 +1,4 @@
+require 'cog_cmd/cfn/stack'
 require 'cog_cmd/cfn/helpers'
 
 module CogCmd::Cfn::Stack
@@ -24,8 +25,8 @@ module CogCmd::Cfn::Stack
     end
 
     def run_command
-      raise(Cog::Error, "You must specify a stack name AND a template name.") unless stack_name
-      raise(Cog::Error, "You must specify a stack name AND a template name.") unless template_name
+      raise(Cog::Abort, "You must specify a stack name AND a template name.") unless stack_name
+      raise(Cog::Abort, "You must specify a stack name AND a template name.") unless template_name
 
       response.template = 'stack_show'
       response.content = create_stack

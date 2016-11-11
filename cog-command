@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-# TODO: We can drop this bit when we get rid of the require_relative bits
 # Make sure we're in the top-level directory for the command
 # since so many paths are relative.
 Dir.chdir(File.dirname(__FILE__))
@@ -9,7 +8,15 @@ Dir.chdir(File.dirname(__FILE__))
 libdir = File.join(File.dirname(__FILE__), 'lib')
 $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
 
-require 'bundler/setup'
+# Set load path for gems installed with "bundle install --standalone" or
+# fallback to good 'ol bundler
+begin
+  require_relative 'bundle/bundler/setup'
+rescue LoadError
+  require 'bundler'
+  Bundler.setup
+end
+
 require 'cog'
 
 Cog.bundle('cfn')

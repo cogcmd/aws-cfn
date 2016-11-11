@@ -1,8 +1,8 @@
-require 'cog_cmd/cfn/template'
+require 'cog_cmd/cfn/defaults'
 require 'cfn/command'
 require 'cfn/ref_options'
 
-module CogCmd::Cfn::Template
+module CogCmd::Cfn::Defaults
   class Show < Cfn::Command
     include Cfn::RefOptions
 
@@ -13,11 +13,11 @@ module CogCmd::Cfn::Template
       require_name!
       require_name_format!
       require_ref_exists!
-      require_template_exists!
+      require_defaults_exists!
 
-      file = git_client.show_template(name, ref)
+      file = git_client.show_defaults(name, ref)[:data]
 
-      response.template = 'template_show'
+      response.template = 'defaults_show'
       response.content = [file]
     end
 
@@ -33,17 +33,17 @@ module CogCmd::Cfn::Template
       end
     end
 
-    def require_template_exists!
-      unless git_client.template_exists?(name, ref)
+    def require_defaults_exists!
+      unless git_client.defaults_exists?(name, ref)
         if branch = ref[:branch]
-          additional = "Check that the template exists in the #{branch} branch and has been pushed to your repository's origin."
+          additional = "Check that the defaults file exists in the #{branch} branch and has been pushed to your repository's origin."
         elsif sha = ref[:tag]
-          additional = "Check that the template exists in the #{tag} tag and has been pushed to your repository's origin."
+          additional = "Check that the defaults file exists in the #{tag} tag and has been pushed to your repository's origin."
         elsif sha = ref[:sha]
-          additional = "Check that the template exists in the git commit SHA #{sha} tag and has been pushed to your repository's origin."
+          additional = "Check that the defaults file exists in the git commit SHA #{sha} tag and has been pushed to your repository's origin."
         end
 
-        raise(Cog::Abort, "Template does not exist. #{additional}")
+        raise(Cog::Abort, "Defaults file does not exist. #{additional}")
       end
     end
 

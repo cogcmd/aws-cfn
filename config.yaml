@@ -2,41 +2,55 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.0.16
+version: 0.0.17
 docker:
   image: cogcmd/aws-cfn
-  tag: 0.0.16
+  tag: 0.0.17
 commands:
-  template-list:
-    executable: "/home/bundle/cog-command"
-    description: List available CloudFormation templates
-    arguments: "[template_prefix]"
-    rules:
-    - must have cfn:template
   template-show:
     executable: "/home/bundle/cog-command"
-    description: Show summary information for a CloudFormation template
-    arguments: "<template_name> | -s <stack_name>"
+    description: Shows contents of a template.
+    arguments: "<name>"
     options:
-      stack:
-        type: bool
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch in which to find the template. Defaults to master.
+      tag:
+        type: string
+        required: false
+        short_flag: t
+        description: Tag in which to find the template.
+      sha:
+        type: string
         required: false
         short_flag: s
-        description: Show template information for the specified stack.
+        description: Git commit SHA in which to find the template.
     rules:
-    - must have cfn:template
-  template-body:
+      - must have cfn:template-show
+  template-ls:
     executable: "/home/bundle/cog-command"
-    description: Show the json body of the template
-    arguments: "<template_name> | -s <stack_name>"
+    description: Lists all templates, filtered by an optional glob pattern.
+    arguments: "[pattern]"
     options:
-      stack:
-        type: bool
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch from which to list templates. Defaults to master.
+      tag:
+        type: string
+        required: false
+        short_flag: t
+        description: Tag from which to list templates.
+      sha:
+        type: string
         required: false
         short_flag: s
-        description: Show the template body for the specified stack.
+        description: Git commit SHA from which to list templates.
     rules:
-    - must have cfn:template
+      - allow
   stack-create:
     executable: "/home/bundle/cog-command"
     description: Creates a new stack based on an existing template and returns the
@@ -169,7 +183,7 @@ commands:
         required: false
         description: The name of your changeset. Defaults to 'changeset<num>'
     rules:
-    - must have cfn:changeset
+      - must have cfn:changeset
   changeset-list:
     executable: "/home/bundle/cog-command"
     description: Lists cloudformation changesets.
@@ -194,35 +208,153 @@ commands:
     arguments: "<changeset_name> <stack_name>"
     rules:
     - must have cfn:changeset
+  definition-create:
+    executable: "/home/bundle/cog-command"
+    description: Creates a stack definition.
+    arguments: "<definition-name> <template-name>"
+    options:
+      defaults:
+        type: list
+        required: false
+        short_flag: d
+        description: List of defaults files to use. Defaults are merged together in the order they were specified.
+      params:
+        type: list
+        required: false
+        short_flag: p
+        description: "Stack parameters which override parameters defined in any defaults files specified. Defined with the following pattern: <key>=<value>."
+      tags:
+        type: list
+        required: false
+        short_flag: t
+        description: "Stack tags which override tags defined in any defaults files specified. Defined with the following pattern: <key>=<value>."
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch from which to find defaults files. Defaults to master.
+    rules:
+      - must have cfn:definition-create
+  definition-ls:
+    executable: "/home/bundle/cog-command"
+    description: Lists all definitions, filtered by an optional glob pattern.
+    arguments: "[pattern]"
+    options:
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch from which to list definitions. Defaults to master.
+      tag:
+        type: string
+        required: false
+        short_flag: t
+        description: Tag from which to list definitions.
+      sha:
+        type: string
+        required: false
+        short_flag: s
+        description: Git commit SHA from which to list definitions.
+    rules:
+      - allow
+  definition-show:
+    executable: "/home/bundle/cog-command"
+    description: Shows contents of a definition.
+    arguments: "<name>"
+    options:
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch in which to find the definition. Defaults to master.
+      tag:
+        type: string
+        required: false
+        short_flag: t
+        description: Tag in which to find the definition.
+      sha:
+        type: string
+        required: false
+        short_flag: s
+        description: Git commit SHA in which to find the definition.
+    rules:
+      - must have cfn:definition-show
+  defaults-create:
+    executable: "/home/bundle/cog-command"
+    description: Creates a new defaults file.
+    arguments: "<name>"
+    options:
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch of which to commit the new defaults file. Defaults to master.
+    rules:
+      - must have cfn:defaults-create
+  defaults-ls:
+    executable: "/home/bundle/cog-command"
+    description: Lists all defaults files, filtered by an optional glob pattern.
+    arguments: "[pattern]"
+    options:
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch from which to list defaults files. Defaults to master.
+      tag:
+        type: string
+        required: false
+        short_flag: t
+        description: Tag from which to list defaults files.
+      sha:
+        type: string
+        required: false
+        short_flag: s
+        description: Git commit SHA from which to list defaults files.
+    rules:
+      - allow
+  defaults-show:
+    executable: "/home/bundle/cog-command"
+    description: Shows contents of a defaults file.
+    arguments: "<name>"
+    options:
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch in which to find the defaults file. Defaults to master.
+      tag:
+        type: string
+        required: false
+        short_flag: t
+        description: Tag in which to find the defaults file.
+      sha:
+        type: string
+        required: false
+        short_flag: s
+        description: Git commit SHA in which to find the defaults file.
+    rules:
+      - must have cfn:defaults-show
 permissions:
-- cfn:stack
-- cfn:changeset
-- cfn:template
+  - cfn:stack
+  - cfn:changeset
+  - cfn:template-show
+  - cfn:defaults-create
+  - cfn:defaults-show
+  - cfn:definition-create
+  - cfn:definition-show
 templates:
   template_list:
     body: |
-      ~attachment title="CloudFormation Templates" color="#1E5775"~~end~
-      ~attachment color="#2681A3"~
       ~each var=$results as=template~
-      • ~$template.name~
-      ~end~
+      ~$template.name~
       ~end~
   template_show:
     body: |
-      ~attachment title="CloudFormation Template Details" color="#1E5775" title_url=$results[0].source~~end~
-
-      ~attachment title="Resource Types" color="#2681A3"~
-      ~each var=$results[0].resource_types as=item~
-      • ~$item~
-      ~end~
-      ~end~
-
-      ~attachment title="Parameters" color="#2681A3"~
-      | Key | Type | Default | Allowed |
-      |-----|------|---------|---------|
-      ~each var=$results[0].parameters as=item~
-      | ~$item.parameter_key~ | ~$item.parameter_type~ | ~$item.default_value~ |  ~join var=$item.parameter_constraints.allowed_values as=allowed_values with=", "~~$allowed_values~~end~ |
-      ~end~
+      ~each var=$results as=template~
+      ```
+      ~$template.body~
+      ```
       ~end~
   stack_show:
     body: |
@@ -321,5 +453,30 @@ templates:
       ~each var=$results as=changeset~
       Successfully deleted '~$changeset.changeset_name~'
       ~end~
-  template_body:
-    body: "~json var=$results[0]~\n"
+  defaults_create:
+    body: |
+      ~each var=$results as=defaults~
+      Created defaults file ~$defaults.name~
+      ~end~
+  defaults_list:
+    body: |
+      ~each var=$results as=defaults~
+      ~$defaults.name~
+      ~end~
+  defaults_show:
+    body: |
+      ~each var=$results as=defaults~
+      ```
+      ~$defaults~
+      ```
+      ~end~
+  definition_create:
+    body: |
+      ~each var=$results as=definition~
+      Created definition ~$definition.name~
+      ~end~
+  definition_list:
+    body: |
+      ~each var=$results as=definition~
+      ~$definition.name~
+      ~end~
