@@ -1,52 +1,72 @@
 module Cfn
   class Definition
     def self.create(git_client, s3_client, attributes)
-      name          = attributes.fetch(:name)
-      template_name = attributes.fetch(:template)
-      defaults      = attributes.fetch(:defaults)
-      params        = attributes.fetch(:params)
-      tags          = attributes.fetch(:tags)
-      branch        = attributes.fetch(:branch)
+      new(attributes).create(git_client, s3_client)
+    end
 
-      template = git_client.show_template(template_name, { branch: branch })
+    def initialize(attributes)
+      @definition_name = attributes.fetch(:name)
+      @template_name   = attributes.fetch(:template)
+      @defaults_names  = attributes.fetch(:defaults)
+      @params          = attributes.fetch(:params)
+      @tags            = attributes.fetch(:tags)
+      @branch          = attributes.fetch(:branch)
+    end
 
-      defaults = defaults.map do |d|
-        default = git_client.show_defaults(d, { branch: branch })
-        { 'name' => default[:name] }.merge(default[:data])
-      end
-
-      overrides = defaults.reduce({ 'params' => {}, 'tags' => {} }) do |merged, defaults|
-        merged['params'].merge!(defaults['params'] || {})
-        merged['tags'].merge!(defaults['tags'] || {})
-        merged
-      end
-
-      params = Hash[params.map { |p| p.split('=') }]
-      tags   = Hash[tags.map   { |t| t.split('=') }]
-
-      overrides['params'].merge!(params)
-      overrides['tags'].merge!(tags)
+    def create(git_client, s3_client)
+      template = fetch_template(git_client)
+      defaults = fetch_defaults(git_client)
+      sha = git_client.branch_sha(@branch)
 
       definition = {
-        'name' => name,
+        'name' => @definition_name,
         'template' => {
-          'name' => template_name,
-          'sha' => git_client.branch_sha(branch)
+          'name' => @template_name,
+          'sha' => sha
         },
         'defaults' => defaults,
-        'overrides' => {
-          'params' => params,
-          'tags' => tags
-        },
-        'params' => params,
-        'tags' => tags
+        'overrides' => overrides(defaults),
+        'params' => @params,
+        'tags' => @tags
       }
 
       timestamp = Time.now.utc.to_i
-      definition = s3_client.create_definition(name, definition, template[:data], timestamp)
-      git_client.create_definition(name, definition, template[:data], timestamp, branch)
+
+      definition = s3_client.create_definition(@definition_name, definition, template, timestamp)
+      git_client.create_definition(@definition_name, definition, template, timestamp, @branch)
 
       definition
+    end
+
+    def fetch_template(git_client)
+      git_client.show_template(@template_name, { branch: @branch })[:data]
+    end
+
+    def fetch_defaults(git_client)
+      @defaults_names.map do |default_name|
+        default = git_client.show_defaults(default_name, { branch: @branch })
+        { 'name' => default[:name] }.merge(default[:data])
+      end
+    end
+
+    def override_layers(defaults)
+      defaults + [{ 'params' => params_hash, 'tags' => tags_hash }]
+    end
+
+    def overrides(defaults)
+      override_layers(defaults).reduce({ 'params' => {}, 'tags' => {} }) do |merged, layer|
+        merged['params'].merge!(layer['params'] || {})
+        merged['tags'].merge!(layer['tags'] || {})
+        merged
+      end
+    end
+
+    def params_hash
+      Hash[@params.map { |p| p.split('=') }]
+    end
+
+    def tags_hash
+      Hash[@tags.map { |t| t.split('=') }]
     end
   end
 end
