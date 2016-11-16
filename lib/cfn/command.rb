@@ -9,7 +9,7 @@ module Cfn
     end
 
     def s3_client
-      @_s3_client ||= Cfn::S3Client.new(aws_access_key_id, aws_secret_access_key, aws_region, s3_stack_definition_bucket, s3_stack_definition_prefix)
+      @_s3_client ||= Cfn::S3Client.new(s3_stack_definition_bucket, s3_stack_definition_prefix, aws_sts_role_arn)
     end
 
     def require_git_client!
@@ -58,16 +58,8 @@ module Cfn
       ENV['GIT_SSH_KEY']
     end
 
-    def aws_access_key_id
-      ENV['AWS_ACCESS_KEY_ID']
-    end
-
-    def aws_secret_access_key
-      ENV['AWS_SECRET_ACCESS_KEY']
-    end
-
-    def aws_region
-      ENV['AWS_REGION']
+    def aws_sts_role_arn
+      ENV['AWS_STS_ROLE_ARN']
     end
 
     def s3_stack_definition_bucket
