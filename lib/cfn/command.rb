@@ -20,7 +20,6 @@ module Cfn
     end
 
     def require_s3_client!
-      require_aws_credentials!
       require_s3_stack_definition_bucket!
 
       s3_client
@@ -35,12 +34,6 @@ module Cfn
     def require_git_ssh_key!
       unless git_ssh_key
         raise(Cog::Abort, '`GIT_SSH_KEY` not set. Set the `GIT_SSH_KEY` environment variable to an ssh key that has access to your git repository.')
-      end
-    end
-
-    def require_aws_credentials!
-      unless aws_access_key_id && aws_secret_access_key
-        raise(Cog::Abort, '`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` not set. Set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables owned by an IAM user that has the AmazonS3FullAccess policy.')
       end
     end
 
