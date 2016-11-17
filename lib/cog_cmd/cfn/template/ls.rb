@@ -17,7 +17,7 @@ module CogCmd::Cfn::Template
     end
 
     def filter
-      request.args[0] || '*'
+      request.args[0] || '**/*'
     end
   end
 end

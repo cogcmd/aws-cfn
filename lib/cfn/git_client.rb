@@ -1,6 +1,7 @@
 require 'rugged'
 require 'json'
 require 'yaml'
+require 'pathname'
 require 'tmpdir'
 require 'tempfile'
 
@@ -39,13 +40,17 @@ module Cfn
       { name: name, data: JSON.parse(body) }
     end
 
-    def list_templates(filter = '*', ref = { branch: 'master' })
+    def list_templates(filter = '**/*', ref = { branch: 'master' })
       reset_hard_ref(ref)
       path_with_glob = workdir_path("templates/#{filter}")
-      files = Dir.glob(path_with_glob)
-      files.map do |path|
-        ext = File.extname(path)
-        { name: File.basename(path, ext) }
+      base_path = Pathname.new(workdir_path("templates/"))
+      files = Dir.glob(path_with_glob).map { |p| Pathname.new(p) }
+      template_files = files.select { |path| path.extname.match(/\A(yml)|(yaml)|(json)\z/) }
+
+      template_files.map do |path|
+        folder = path.relative_path_from(base_path).dirname
+        name = path.basename(path.extname)
+        { name: folder.join(name) }
       end
     end
 
