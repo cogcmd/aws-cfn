@@ -1,4 +1,5 @@
 require 'cog_cmd/cfn/stack'
+
 require 'cog_cmd/cfn/helpers'
 
 module CogCmd::Cfn::Stack
@@ -6,13 +7,13 @@ module CogCmd::Cfn::Stack
 
     include CogCmd::Cfn::Helpers
 
-    attr_reader :stack_name, :template_name
+    attr_reader :stack_name, :template_url
     attr_reader :stack_params, :tags, :policy, :notify, :on_failure, :timeout, :capabilities
 
     def initialize
       # args
       @stack_name = request.args[0]
-      @template_name = request.args[1]
+      @template_url = request.args[1]
 
       # options
       @stack_params = request.options['param']
@@ -26,7 +27,7 @@ module CogCmd::Cfn::Stack
 
     def run_command
       raise(Cog::Abort, "You must specify a stack name AND a template name.") unless stack_name
-      raise(Cog::Abort, "You must specify a stack name AND a template name.") unless template_name
+      raise(Cog::Abort, "You must specify a stack name AND a template name.") unless template_url
 
       response.template = 'stack_show'
       response.content = create_stack
@@ -39,7 +40,7 @@ module CogCmd::Cfn::Stack
 
       params = {
         stack_name: stack_name,
-        template_url: template_url(template_name),
+        template_url: template_url,
         parameters: process_parameters(stack_params),
         tags: process_tags(tags),
         stack_policy_url: policy_url(policy),

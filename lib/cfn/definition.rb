@@ -17,6 +17,7 @@ module Cfn
       template = fetch_template(git_client)
       defaults = fetch_defaults(git_client)
       sha = git_client.branch_sha(@branch)
+      overrides = merge_overrides(defaults)
 
       definition = {
         'name' => @definition_name,
@@ -25,9 +26,9 @@ module Cfn
           'sha' => sha
         },
         'defaults' => defaults,
-        'overrides' => overrides(defaults),
-        'params' => @params,
-        'tags' => @tags
+        'overrides' => overrides,
+        'params' => hash_to_kv(overrides['params']),
+        'tags' => hash_to_kv(overrides['tags'])
       }
 
       timestamp = Time.now.utc.to_i
@@ -53,7 +54,7 @@ module Cfn
       defaults + [{ 'params' => params_hash, 'tags' => tags_hash }]
     end
 
-    def overrides(defaults)
+    def merge_overrides(defaults)
       override_layers(defaults).reduce({ 'params' => {}, 'tags' => {} }) do |merged, layer|
         merged['params'].merge!(layer['params'] || {})
         merged['tags'].merge!(layer['tags'] || {})
@@ -62,11 +63,19 @@ module Cfn
     end
 
     def params_hash
-      Hash[@params.map { |p| p.split('=') }]
+      kv_to_hash(@params)
     end
 
     def tags_hash
-      Hash[@tags.map { |t| t.split('=') }]
+      kv_to_hash(@tags)
+    end
+
+    def hash_to_kv(hash)
+      hash.to_a.map { |i| i.join("=") }
+    end
+
+    def kv_to_hash(kv)
+      Hash[kv.map { |t| t.split('=') }]
     end
   end
 end
