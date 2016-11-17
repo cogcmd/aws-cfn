@@ -9,7 +9,7 @@ module Cfn
     end
 
     def s3_client
-      @_s3_client ||= Cfn::S3Client.new(aws_access_key_id, aws_secret_access_key, aws_region, s3_stack_definition_bucket, s3_stack_definition_prefix)
+      @_s3_client ||= Cfn::S3Client.new(s3_stack_definition_bucket, s3_stack_definition_prefix, aws_sts_role_arn)
     end
 
     def require_git_client!
@@ -20,7 +20,6 @@ module Cfn
     end
 
     def require_s3_client!
-      require_aws_credentials!
       require_s3_stack_definition_bucket!
 
       s3_client
@@ -38,12 +37,6 @@ module Cfn
       end
     end
 
-    def require_aws_credentials!
-      unless aws_access_key_id && aws_secret_access_key
-        raise(Cog::Abort, '`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` not set. Set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables owned by an IAM user that has the AmazonS3FullAccess policy.')
-      end
-    end
-
     def require_s3_stack_definition_bucket!
       unless s3_stack_definition_bucket
         raise(Cog::Abort, '`S3_STACK_DEFINITION_BUCKET` not set. Set the `S3_STACK_DEFINITION_BUCKET` environment variable to the name of the bucket used to read and write stack definitions.')
@@ -58,16 +51,8 @@ module Cfn
       ENV['GIT_SSH_KEY']
     end
 
-    def aws_access_key_id
-      ENV['AWS_ACCESS_KEY_ID']
-    end
-
-    def aws_secret_access_key
-      ENV['AWS_SECRET_ACCESS_KEY']
-    end
-
-    def aws_region
-      ENV['AWS_REGION']
+    def aws_sts_role_arn
+      ENV['AWS_STS_ROLE_ARN']
     end
 
     def s3_stack_definition_bucket

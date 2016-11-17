@@ -5,14 +5,10 @@ module Cfn
   class S3Client
     attr_reader :client, :bucket, :prefix
 
-    def initialize(access_key_id, secret_access_key, region, bucket, prefix)
-      params = { access_key_id:     access_key_id,
-                 secret_access_key: secret_access_key }
+    def initialize(bucket, prefix, aws_sts_role_arn = nil)
+      update_aws_credentials(aws_sts_role_arn) if aws_sts_role_arn
 
-      params[:region] = region if region
-
-      @client = Aws::S3::Client.new(params)
-
+      @client = Aws::S3::Client.new
       @prefix = prefix
       @bucket = bucket
     end
@@ -57,6 +53,15 @@ module Cfn
       params.merge!(bucket: bucket, key: key)
       @client.delete_object(params)
       params
+    end
+
+    def update_aws_credentials(aws_sts_role_arn)
+      Aws.config.update(
+        credentials: Aws::AssumeRoleCredentials.new(
+          role_arn: aws_sts_role_arn,
+          role_session_name: "cog-#{ENV['COG_USER']}"
+        )
+      )
     end
   end
 end
