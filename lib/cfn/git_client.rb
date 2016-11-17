@@ -45,7 +45,7 @@ module Cfn
       path_with_glob = workdir_path("templates/#{filter}")
       base_path = Pathname.new(workdir_path("templates/"))
       files = Dir.glob(path_with_glob).map { |p| Pathname.new(p) }
-      template_files = files.select { |path| path.extname.match(/\A(yml)|(yaml)|(json)\z/) }
+      template_files = files.select { |path| ['.yml', '.yaml', '.json'].include?(path.extname.downcase) }
 
       template_files.map do |path|
         folder = path.relative_path_from(base_path).dirname
