@@ -24,7 +24,7 @@ describe CogCmd::Cfn::Template::Ls do
         and_return(true)
 
       expect(git_client).to receive(:list_templates).
-        with('*', branch: 'master').
+        with('**/*', branch: 'master').
         and_return([{ name: 'flywheel' },
                     { name: 'enterprise-builder' }])
 

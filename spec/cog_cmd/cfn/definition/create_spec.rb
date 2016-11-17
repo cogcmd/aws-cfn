@@ -104,20 +104,6 @@ describe CogCmd::Cfn::Definition::Create do
     end
   end
 
-  context 'with invalid AWS env' do
-    before do
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with('GIT_REMOTE_URL').and_return('github.com:operable/cfn-test-repo.git')
-      allow(ENV).to receive(:[]).with('GIT_SSH_KEY').and_return('not-actually-a-private-key')
-    end
-
-    it 'returns an error if missing AWS env vars' do
-      expect {
-        run_command(args: ['flywheel', 'ec2'])
-      }.to raise_error(Cog::Abort, '`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` not set. Set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables owned by an IAM user that has the AmazonS3FullAccess policy.')
-    end
-  end
-
   context 'with invalid args' do
     before do
       allow(ENV).to receive(:[]).and_call_original

@@ -6,7 +6,7 @@ module CogCmd::Cfn::Template
   class Show < Cfn::Command
     include Cfn::RefOptions
 
-    NAME_FORMAT = /\A[\w-]*\z/
+    NAME_FORMAT = /\A[-\w\/]*\z/
 
     def run_command
       require_git_client!
@@ -29,7 +29,7 @@ module CogCmd::Cfn::Template
 
     def require_name_format!
       unless NAME_FORMAT.match(name)
-        raise(Cog::Abort, 'Name must only include word characters [a-zA-Z0-9_-].')
+        raise(Cog::Abort, 'Name must only include word characters [a-zA-Z0-9_-/].')
       end
     end
 

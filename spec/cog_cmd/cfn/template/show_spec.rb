@@ -64,7 +64,7 @@ describe CogCmd::Cfn::Template::Show do
     it 'returns an error if invalid name is passed' do
       expect {
         run_command(args: ['! # l #'])
-      }.to raise_error(Cog::Abort, 'Name must only include word characters [a-zA-Z0-9_-].')
+      }.to raise_error(Cog::Abort, 'Name must only include word characters [a-zA-Z0-9_-/].')
     end
   end
 
