@@ -15,9 +15,10 @@ module CogCmd::Cfn::Defaults
       require_name!
       require_name_format!
       require_singular_input!
+      require_input_structure!
       require_branch_exists!
 
-      defaults = git_client.create_defaults(name, body, branch)
+      defaults = git_client.create_defaults(name, params || {}, tags || {}, branch)
 
       response.template = 'defaults_create'
       response.content = defaults
@@ -41,6 +42,12 @@ module CogCmd::Cfn::Defaults
       end
     end
 
+    def require_input_structure!
+      if !params && !tags
+        raise(Cog::Abort, 'Input must include at least a "params" or "tags" key.')
+      end
+    end
+
     def name
       request.args[0]
     end
@@ -51,6 +58,14 @@ module CogCmd::Cfn::Defaults
 
     def body
       input[0]
+    end
+
+    def params
+      body['params']
+    end
+
+    def tags
+      body['tags']
     end
   end
 end
