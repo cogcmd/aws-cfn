@@ -15,11 +15,11 @@ module Cfn
       @repository = clone_repository(remote_url, @credential)
     end
 
-    def create_defaults(name, params, tags, branch = 'master')
+    def create_defaults(name, body, branch = 'master')
       path = "defaults/#{name}.json"
 
       reset_hard_branch(branch)
-      create_file(path, JSON.pretty_generate({ "params" => params, "tags" => tags }))
+      create_file(path, JSON.pretty_generate(body))
       create_commit([path])
       push_repository(branch)
 

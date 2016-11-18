@@ -25,7 +25,7 @@ describe CogCmd::Cfn::Defaults::Create do
         and_return(true)
 
       expect(git_client).to receive(:create_defaults).
-        with('webapp', { 'port' => 80 }, {}, 'master').
+        with('webapp', { 'params' => { 'port' => 80 } }, 'master').
         and_return([{ 'params' => { 'port' => 80 } }])
 
       run_command(args: ['webapp'])

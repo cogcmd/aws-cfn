@@ -18,7 +18,7 @@ module CogCmd::Cfn::Defaults
       require_input_structure!
       require_branch_exists!
 
-      defaults = git_client.create_defaults(name, params || {}, tags || {}, branch)
+      defaults = git_client.create_defaults(name, body, branch)
 
       response.template = 'defaults_create'
       response.content = defaults
