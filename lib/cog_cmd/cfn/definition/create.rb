@@ -10,8 +10,6 @@ module CogCmd::Cfn::Definition
     DEFINITION_NAME_FORMAT = /\A[\w-]*\z/
     TEMPLATE_NAME_FORMAT = /\A[-\w\/]*\z/
 
-    input :accumulate
-
     def run_command
       require_git_client!
       require_s3_client!
