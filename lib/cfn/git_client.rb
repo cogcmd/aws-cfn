@@ -69,7 +69,7 @@ module Cfn
       definition_path = "#{path}/definition.yaml"
 
       reset_hard_branch(branch)
-      create_file(template_path, template.to_yaml)
+      create_file(template_path, template)
       create_file(definition_path, definition.to_yaml)
       create_commit([template_path, definition_path])
       push_repository(branch)
@@ -87,9 +87,14 @@ module Cfn
     def show_definition(name, ref = { branch: 'master' })
       reset_hard_ref(ref)
       absolute_path = workdir_path("definitions/#{name}/*/definition.yaml")
-      entries = Dir.glob(absolute_path)
-      body = File.read(entries.last)
+      path = Dir.glob(absolute_path).sort.last
+      body = File.read(path)
       data = YAML.load(body)
+
+      # Decorate the definition object with the timestamp of the
+      # Git directory it lives in.
+      data['timestamp'] = File.split(File.dirname(path))[1]
+
       { name: name, body: body, data: data }
     end
 

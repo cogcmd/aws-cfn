@@ -21,7 +21,7 @@ module Cfn
       template_path = "#{path}/template.yaml"
       definition_path = "#{path}/definition.yaml"
 
-      @client.put_object(bucket: bucket, key: "#{path}/template.yaml", body: template.to_yaml)
+      @client.put_object(bucket: bucket, key: "#{path}/template.yaml", body: template)
 
       definition['template_url'] = url_for(template_path)
       @client.put_object(bucket: bucket, key: "#{path}/definition.yaml", body: definition.to_yaml)
