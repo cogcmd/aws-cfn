@@ -17,8 +17,17 @@ module CogCmd::Cfn::Template
 
       file = git_client.show_template(name, ref)
 
-      response.template = 'template_show'
-      response.content = [file]
+      if request.options['raw']
+        response.template = 'template_body'
+        response.content = [file]
+      else
+        temp_url = s3_client.create_temp_file(file[:body])
+        client = Aws::CloudFormation::Client.new
+        summary = client.get_template_summary(template_url: temp_url).to_h
+
+        response.template = 'template_show'
+        response.content = summary
+      end
     end
 
     def require_name!

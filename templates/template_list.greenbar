@@ -1,6 +1,5 @@
-~attachment title="CloudFormation Templates" color="#1E5775"~~end~
-~attachment color="#2681A3"~
+**CloudFormation Templates:**
+~br~
 ~each var=$results as=template~
 • ~$template.name~
-~end~
 ~end~
