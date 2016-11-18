@@ -335,6 +335,11 @@ commands:
         description: Git commit SHA in which to find the defaults file.
     rules:
       - must have cfn:defaults-show
+  check-setup:
+    executable: "/home/bundle/cog-command"
+    description: Checks that all configuration is set correctly
+    rules:
+      - allow
 permissions:
   - cfn:stack
   - cfn:changeset
@@ -479,4 +484,17 @@ templates:
     body: |
       ~each var=$results as=definition~
       ~$definition.name~
+      ~end~
+  check_setup:
+    body: |
+      ~each var=$results as=setup~
+      | Check | Success |
+      | ----- | ------- |
+      | Authentication with git server | ~if cond=$setup.git_auth == 1~yes~end~~if cond=$setup.git_auth == 0~no~end~ |
+      | Git repository exists | ~if cond=$setup.git_repo_exists == 1~yes~end~~if cond=$setup.git_repo_exists == 0~no~end~ |
+      | Git repository structured correctly | ~if cond=$setup.git_repo_structure == 1~yes~end~~if cond=$setup.git_repo_structure == 0~no~end~ |
+      | Authentication with Amazon Web Services | ~if cond=$setup.aws_auth == 1~yes~end~~if cond=$setup.aws_auth == 0~no~end~ |
+      | Cloudformation permissions | ~if cond=$setup.aws_cfn_permissions == 1~yes~end~~if cond=$setup.aws_cfn_permissions == 0~no~end~ |
+      | S3 permissions | ~if cond=$setup.aws_s3_permissions == 1~yes~end~~if cond=$setup.aws_s3_permissions== 0~no~end~ |
+      | S3 bucket exists | ~if cond=$setup.aws_s3_bucket == 1~yes~end~~if cond=$setup.aws_s3_bucket == 0~no~end~ |
       ~end~

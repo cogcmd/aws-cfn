@@ -28,6 +28,10 @@ module Cfn
       definition
     end
 
+    def bucket_exists?
+      @client.head_bucket(bucket: @bucket)
+    end
+
     private
 
     # TODO: Handle listing over continuation (pagination)

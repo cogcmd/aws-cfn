@@ -117,6 +117,13 @@ module Cfn
       entries.any? { |e| File.exist?(e) }
     end
 
+    def file_exists?(path, ref = { branch: 'master' })
+      reset_hard_ref(ref)
+      absolute_path = workdir_path(path)
+      entries = Dir.glob(absolute_path)
+      entries.any? { |e| File.exist?(e) }
+    end
+
     def ref_exists?(ref)
       if branch = ref[:branch]
         branch_exists?(branch)

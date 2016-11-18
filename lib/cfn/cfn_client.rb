@@ -9,6 +9,10 @@ module Cfn
       @client = Aws::CloudFormation::Client.new
     end
 
+    def list_stacks
+      @client.list_stacks
+    end
+
     def validate_template(template_body)
       @client.validate_template(template_body: template_body)
     end
