@@ -9,15 +9,3 @@
 • ~$item.parameter_key~ (~$item.parameter_type~) ~if cond=$item.default_value != ""~[~$item.default_value~]~end~
 
 ~end~
-
-~br~
-**Outputs:**
-
-~if cond=$results[0].outputs empty?~
-None
-~end~
-
-~each var=$results[0].outputs as=item~
-• ~$item.output_key~ ~if cond=$item.output_description bound?~: ~$item.output_description~~end~
-
-~end~
