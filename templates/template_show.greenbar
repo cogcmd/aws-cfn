@@ -1,15 +1,23 @@
-~attachment title="CloudFormation Template Details" color="#1E5775" title_url=$results[0].source~~end~
+**Template:** ~$results[0].name~
+**Description:** ~$results[0].description~
+~if cond=$results[0].capabilities bound?~**Capabilities:** ~$results[0].capabilities[0]~~end~
 
-~attachment title="Resource Types" color="#2681A3"~
-~each var=$results[0].resource_types as=item~
-• ~$item~
-~end~
+~br~
+**Parameters:**
+
+~each var=$results[0].parameters~
+• ~$item.parameter_key~ (~$item.parameter_type~) ~if cond=$item.default_value != ""~[~$item.default_value~]~end~
+
 ~end~
 
-~attachment title="Parameters" color="#2681A3"~
-| Key | Type | Default | Allowed |
-|-----|------|---------|---------|
-~each var=$results[0].parameters as=item~
-| ~$item.parameter_key~ | ~$item.parameter_type~ | ~$item.default_value~ |  ~join var=$item.parameter_constraints.allowed_values as=allowed_values with=", "~~$allowed_values~~end~ |
+~br~
+**Outputs:**
+
+~if cond=$results[0].outputs empty?~
+None
 ~end~
+
+~each var=$results[0].outputs as=item~
+• ~$item.output_key~ ~if cond=$item.output_description bound?~: ~$item.output_description~~end~
+
 ~end~

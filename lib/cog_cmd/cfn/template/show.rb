@@ -24,7 +24,9 @@ module CogCmd::Cfn::Template
         temp_url = s3_client.create_temp_file(file[:body])
         client = Aws::CloudFormation::Client.new
         summary = client.get_template_summary(template_url: temp_url).to_h
+        summary[:name] = name
 
+        response.log(:info, "summary: #{summary.inspect}")
         response.template = 'template_show'
         response.content = summary
       end

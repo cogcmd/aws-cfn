@@ -17,7 +17,7 @@ module CogCmd::Cfn::Definition
 
       definition = git_client.show_definition(name, ref)[:data]
 
-      # response.template = 'definition_show'
+      response.template = 'definition_show'
       response.content = [definition]
     end
 

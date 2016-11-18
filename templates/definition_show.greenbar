@@ -1,0 +1,28 @@
+**Name:** ~$results[0].name~
+**Template:** ~$results[0].template.name~
+
+~br~
+**Parameters:**
+
+~each var=$results[0].params~
+• ~$item~
+~end~
+
+~br~
+**Tags:**
+
+~each var=$results[0].tags~
+• ~$item~
+~end~
+
+~br~
+**Defaults:**
+
+~each var=$results[0].defaults~
+• ~$item.name~
+~end~
+
+~br~
+**Overrides:**
+
+~json var=$results[0].overrides~

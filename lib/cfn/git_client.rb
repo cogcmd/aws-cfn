@@ -88,7 +88,7 @@ module Cfn
       reset_hard_ref(ref)
       absolute_path = workdir_path("definitions/#{name}/*/definition.yaml")
       entries = Dir.glob(absolute_path)
-      body = File.read(entries.first)
+      body = File.read(entries.last)
       data = YAML.load(body)
       { name: name, body: body, data: data }
     end
