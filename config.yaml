@@ -12,6 +12,10 @@ commands:
     description: Shows contents of a template.
     arguments: "<name>"
     options:
+      raw:
+        type: bool
+        required: false
+        description: Dump raw template body
       branch:
         type: string
         required: false
@@ -28,7 +32,7 @@ commands:
         short_flag: s
         description: Git commit SHA in which to find the template.
     rules:
-      - must have cfn:template-show
+    - must have cfn:template-show
   template-ls:
     executable: "/home/bundle/cog-command"
     description: Lists all templates, filtered by an optional glob pattern.
@@ -50,7 +54,7 @@ commands:
         short_flag: s
         description: Git commit SHA from which to list templates.
     rules:
-      - allow
+    - allow
   stack-create:
     executable: "/home/bundle/cog-command"
     description: Creates a new stack based on an existing template and returns the
@@ -183,7 +187,7 @@ commands:
         required: false
         description: The name of your changeset. Defaults to 'changeset<num>'
     rules:
-      - must have cfn:changeset
+    - must have cfn:changeset
   changeset-list:
     executable: "/home/bundle/cog-command"
     description: Lists cloudformation changesets.
@@ -217,24 +221,27 @@ commands:
         type: list
         required: false
         short_flag: d
-        description: List of defaults files to use. Defaults are merged together in the order they were specified.
+        description: List of defaults files to use. Defaults are merged together in
+          the order they were specified.
       params:
         type: list
         required: false
         short_flag: p
-        description: "Stack parameters which override parameters defined in any defaults files specified. Defined with the following pattern: <key>=<value>."
+        description: 'Stack parameters which override parameters defined in any defaults
+          files specified. Defined with the following pattern: <key>=<value>.'
       tags:
         type: list
         required: false
         short_flag: t
-        description: "Stack tags which override tags defined in any defaults files specified. Defined with the following pattern: <key>=<value>."
+        description: 'Stack tags which override tags defined in any defaults files
+          specified. Defined with the following pattern: <key>=<value>.'
       branch:
         type: string
         required: false
         short_flag: b
         description: Branch from which to find defaults files. Defaults to master.
     rules:
-      - must have cfn:definition-create
+    - must have cfn:definition-create
   definition-ls:
     executable: "/home/bundle/cog-command"
     description: Lists all definitions, filtered by an optional glob pattern.
@@ -256,7 +263,7 @@ commands:
         short_flag: s
         description: Git commit SHA from which to list definitions.
     rules:
-      - allow
+    - allow
   definition-show:
     executable: "/home/bundle/cog-command"
     description: Shows contents of a definition.
@@ -278,7 +285,7 @@ commands:
         short_flag: s
         description: Git commit SHA in which to find the definition.
     rules:
-      - must have cfn:definition-show
+    - must have cfn:definition-show
   defaults-create:
     executable: "/home/bundle/cog-command"
     description: Creates a new defaults file.
@@ -288,9 +295,10 @@ commands:
         type: string
         required: false
         short_flag: b
-        description: Branch of which to commit the new defaults file. Defaults to master.
+        description: Branch of which to commit the new defaults file. Defaults to
+          master.
     rules:
-      - must have cfn:defaults-create
+    - must have cfn:defaults-create
   defaults-ls:
     executable: "/home/bundle/cog-command"
     description: Lists all defaults files, filtered by an optional glob pattern.
@@ -312,7 +320,7 @@ commands:
         short_flag: s
         description: Git commit SHA from which to list defaults files.
     rules:
-      - allow
+    - allow
   defaults-show:
     executable: "/home/bundle/cog-command"
     description: Shows contents of a defaults file.
@@ -341,25 +349,37 @@ commands:
     rules:
       - allow
 permissions:
-  - cfn:stack
-  - cfn:changeset
-  - cfn:template-show
-  - cfn:defaults-create
-  - cfn:defaults-show
-  - cfn:definition-create
-  - cfn:definition-show
+- cfn:stack
+- cfn:changeset
+- cfn:template-show
+- cfn:defaults-create
+- cfn:defaults-show
+- cfn:definition-create
+- cfn:definition-show
 templates:
   template_list:
     body: |
+      **CloudFormation Templates:**
+      ~br~
       ~each var=$results as=template~
-      ~$template.name~
+      • ~$template.name~
       ~end~
   template_show:
     body: |
-      ~each var=$results as=template~
-      ```
-      ~$template.body~
-      ```
+      ~attachment title="CloudFormation Template Details" color="#1E5775" title_url=$results[0].source~~end~
+
+      ~attachment title="Resource Types" color="#2681A3"~
+      ~each var=$results[0].resource_types as=item~
+      • ~$item~
+      ~end~
+      ~end~
+
+      ~attachment title="Parameters" color="#2681A3"~
+      | Key | Type | Default | Allowed |
+      |-----|------|---------|---------|
+      ~each var=$results[0].parameters as=item~
+      | ~$item.parameter_key~ | ~$item.parameter_type~ | ~$item.default_value~ |  ~join var=$item.parameter_constraints.allowed_values as=allowed_values with=", "~~$allowed_values~~end~ |
+      ~end~
       ~end~
   stack_show:
     body: |
@@ -498,3 +518,5 @@ templates:
       | S3 permissions | ~if cond=$setup.aws_s3_permissions == 1~yes~end~~if cond=$setup.aws_s3_permissions== 0~no~end~ |
       | S3 bucket exists | ~if cond=$setup.aws_s3_bucket == 1~yes~end~~if cond=$setup.aws_s3_bucket == 0~no~end~ |
       ~end~
+  template_body:
+    body: "~json var=$results[0]~\n"
