@@ -1,7 +1,79 @@
 ---
 cog_bundle_version: 4
+
 name: cfn
 description: AWS CloudFormation
+long_description: |
+  This bundle provides an opinioned interface to CloudFormation's raw
+  capabilities, not just to make it easier to use but, easier to use well.
+  Commands to perform all basic CloudFormation actions, such as creating and
+  listing stacks, are available, as you would expect. But, we've also built a
+  set of commands for managing a new concept, stack definitions.
+
+  Stack definitions are a layer on top of CloudFormation templates aimed at
+  making them more reusable and easier to work with as a team. They're
+  comprised of a defaults file, which is a named set of CloudFormation
+  paramters and tags, a named CloudFormation template, and a set of overrides.
+  All of these layers are merged together to make up all the inputs required to
+  create a stack.
+
+  Because most engineering and operations teams require a canonical version of
+  their infrastructure definitions to be stored in a VCS repository, templates,
+  defaults files, and stack definitions will be stored in a git repository.
+  Doing so supports several common use cases such as debugging and auditing.
+
+  Putting this all together results in a reusable, repeatable workflow that can
+  easily be executed from chat, while still allowing basic CloudFormation
+  actions when necessary.
+config:
+  notes: |
+    The commands in this bundle support a number of ways to authenticate with
+    Amazon Web Services. If you're not hosting a relay on EC2, you can provide
+    basic credentials with the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+    environment variables. Or, if you are hosting Relay on EC2, you can keep
+    those environment variables blank and allow the commands to request
+    credentials from instance metadata. We also support an `AWS_STS_ROLE_ARN`
+    environment variable if you'd like to assume a role for all AWS requests.
+    You can read more about how IAM instance metadata and STS role ARNs work at
+    the following documentation page:
+
+    http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html
+
+    For access to the git repository, you'll need to provide a key that has
+    read and write access to all branches to be used by the command. If you're
+    having trouble providing the key in your dynamic config file, make sure
+    that row like the following:
+
+    ```
+    - |
+        GIT_SSH_KEY=-----BEGIN RSA PRIVATE KEY-----
+        66HcO6zqknSn5b+kbn5TKiU/TUxjE1wUYZqiEBI+9t7kZWT5H3aTi5zhhHti0xGF
+        vhI8N1p1ZRP8EeVcRASGeCjVt58llQhNpWP9bArz0B1vU5QvFZJ0gnnk5LI3uFYr
+        ...
+    ```
+
+    Once you've set all of your environment variables with dynamic config, you
+    can check to make sure all of them are set correctly and have the necessary
+    permissions by running `check setup`.
+  env:
+    - var: AWS_ACCESS_KEY_ID
+      description: ID of the access key used to authenticate with the AWS API. Required if IAM instance metadata not used.
+    - var: AWS_SECRET_ACCESS_KEY
+      description: Secret of the access key used to authenticate with the AWS API. Required if IAM instance metadata not used.
+    - var: AWS_REGION
+      description: Optional region used for all commands
+    - var: AWS_STS_ROLE_ARN
+      description: Optional STS role ARN of which to assume when making requests to the AWS API.
+    - var: S3_STACK_DEFINITON_BUCKET
+      description: Required bucket name where created definitions will be written and read from when used to create stacks.
+    - var: S3_STACK_DEFINITON_PREFIX
+      description: Optional bucket key prefix to use when storing definitions in a shared bucket.
+    - var: GIT_REMOTE_URL
+      description: Url of git repository used to read and write defaults files, templates, and definitions.
+    - var: GIT_SSH_KEY
+      description: SSH key used to authenticate with the above git repository. Must have read and write access.
+homepage: https://github.com/cogcmd/aws-cfn
+author: Mark Imbriaco <mark@operable.io>
 version: 0.0.17
 docker:
   image: cogcmd/aws-cfn
@@ -10,6 +82,36 @@ commands:
   template-show:
     executable: "/home/bundle/cog-command"
     description: Shows contents of a template.
+    long_description: |
+      Templates can either be shown by passing the name of the template or the
+      full url if the `--s3` option is specified. When showing a template by
+      name, the relative path without the file extension is used. Only json,
+      yml, and yaml extensions are supported.
+    exammples: |
+      Showing a template by name:
+
+      ```
+      template show webapp
+      ```
+
+      Showing a template in a subdirectory:
+
+      ```
+      template show apps/warehouse/web
+      ```
+
+      Show a template on a branch by name:
+
+      ```
+      template show -b staging webapp
+      ```
+
+
+      Showing a template by S3 url:
+
+      ```
+      template show --s3 https://s3.amazonaws.com/bucket/prefix/definitions/webapp/127471284811/template.yml
+      ```
     arguments: "<name>"
     options:
       s3:
@@ -37,6 +139,32 @@ commands:
   template-list:
     executable: "/home/bundle/cog-command"
     description: Lists all templates, filtered by an optional glob pattern.
+    long_description:
+      The names, the relative path without the file extension of all templates
+      in all subdirectories are listed. Only json, yml, and yaml extensions are
+      supported.
+
+      When filtering the list with a pattern, only simple patterns
+      similar to a shell glob are accepted.
+
+      `*` - Matches any string of characters
+      `**` - Matches any path
+      `?` - Matches any one character
+      `[set]` - Matches any one character in the set
+      `{p,q}` - Matches either literal p or q
+      `\` - Escapes the next pattern character
+    examples: |
+      Listing all templates:
+
+      ```
+      template list
+      ```
+
+      Listing all templates in a subdirectory that start with "webapp":
+
+      ```
+      template list "apps/warehouse/webapp*"
+      ```
     arguments: "[pattern]"
     options:
       branch:
@@ -60,7 +188,32 @@ commands:
     executable: "/home/bundle/cog-command"
     description: Creates a new stack based on an existing template and returns the
       newly created stack.
-    arguments: "<stack_name> <template_name>"
+    long_description: |
+      Although this command can be used on it's own to fully define and create
+      a stack with a template url just as you would with the awscli tool, it is
+      entended to be used with a stack definition. This can be accomplished by
+      first creating a stack definition (see `definition-create`) and then
+      either defining that definition by name with the `--definition` option,
+      or by pipeing that definition to the `stack-create` command.
+    examples: |
+      Creating a stack from a definition with a single parameter:
+
+      ```
+      stack create webapp3 -d webapp -p "SshKey=web-team"
+      ```
+
+      Creating a stack with a definition in a pipeline:
+
+      ```
+      definition show webapp3 | stack create $name $template_url -p $params -t $tags -p "SshKey=web-team"
+      ```
+
+      Creating a stack without a definition:
+
+      ```
+      stack create webapp3 https://s3.amazonaws.com/bucket/webapp3.yml -p "SshKey=web-team" -p "Port=8080" -t "Name=webapp3"
+      ```
+    arguments: "<stack-name> <template-url> | [<stack-name>] --definition <definition-name>"
     options:
       definition:
         type: string
@@ -122,14 +275,14 @@ commands:
   stack-delete:
     executable: "/home/bundle/cog-command"
     description: Deletes a stack.
-    arguments: "<stack_name>"
+    arguments: "<stack-name>"
     rules:
     - must have cfn:stack
   stack-events:
     executable: "/home/bundle/cog-command"
     description: Lists events for a stack. Returns all stack related events for a
       specified stack in reverse chronological order.
-    arguments: "<stack_name>"
+    arguments: "<stack-name>"
     rules:
     - must have cfn:stack
   stack-list:
@@ -142,6 +295,18 @@ commands:
 
       Additionally a few special filter strings that correspond to a subset of the standard filter strings may be used:
       ACTIVE, COMPLETE, FAILED, DELETED, IN_PROGRESS
+    examples: |
+      Listing all stacks:
+
+      ```
+      stack list
+      ```
+
+      Listing all stacks that have failed:
+
+      ```
+      stack list -f FAILED
+      ```
     options:
       filter:
         type: list
@@ -155,19 +320,19 @@ commands:
   stack-resources:
     executable: "/home/bundle/cog-command"
     description: Lists stack resources.
-    arguments: "<stack_name>"
+    arguments: "<stack-name>"
     rules:
     - must have cfn:stack
   stack-show:
     executable: "/home/bundle/cog-command"
     description: Shows details for a stack.
-    arguments: "<stack_name>"
+    arguments: "<stack-name>"
     rules:
     - must have cfn:stack
   changeset-create:
     executable: "/home/bundle/cog-command"
     description: Creates a changeset for a stack.
-    arguments: "<stack_name>"
+    arguments: "<stack-name>"
     options:
       param:
         type: list
@@ -207,30 +372,47 @@ commands:
   changeset-list:
     executable: "/home/bundle/cog-command"
     description: Lists cloudformation changesets.
-    arguments: "<stack_name>"
+    arguments: "<stack-name>"
     rules:
     - must have cfn:changeset
   changeset-delete:
     executable: "/home/bundle/cog-command"
     description: Deletes cloudformation changesets.
-    arguments: "<changeset_name> <stack_name>"
+    arguments: "<changeset-name> <stack-name>"
     rules:
     - must have cfn:changeset
   changeset-show:
     executable: "/home/bundle/cog-command"
     description: Shows a cloudformation changeset.
-    arguments: "<changeset_name> <stack_name>"
+    arguments: "<changeset-name> <stack-name>"
     rules:
     - must have cfn:changeset
   changeset-apply:
     executable: "/home/bundle/cog-command"
     description: Applies a cloudformation changeset.
-    arguments: "<changeset_name> <stack_name>"
+    arguments: "<changeset-name> <stack-name>"
     rules:
     - must have cfn:changeset
   definition-create:
     executable: "/home/bundle/cog-command"
     description: Creates a stack definition.
+    long_description: |
+      Definitions are defined with a name, a template, a set of defaults files,
+      and a set of overrides (tags and parameters). These layers are then all
+      merged together in the above order and stored in the defined git
+      repository for use with the `stack-create` command.
+    examples: |
+      Creating a simple definition without overrides:
+
+      ```
+      definition create webapp-prod webapp
+      ```
+
+      Creating a definition with a few overrides:
+
+      ```
+      definition create webapp-staging webapp -p "Port=8080" -p "InstanceType=t2.medium" -t "Env=staging"
+      ```
     arguments: "<definition-name> <template-name>"
     options:
       defaults:
@@ -261,6 +443,29 @@ commands:
   definition-list:
     executable: "/home/bundle/cog-command"
     description: Lists all definitions, filtered by an optional glob pattern.
+    long_description: |
+      The names of each definition are listed.
+
+      When filtering the list with a pattern, only simple patterns
+      similar to a shell glob are accepted.
+
+      `*` - Matches any string of characters
+      `?` - Matches any one character
+      `[set]` - Matches any one character in the set
+      `{p,q}` - Matches either literal p or q
+      `\` - Escapes the next pattern character
+    examples: |
+      Listing all definitions:
+
+      ```
+      definition list
+      ```
+
+      Listing all definitions that start with "webapp":
+
+      ```
+      definition list "webapp*"
+      ```
     arguments: "[pattern]"
     options:
       branch:
@@ -283,6 +488,22 @@ commands:
   definition-show:
     executable: "/home/bundle/cog-command"
     description: Shows contents of a definition.
+    long_description: |
+      The most recently created stack definition with the name specified is
+      found and returned as json. Keys `params` and `tags` are formatted to be
+      used in a pipeline. See examples for usage.
+    examples: |
+      Show a definition:
+
+      ```
+      definition show webapp
+      ```
+
+      Show a definition and use it in a pipeline with `stack-create`:
+
+      ```
+      definition show webapp3 | stack create $name $template_url -p $params -t $tags -p "SshKey=web-team"
+      ```
     arguments: "<name>"
     options:
       branch:
@@ -305,6 +526,17 @@ commands:
   defaults-create:
     executable: "/home/bundle/cog-command"
     description: Creates a new defaults file.
+    long_description: |
+      Defaults are named sets of parameters and tags applied to templates when
+      creating a stack. Creating a few defaults file stores the parameters and
+      tags provided as previous command input as JSON in the specified git
+      repository.
+    examples: |
+      Create a defaults file with parameters and tags:
+
+      ```
+      seed '{ "params": { "Port": "80" }, "tags": { "Env": "staging" } }' | defaults create staging
+      ```
     arguments: "<name>"
     options:
       branch:
@@ -318,6 +550,29 @@ commands:
   defaults-list:
     executable: "/home/bundle/cog-command"
     description: Lists all defaults files, filtered by an optional glob pattern.
+    long_description: |
+      The names of each defaults file are listed.
+
+      When filtering the list with a pattern, only simple patterns
+      similar to a shell glob are accepted.
+
+      `*` - Matches any string of characters
+      `?` - Matches any one character
+      `[set]` - Matches any one character in the set
+      `{p,q}` - Matches either literal p or q
+      `\` - Escapes the next pattern character
+    examples: |
+      Listing all defaults files:
+
+      ```
+      defaults list
+      ```
+
+      Listing all defaults files that start with "webapp":
+
+      ```
+      defaults list "webapp*"
+      ```
     arguments: "[pattern]"
     options:
       branch:
@@ -340,6 +595,15 @@ commands:
   defaults-show:
     executable: "/home/bundle/cog-command"
     description: Shows contents of a defaults file.
+    long_description: |
+      The name and the parsed JSON data are returned for use in other pipelines
+      or for viewing in chat.
+    examples: |
+      Show a defaults file:
+
+      ```
+      defaults show staging
+      ```
     arguments: "<name>"
     options:
       branch:
@@ -362,6 +626,11 @@ commands:
   check-setup:
     executable: "/home/bundle/cog-command"
     description: Checks that all configuration is set correctly
+    long_description: |
+      This command is meant to be a sanity check for users once they have
+      installed and configured the bundle. It will inspect provided environment
+      variables and try to make sure that the accounts used have all the
+      necessary permissions.
     rules:
     - allow
 permissions:
