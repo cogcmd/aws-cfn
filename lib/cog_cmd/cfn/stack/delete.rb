@@ -16,7 +16,7 @@ module CogCmd::Cfn::Stack
     def run_command
       raise(Cog::Abort, "You must specify a stack name.") unless stack_name
 
-      response.template = 'stack_show'
+      response.template = 'stack_delete'
       response.content = delete_stack
     end
 

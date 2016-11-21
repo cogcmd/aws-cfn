@@ -15,10 +15,19 @@ module CogCmd::Cfn::Defaults
       require_ref_exists!
       require_defaults_exists!
 
-      file = git_client.show_defaults(name, ref)[:data]
+      defaults = git_client.show_defaults(name, ref)[:data]
+
+      defaults['meta'] ||= {}
+      defaults['meta']['name'] = name
+      defaults['param_list'] = map_to_list(defaults['params']) if defaults['params']
+      defaults['tag_list'] = map_to_list(defaults['tags']) if defaults['tags']
 
       response.template = 'defaults_show'
-      response.content = [file]
+      response.content = defaults
+    end
+
+    def map_to_list(data)
+      data.map { |k,v| "#{k}=#{v}" }
     end
 
     def require_name!

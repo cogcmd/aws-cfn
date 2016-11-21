@@ -7,9 +7,8 @@ module CogCmd::Cfn::Definition
   class Create < Cfn::Command
     include Cfn::BranchOption
 
-    NAME_FORMAT = /\A[-\w\/]*\z/
-
-    input :accumulate
+    DEFINITION_NAME_FORMAT = /\A[\w-]*\z/
+    TEMPLATE_NAME_FORMAT = /\A[-\w\/]*\z/
 
     def run_command
       require_git_client!
@@ -42,7 +41,7 @@ module CogCmd::Cfn::Definition
     end
 
     def require_name_format!
-      unless NAME_FORMAT.match(name)
+      unless DEFINITION_NAME_FORMAT.match(name)
         raise(Cog::Abort, 'Name must only include word characters [a-zA-Z0-9_-].')
       end
     end
@@ -54,8 +53,8 @@ module CogCmd::Cfn::Definition
     end
 
     def require_template_format!
-      unless NAME_FORMAT.match(template)
-        raise(Cog::Abort, 'Template must only include word characters [a-zA-Z0-9_-].')
+      unless TEMPLATE_NAME_FORMAT.match(template)
+        raise(Cog::Abort, 'Name must only include word characters [a-zA-Z0-9_-/].')
       end
     end
 

@@ -1,12 +1,39 @@
-~each var=$results as=stack~
-~attachment title=$stack.stack_name color="mediumblue"~
-~$stack.stack_status~
+**~$results[0].stack_name~**
+
+~br~
+**Description:** ~$results[0].description~
+**Stack Status:** ~$results[0].stack_status~
+**Last Update:** ~$results[0].last_updated_time~
+
+~br~
+**Parameters:**
+
+~if cond=$results[0].parameters empty?~
+None
 ~end~
-~attachment title="Parameters" color="darkblue"~
-| Key | Value |
-|-----|-------|
-~each var=$stack.parameters as=param~
-| ~$param.parameter_key~ | ~$param.parameter_value~ |
+~each var=$results[0].parameters~
+• ~$item.parameter_key~=~$item.parameter_value~
+
 ~end~
+
+~br~
+**Outputs:**
+
+~if cond=$results[0].outputs empty?~
+None
 ~end~
+~each var=$results[0].outputs as=item~
+• ~$item.output_key~=~$item.output_value~
+
+~end~
+
+~br~
+**Tags:**
+
+~if cond=$results[0].tags empty?~
+None
+~end~
+~each var=$results[0].tags as=item~
+• ~$item.key~=~$item.value~
+
 ~end~

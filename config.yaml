@@ -12,6 +12,11 @@ commands:
     description: Shows contents of a template.
     arguments: "<name>"
     options:
+      s3:
+        type: bool
+        required: false
+        description: Show template from an S3 URL instead of Git. <name> should be
+          the URL.
       branch:
         type: string
         required: false
@@ -28,7 +33,7 @@ commands:
         short_flag: s
         description: Git commit SHA in which to find the template.
     rules:
-      - must have cfn:template-show
+    - must have cfn:template-show
   template-ls:
     executable: "/home/bundle/cog-command"
     description: Lists all templates, filtered by an optional glob pattern.
@@ -50,25 +55,40 @@ commands:
         short_flag: s
         description: Git commit SHA from which to list templates.
     rules:
-      - allow
+    - allow
   stack-create:
     executable: "/home/bundle/cog-command"
     description: Creates a new stack based on an existing template and returns the
       newly created stack.
     arguments: "<stack_name> <template_name>"
     options:
-      param:
-        type: list
+      definition:
+        type: string
         required: false
-        short_flag: p
-        description: Key-value pairs specified as 'key=value', that specify input
-          parameters for your stack. Can be specified multiple times.
+        short_flag: d
+        description: Name of a definition to use as default values for stack creation.
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch from which to read definitions. Defaults to master.
       tag:
         type: list
         required: false
         short_flag: t
         description: Key-value pairs to associate with this stack. Can be specified
           multiple times.
+      sha:
+        type: string
+        required: false
+        short_flag: s
+        description: Git commit SHA from which to read definitions.
+      param:
+        type: list
+        required: false
+        short_flag: p
+        description: Key-value pairs specified as 'key=value', that specify input
+          parameters for your stack. Can be specified multiple times.
       policy:
         type: string
         required: false
@@ -183,7 +203,7 @@ commands:
         required: false
         description: The name of your changeset. Defaults to 'changeset<num>'
     rules:
-      - must have cfn:changeset
+    - must have cfn:changeset
   changeset-list:
     executable: "/home/bundle/cog-command"
     description: Lists cloudformation changesets.
@@ -217,24 +237,27 @@ commands:
         type: list
         required: false
         short_flag: d
-        description: List of defaults files to use. Defaults are merged together in the order they were specified.
+        description: List of defaults files to use. Defaults are merged together in
+          the order they were specified.
       params:
         type: list
         required: false
         short_flag: p
-        description: "Stack parameters which override parameters defined in any defaults files specified. Defined with the following pattern: <key>=<value>."
+        description: 'Stack parameters which override parameters defined in any defaults
+          files specified. Defined with the following pattern: <key>=<value>.'
       tags:
         type: list
         required: false
         short_flag: t
-        description: "Stack tags which override tags defined in any defaults files specified. Defined with the following pattern: <key>=<value>."
+        description: 'Stack tags which override tags defined in any defaults files
+          specified. Defined with the following pattern: <key>=<value>.'
       branch:
         type: string
         required: false
         short_flag: b
         description: Branch from which to find defaults files. Defaults to master.
     rules:
-      - must have cfn:definition-create
+    - must have cfn:definition-create
   definition-ls:
     executable: "/home/bundle/cog-command"
     description: Lists all definitions, filtered by an optional glob pattern.
@@ -256,7 +279,7 @@ commands:
         short_flag: s
         description: Git commit SHA from which to list definitions.
     rules:
-      - allow
+    - allow
   definition-show:
     executable: "/home/bundle/cog-command"
     description: Shows contents of a definition.
@@ -278,7 +301,7 @@ commands:
         short_flag: s
         description: Git commit SHA in which to find the definition.
     rules:
-      - must have cfn:definition-show
+    - must have cfn:definition-show
   defaults-create:
     executable: "/home/bundle/cog-command"
     description: Creates a new defaults file.
@@ -288,9 +311,10 @@ commands:
         type: string
         required: false
         short_flag: b
-        description: Branch of which to commit the new defaults file. Defaults to master.
+        description: Branch of which to commit the new defaults file. Defaults to
+          master.
     rules:
-      - must have cfn:defaults-create
+    - must have cfn:defaults-create
   defaults-ls:
     executable: "/home/bundle/cog-command"
     description: Lists all defaults files, filtered by an optional glob pattern.
@@ -312,7 +336,7 @@ commands:
         short_flag: s
         description: Git commit SHA from which to list defaults files.
     rules:
-      - allow
+    - allow
   defaults-show:
     executable: "/home/bundle/cog-command"
     description: Shows contents of a defaults file.
@@ -341,39 +365,74 @@ commands:
     rules:
       - allow
 permissions:
-  - cfn:stack
-  - cfn:changeset
-  - cfn:template-show
-  - cfn:defaults-create
-  - cfn:defaults-show
-  - cfn:definition-create
-  - cfn:definition-show
+- cfn:stack
+- cfn:changeset
+- cfn:template-show
+- cfn:defaults-create
+- cfn:defaults-show
+- cfn:definition-create
+- cfn:definition-show
 templates:
   template_list:
     body: |
+      **CloudFormation Templates:**
+      ~br~
       ~each var=$results as=template~
-      ~$template.name~
+      • ~$template.name~
       ~end~
   template_show:
     body: |
-      ~each var=$results as=template~
-      ```
-      ~$template.body~
-      ```
+      **Template:** ~$results[0].name~
+      **Description:** ~$results[0].description~
+      ~if cond=$results[0].capabilities bound?~**Capabilities:** ~$results[0].capabilities[0]~~end~
+
+      ~br~
+      **Parameters:**
+
+      ~each var=$results[0].parameters~
+      • ~$item.parameter_key~ (~$item.parameter_type~) ~if cond=$item.default_value != ""~[~$item.default_value~]~end~
+
       ~end~
   stack_show:
     body: |
-      ~each var=$results as=stack~
-      ~attachment title=$stack.stack_name color="mediumblue"~
-      ~$stack.stack_status~
+      **~$results[0].stack_name~**
+
+      ~br~
+      **Description:** ~$results[0].description~
+      **Stack Status:** ~$results[0].stack_status~
+      **Last Update:** ~$results[0].last_updated_time~
+
+      ~br~
+      **Parameters:**
+
+      ~if cond=$results[0].parameters empty?~
+      None
       ~end~
-      ~attachment title="Parameters" color="darkblue"~
-      | Key | Value |
-      |-----|-------|
-      ~each var=$stack.parameters as=param~
-      | ~$param.parameter_key~ | ~$param.parameter_value~ |
+      ~each var=$results[0].parameters~
+      • ~$item.parameter_key~=~$item.parameter_value~
+
       ~end~
+
+      ~br~
+      **Outputs:**
+
+      ~if cond=$results[0].outputs empty?~
+      None
       ~end~
+      ~each var=$results[0].outputs as=item~
+      • ~$item.output_key~=~$item.output_value~
+
+      ~end~
+
+      ~br~
+      **Tags:**
+
+      ~if cond=$results[0].tags empty?~
+      None
+      ~end~
+      ~each var=$results[0].tags as=item~
+      • ~$item.key~=~$item.value~
+
       ~end~
   stack_event_list:
     body: |
@@ -470,10 +529,26 @@ templates:
       ~end~
   defaults_show:
     body: |
-      ~each var=$results as=defaults~
-      ```
-      ~$defaults~
-      ```
+      **Defaults:** ~$results[0].meta.name~
+
+      ~br~
+      **Params:**
+
+      ~if cond=$results[0].param_list empty?~
+      None
+      ~end~
+      ~each var=$results[0].param_list~
+      • ~$item~
+      ~end~
+
+      ~br~
+      **Tags:**
+
+      ~if cond=$results[0].tag_list empty?~
+      None
+      ~end~
+      ~each var=$results[0].tag_list~
+      • ~$item~
       ~end~
   definition_create:
     body: |
@@ -498,3 +573,43 @@ templates:
       | S3 permissions | ~if cond=$setup.aws_s3_permissions == 1~yes~end~~if cond=$setup.aws_s3_permissions== 0~no~end~ |
       | S3 bucket exists | ~if cond=$setup.aws_s3_bucket == 1~yes~end~~if cond=$setup.aws_s3_bucket == 0~no~end~ |
       ~end~
+  template_body:
+    body: "~json var=$results[0]~\n"
+  definition_show:
+    body: |
+      **Name:** ~$results[0].name~
+      **Template:** ~$results[0].template.name~
+      **Timestamp:** ~$results[0].timestamp~
+
+      ~br~
+      **Parameters:**
+
+      ~each var=$results[0].params~
+      • ~$item~
+      ~end~
+
+      ~br~
+      **Tags:**
+
+      ~each var=$results[0].tags~
+      • ~$item~
+      ~end~
+
+      ~br~
+      **Defaults:**
+
+      ~each var=$results[0].defaults~
+      • ~$item.name~
+      ~end~
+
+      ~br~
+      **Overrides:**
+
+      ~json var=$results[0].overrides~
+  error_stack_capability:
+    body: 'Insufficient capabilities to create stack ~$results[0].name~. Add `-c ~$results[0].capability~`
+      to your stack-create options to proceed.
+
+'
+  stack_delete:
+    body: "**~$results[0].stack_name~**: ~$results[0].stack_status~\n"
