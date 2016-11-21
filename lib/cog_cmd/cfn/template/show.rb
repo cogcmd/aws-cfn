@@ -1,3 +1,4 @@
+require 'cog_cmd/cfn/helpers'
 require 'cog_cmd/cfn/template'
 require 'cfn/command'
 require 'cfn/ref_options'
@@ -5,31 +6,44 @@ require 'cfn/ref_options'
 module CogCmd::Cfn::Template
   class Show < Cfn::Command
     include Cfn::RefOptions
+    include CogCmd::Cfn::Helpers
 
     NAME_FORMAT = /\A[-\w\/]*\z/
 
     def run_command
       require_git_client!
       require_name!
-      require_name_format!
-      require_ref_exists!
-      require_template_exists!
 
-      file = git_client.show_template(name, ref)
+      template_url =
+        if request.options['s3']
+          name
+        else
+          require_name_format!
+          require_ref_exists!
+          require_template_exists!
 
-      if request.options['raw']
-        response.template = 'template_body'
-        response.content = [file]
-      else
-        temp_url = s3_client.create_temp_file(file[:body])
-        client = Aws::CloudFormation::Client.new
-        summary = client.get_template_summary(template_url: temp_url).to_h
-        summary[:name] = name
+          file = git_client.show_template(name, ref)
+          s3_client.create_temp_file(file[:body])
+        end
 
-        response.log(:info, "summary: #{summary.inspect}")
-        response.template = 'template_show'
-        response.content = summary
+      client = Aws::CloudFormation::Client.new
+
+      summary = client.get_template_summary(template_url: template_url).to_h
+      summary[:name] = name
+
+      sort_order = {
+        :parameters => :parameter_key,
+        :tags => :key,
+        :outputs => :output_key
+      }
+
+      sort_order.each do |type, sort_key|
+        next unless summary[type]
+        summary[type] = summary[type].sort_by { |p| p[sort_key] }
       end
+
+      response.template = 'template_show'
+      response.content = summary
     end
 
     def require_name!
