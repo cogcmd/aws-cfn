@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'cog_cmd/cfn/defaults/ls'
+require 'cog_cmd/cfn/defaults/list'
 require 'cfn/git_client'
 
 describe CogCmd::Cfn::Defaults::List do

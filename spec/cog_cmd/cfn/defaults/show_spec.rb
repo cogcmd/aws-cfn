@@ -36,7 +36,7 @@ describe CogCmd::Cfn::Defaults::Show do
 
       run_command(args: ['webapp'])
 
-      expect(command).to respond_with([{ 'params' => { 'port' => 80 } }])
+      expect(command).to respond_with({ 'meta' => { 'name' => 'webapp' }, 'param_list' => ["port=80"], 'params' => { 'port' => 80 } })
     end
   end
 
