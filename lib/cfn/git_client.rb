@@ -20,7 +20,7 @@ module Cfn
 
       reset_hard_branch(branch)
       create_file(path, JSON.pretty_generate(body))
-      create_commit([path])
+      create_commit([path], "Create Defaults: #{name}")
       push_repository(branch)
 
       [{ name: name, body: body }]
@@ -71,7 +71,7 @@ module Cfn
       reset_hard_branch(branch)
       create_file(template_path, template)
       create_file(definition_path, definition.to_yaml)
-      create_commit([template_path, definition_path])
+      create_commit([template_path, definition_path], "Definition Create: #{name}")
       push_repository(branch)
 
       definition
@@ -215,9 +215,10 @@ module Cfn
       File.write(absolute_path, body)
     end
 
-    def create_commit(paths)
+    def create_commit(paths, message = nil)
       index = repository.index
       parent = repository.head.target
+      message = "Cog commit: #{paths}" if message.nil?
 
       paths.each do |path|
         oid = Rugged::Blob.from_workdir(repository, path)
@@ -229,7 +230,7 @@ module Cfn
 
       author = {
         email: 'cog@operable.io',
-        name: 'Cog',
+        name: ENV['COG_CHAT_HANDLE'],
         time: Time.now
       }
 
@@ -237,11 +238,21 @@ module Cfn
         repository,
         author: author,
         committer: author,
-        message: "Create #{paths.join(', ')}",
+        message: commit_message(message, paths),
         parents: [parent],
         tree: commit_tree,
         update_ref: 'HEAD'
       )
+    end
+
+    def commit_message(message, paths)
+      message += "\n\n" + <<~EOF
+        Created Files:
+        #{ paths.map { |p| "- #{p}" }.join("\n") }
+
+        Creator Chat Handle:
+        #{ ENV["COG_CHAT_HANDLE"]}
+      EOF
     end
 
     def push_repository(branch = 'master')
