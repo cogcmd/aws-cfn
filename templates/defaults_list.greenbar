@@ -1,0 +1,6 @@
+**CloudFormation Defaults:**
+
+~br~
+~each var=$results~
+• ~$item.name~
+~end~

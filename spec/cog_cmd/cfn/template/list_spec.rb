@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-require 'cog_cmd/cfn/template/ls'
+require 'cog_cmd/cfn/template/list'
 require 'cfn/git_client'
 
-describe CogCmd::Cfn::Template::Ls do
-  let(:command_name) { 'template-ls' }
+describe CogCmd::Cfn::Template::List do
+  let(:command_name) { 'template-list' }
   let(:git_client) { double(Cfn::GitClient) }
 
   before do
@@ -46,7 +46,7 @@ describe CogCmd::Cfn::Template::Ls do
       run_command(args: ['fly*'])
 
       expect(command).to respond_with([{ name: 'flywheel' }])
-                                        
+
     end
   end
 

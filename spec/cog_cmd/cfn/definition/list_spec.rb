@@ -1,11 +1,12 @@
 require 'spec_helper'
 
-require 'cog_cmd/cfn/defaults/ls'
+require 'cog_cmd/cfn/definition/list'
 require 'cfn/git_client'
 
-describe CogCmd::Cfn::Defaults::Ls do
-  let(:command_name) { 'defaults-ls' }
+describe CogCmd::Cfn::Defaults::List do
+  let(:command_name) { 'definition-list' }
   let(:git_client) { double(Cfn::GitClient) }
+  let(:s3_client) { double(Cfn::S3Client) }
 
   before do
     allow(Cfn::GitClient).to receive(:new).and_return(git_client)
@@ -18,20 +19,20 @@ describe CogCmd::Cfn::Defaults::Ls do
       allow(ENV).to receive(:[]).with('GIT_SSH_KEY').and_return('not-actually-a-private-key')
     end
 
-    it 'lists defaults files' do
+    it 'lists definitions' do
       expect(git_client).to receive(:ref_exists?).
         with({ branch: 'master' }).
         and_return(true)
 
-      expect(git_client).to receive(:list_defaults).
+      expect(git_client).to receive(:list_definitions).
         with('*', branch: 'master').
-        and_return([{ name: 'webapp', body: '{ "params": { "port": 80 } }', data: { 'params' => { 'port' => 80 } } },
-                    { name: 'staging', body: '{ "tags": { "env": "staging" } }', data: { 'tags' => { 'env' => 'staging' } } }])
+        and_return([{ name: 'flywheel' },
+                    { name: 'enterprise-builder' }])
 
       run_command
 
-      expect(command).to respond_with([{ name: 'webapp', body: '{ "params": { "port": 80 } }', data: { 'params' => { 'port' => 80 } } },
-                                       { name: 'staging', body: '{ "tags": { "env": "staging" } }', data: { 'tags' => { 'env' => 'staging' } } }])
+      expect(command).to respond_with([{ name: 'flywheel' },
+                                       { name: 'enterprise-builder' }])
     end
 
     it 'lists defaults files filtered by a pattern' do
@@ -39,13 +40,13 @@ describe CogCmd::Cfn::Defaults::Ls do
         with({ branch: 'master' }).
         and_return(true)
 
-      expect(git_client).to receive(:list_defaults).
-        with('web*', branch: 'master').
-        and_return([{ name: 'webapp', body: '{ "params": { "port": 80 } }', data: { 'params' => { 'port' => 80 } } }])
+      expect(git_client).to receive(:list_definitions).
+        with('fly*', branch: 'master').
+        and_return([{ name: 'flywheel' }])
 
-      run_command(args: ['web*'])
+      run_command(args: ['fly*'])
 
-      expect(command).to respond_with([{ name: 'webapp', body: '{ "params": { "port": 80 } }', data: { 'params' => { 'port' => 80 } } }])
+      expect(command).to respond_with([{ name: 'flywheel' }])
     end
   end
 
