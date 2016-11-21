@@ -1,0 +1,1 @@
+Insufficient capabilities to create stack ~$results[0].name~. Add `-c ~$results[0].capability~` to your stack-create options to proceed.

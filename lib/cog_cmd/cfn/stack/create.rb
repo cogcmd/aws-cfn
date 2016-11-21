@@ -1,26 +1,44 @@
+require 'cfn/command'
+require 'cfn/ref_options'
 require 'cog_cmd/cfn/stack'
-
 require 'cog_cmd/cfn/helpers'
 
 module CogCmd::Cfn::Stack
-  class Create < Cog::Command
+  class Create < Cfn::Command
 
+    include Cfn::RefOptions
     include CogCmd::Cfn::Helpers
 
-    attr_reader :stack_name, :template_url
+    attr_reader :stack_name, :template_url, :definition
     attr_reader :stack_params, :tags, :policy, :notify, :on_failure, :timeout, :capabilities
 
     def initialize
-      # args
-      @stack_name = request.args[0]
-      @template_url = request.args[1]
+      @definition = request.options['definition']
 
-      # options
-      @stack_params = request.options['param']
-      @tags = request.options['tag']
-      @policy = request.options['policy']
-      @notify = request.options['notify']
-      @on_failure = request.options['on-failure']
+      if @definition
+        require_git_client!
+        require_ref_exists!
+        require_definition_exists!
+
+        definition = git_client.show_definition(@definition, { branch: 'master' })[:data]
+
+        @stack_name = request.args[0] || definition['name']
+        @template_url = definition['template_url']
+        @stack_params = definition['params']
+        @tags = definition['tags']
+      else
+        # args
+        @stack_name = request.args[0] || @stack_name
+        @template_url = request.args[1] || @template_url
+
+        # options
+        @stack_params = request.options['param']
+        @tags = request.options['tag']
+        @policy = request.options['policy']
+        @notify = request.options['notify']
+        @on_failure = request.options['on-failure']
+      end
+
       @timeout = request.options['timeout']
       @capabilities = request.options['capabilities']
     end
@@ -52,6 +70,15 @@ module CogCmd::Cfn::Stack
 
       client.create_stack(params)
       client.describe_stacks(stack_name: stack_name).stacks[0].to_h
+    rescue Aws::CloudFormation::Errors::InsufficientCapabilitiesException => ex
+      cap_name = ex.message.match(/\[(?<capability>.+)\]/)[:capability]
+      cap_option = cap_name.gsub(/^CAPABILITY_/, '').downcase
+
+      response.template = "error_stack_capability"
+      response.content = {
+        "name": stack_name,
+        "capability": cap_option
+      }
     end
 
     def process_parameters(params)
@@ -64,5 +91,18 @@ module CogCmd::Cfn::Stack
       end
     end
 
+    def require_definition_exists!
+      unless git_client.definition_exists?(@definition, ref)
+        if branch = ref[:branch]
+          additional = "Check that the definition exists in the #{branch} branch and has been pushed to your repository's origin."
+        elsif sha = ref[:tag]
+          additional = "Check that the definition exists in the #{tag} tag and has been pushed to your repository's origin."
+        elsif sha = ref[:sha]
+          additional = "Check that the definition exists in the git commit SHA #{sha} tag and has been pushed to your repository's origin."
+        end
+
+        raise(Cog::Abort, "Definition does not exist. #{additional}")
+      end
+    end
   end
 end
