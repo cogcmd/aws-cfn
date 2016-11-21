@@ -245,9 +245,8 @@ module Cfn
     end
 
     def push_repository(branch = 'master')
-      branch = repository.branches[branch]
       remote = repository.remotes['origin']
-      remote.push([branch.canonical_name], credentials: credential)
+      remote.push(["HEAD:refs/heads/#{branch}"], credentials: credential)
     end
 
     def workdir_path(path)
