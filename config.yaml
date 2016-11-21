@@ -34,7 +34,7 @@ commands:
         description: Git commit SHA in which to find the template.
     rules:
     - must have cfn:template-show
-  template-ls:
+  template-list:
     executable: "/home/bundle/cog-command"
     description: Lists all templates, filtered by an optional glob pattern.
     arguments: "[pattern]"
@@ -258,7 +258,7 @@ commands:
         description: Branch from which to find defaults files. Defaults to master.
     rules:
     - must have cfn:definition-create
-  definition-ls:
+  definition-list:
     executable: "/home/bundle/cog-command"
     description: Lists all definitions, filtered by an optional glob pattern.
     arguments: "[pattern]"
@@ -315,7 +315,7 @@ commands:
           master.
     rules:
     - must have cfn:defaults-create
-  defaults-ls:
+  defaults-list:
     executable: "/home/bundle/cog-command"
     description: Lists all defaults files, filtered by an optional glob pattern.
     arguments: "[pattern]"
@@ -358,12 +358,12 @@ commands:
         short_flag: s
         description: Git commit SHA in which to find the defaults file.
     rules:
-      - must have cfn:defaults-show
+    - must have cfn:defaults-show
   check-setup:
     executable: "/home/bundle/cog-command"
     description: Checks that all configuration is set correctly
     rules:
-      - allow
+    - allow
 permissions:
 - cfn:stack
 - cfn:changeset
@@ -442,12 +442,9 @@ templates:
       | ~$event.timestamp~ | ~$event.resource_status~ | ~$event.resource_type~ | ~$event.logical_resource_id~ |
       ~end~
   stack_list:
-    body: |
-      | Name | Status | Description |
-      |------|--------|-------------|
-      ~each var=$results as=stack~
-      | ~$stack.stack_name~ | ~$stack.stack_status~ | ~$stack.template_description~ |
-      ~end~
+    body: "| Name | Status | Description |\n|------|--------|-------------|\n~each
+      var=$results as=stack~\n| ~$stack.stack_name~ | ~$stack.stack_status~ | ~$stack.template_description~
+      | \n~end~\n"
   stack_resource_list:
     body: |
       | Type | Status | Logical ID | Physical ID |
@@ -524,8 +521,11 @@ templates:
       ~end~
   defaults_list:
     body: |
-      ~each var=$results as=defaults~
-      ~$defaults.name~
+      **CloudFormation Defaults:**
+
+      ~br~
+      ~each var=$results~
+      • ~$item.name~
       ~end~
   defaults_show:
     body: |
@@ -557,8 +557,10 @@ templates:
       ~end~
   definition_list:
     body: |
-      ~each var=$results as=definition~
-      ~$definition.name~
+      | Definition | Template | Defaults |
+      |------------|----------|----------|
+      ~each var=$results~
+      | ~$item.name~ | ~$item.data.template.name~ | ~each var=$item.data.defaults as=defaults~~$defaults.name~ ~end~ |
       ~end~
   check_setup:
     body: |

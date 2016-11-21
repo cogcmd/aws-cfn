@@ -81,11 +81,16 @@ module Cfn
       reset_hard_ref(ref)
       path_with_glob = workdir_path("definitions/#{filter}")
       dirs = Dir.glob(path_with_glob)
-      dirs.map { |p| { name: File.basename(p) } }
+
+      dirs.map { |path| read_definition(File.basename(path)) }
     end
 
     def show_definition(name, ref = { branch: 'master' })
       reset_hard_ref(ref)
+      read_definition(name)
+    end
+
+    def read_definition(name)
       absolute_path = workdir_path("definitions/#{name}/*/definition.yaml")
       path = Dir.glob(absolute_path).sort.last
       body = File.read(path)

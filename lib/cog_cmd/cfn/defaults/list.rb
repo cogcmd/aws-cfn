@@ -3,7 +3,7 @@ require 'cfn/command'
 require 'cfn/ref_options'
 
 module CogCmd::Cfn::Defaults
-  class Ls < Cfn::Command
+  class List < Cfn::Command
     include Cfn::RefOptions
 
     def run_command
