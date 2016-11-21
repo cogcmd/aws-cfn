@@ -12,10 +12,11 @@ commands:
     description: Shows contents of a template.
     arguments: "<name>"
     options:
-      raw:
+      s3:
         type: bool
         required: false
-        description: Dump raw template body
+        description: Show template from an S3 URL instead of Git. <name> should be
+          the URL.
       branch:
         type: string
         required: false
@@ -61,18 +62,33 @@ commands:
       newly created stack.
     arguments: "<stack_name> <template_name>"
     options:
-      param:
-        type: list
+      definition:
+        type: string
         required: false
-        short_flag: p
-        description: Key-value pairs specified as 'key=value', that specify input
-          parameters for your stack. Can be specified multiple times.
+        short_flag: d
+        description: Name of a definition to use as default values for stack creation.
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch from which to read definitions. Defaults to master.
       tag:
         type: list
         required: false
         short_flag: t
         description: Key-value pairs to associate with this stack. Can be specified
           multiple times.
+      sha:
+        type: string
+        required: false
+        short_flag: s
+        description: Git commit SHA from which to read definitions.
+      param:
+        type: list
+        required: false
+        short_flag: p
+        description: Key-value pairs specified as 'key=value', that specify input
+          parameters for your stack. Can be specified multiple times.
       policy:
         type: string
         required: false
@@ -377,18 +393,6 @@ templates:
       • ~$item.parameter_key~ (~$item.parameter_type~) ~if cond=$item.default_value != ""~[~$item.default_value~]~end~
 
       ~end~
-
-      ~br~
-      **Outputs:**
-
-      ~if cond=$results[0].outputs empty?~
-      None
-      ~end~
-
-      ~each var=$results[0].outputs as=item~
-      • ~$item.output_key~ ~if cond=$item.output_description bound?~: ~$item.output_description~~end~
-
-      ~end~
   stack_show:
     body: |
       **~$results[0].stack_name~**
@@ -525,10 +529,26 @@ templates:
       ~end~
   defaults_show:
     body: |
-      ~each var=$results as=defaults~
-      ```
-      ~$defaults~
-      ```
+      **Defaults:** ~$results[0].meta.name~
+
+      ~br~
+      **Params:**
+
+      ~if cond=$results[0].param_list empty?~
+      None
+      ~end~
+      ~each var=$results[0].param_list~
+      • ~$item~
+      ~end~
+
+      ~br~
+      **Tags:**
+
+      ~if cond=$results[0].tag_list empty?~
+      None
+      ~end~
+      ~each var=$results[0].tag_list~
+      • ~$item~
       ~end~
   definition_create:
     body: |
@@ -559,6 +579,7 @@ templates:
     body: |
       **Name:** ~$results[0].name~
       **Template:** ~$results[0].template.name~
+      **Timestamp:** ~$results[0].timestamp~
 
       ~br~
       **Parameters:**
@@ -585,3 +606,10 @@ templates:
       **Overrides:**
 
       ~json var=$results[0].overrides~
+  error_stack_capability:
+    body: 'Insufficient capabilities to create stack ~$results[0].name~. Add `-c ~$results[0].capability~`
+      to your stack-create options to proceed.
+
+'
+  stack_delete:
+    body: "**~$results[0].stack_name~**: ~$results[0].stack_status~\n"
