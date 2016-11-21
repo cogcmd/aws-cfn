@@ -1,6 +1,7 @@
 require 'cog/command'
 require 'cfn/git_client'
 require 'cfn/s3_client'
+require 'cfn/cfn_client'
 
 module Cfn
   class Command < Cog::Command
@@ -10,6 +11,10 @@ module Cfn
 
     def s3_client
       @_s3_client ||= Cfn::S3Client.new(s3_stack_definition_bucket, s3_stack_definition_prefix, aws_sts_role_arn)
+    end
+
+    def cfn_client
+      @_cfn_client ||= Cfn::CfnClient.new(aws_sts_role_arn)
     end
 
     def require_git_client!

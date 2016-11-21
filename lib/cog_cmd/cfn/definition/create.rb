@@ -7,7 +7,7 @@ module CogCmd::Cfn::Definition
   class Create < Cfn::Command
     include Cfn::BranchOption
 
-    NAME_FORMAT = /\A[\w-]*\z/
+    NAME_FORMAT = /\A[-\w\/]*\z/
 
     input :accumulate
 
@@ -22,7 +22,7 @@ module CogCmd::Cfn::Definition
       require_template_exists!
       require_defaults_exist!
 
-      definition = Cfn::Definition.create(git_client, s3_client, {
+      definition = Cfn::Definition.create(git_client, s3_client, cfn_client, {
         name: name,
         template: template,
         defaults: defaults,

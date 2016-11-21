@@ -1,7 +1,7 @@
 module Cfn
   class Definition
-    def self.create(git_client, s3_client, attributes)
-      new(attributes).create(git_client, s3_client)
+    def self.create(git_client, s3_client, cfn_client, attributes)
+      new(attributes).create(git_client, s3_client, cfn_client)
     end
 
     def initialize(attributes)
@@ -13,7 +13,7 @@ module Cfn
       @branch          = attributes.fetch(:branch)
     end
 
-    def create(git_client, s3_client)
+    def create(git_client, s3_client, cfn_client)
       template = fetch_template(git_client)
       defaults = fetch_defaults(git_client)
       sha = git_client.branch_sha(@branch)
@@ -31,16 +31,17 @@ module Cfn
         'tags' => hash_to_kv(overrides['tags'])
       }
 
-      timestamp = Time.now.utc.to_i
+      cfn_client.validate_template(template[:body])
 
-      definition = s3_client.create_definition(@definition_name, definition, template, timestamp)
-      git_client.create_definition(@definition_name, definition, template, timestamp, @branch)
+      timestamp = Time.now.utc.to_i
+      definition = s3_client.create_definition(@definition_name, definition, template[:data], timestamp)
+      git_client.create_definition(@definition_name, definition, template[:data], timestamp, @branch)
 
       definition
     end
 
     def fetch_template(git_client)
-      git_client.show_template(@template_name, { branch: @branch })[:data]
+      git_client.show_template(@template_name, { branch: @branch })
     end
 
     def fetch_defaults(git_client)

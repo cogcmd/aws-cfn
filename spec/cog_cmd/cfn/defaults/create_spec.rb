@@ -90,7 +90,7 @@ describe CogCmd::Cfn::Defaults::Create do
     end
   end
 
-  context 'with invalid env' do
+  context 'with env that has more than one item' do
     let(:cog_env) { [{ 'params' => { 'port' => 80 } }, { 'params' => { 'port' => 8080 } }] }
 
     before do
@@ -103,6 +103,22 @@ describe CogCmd::Cfn::Defaults::Create do
       expect {
         run_command(args: ['webapp'], options: { 'branch' => 'dev' })
       }.to raise_error(Cog::Abort, 'Input from previous command must only include a single item.')
+    end
+  end
+
+  context 'with env that does not have the right structure' do
+    let(:cog_env) { [{ 'port' => 80 }] }
+
+    before do
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with('GIT_REMOTE_URL').and_return('github.com:operable/cfn-test-repo.git')
+      allow(ENV).to receive(:[]).with('GIT_SSH_KEY').and_return('not-actually-a-private-key')
+    end
+
+    it 'returns an error if the json structure does not have the right keys' do
+      expect {
+        run_command(args: ['webapp'])
+      }.to raise_error(Cog::Abort, 'Input must include at least a "params" or "tags" key.')
     end
   end
 end

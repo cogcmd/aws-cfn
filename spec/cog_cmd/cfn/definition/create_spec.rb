@@ -3,16 +3,19 @@ require 'spec_helper'
 require 'cog_cmd/cfn/definition/create'
 require 'cfn/git_client'
 require 'cfn/s3_client'
+require 'cfn/cfn_client'
 require 'cfn/definition'
 
 describe CogCmd::Cfn::Definition::Create do
   let(:command_name) { 'definition-create' }
   let(:git_client) { double(Cfn::GitClient) }
   let(:s3_client) { double(Cfn::S3Client) }
+  let(:cfn_client) { double(Cfn::CfnClient) }
 
   before do
     allow(Cfn::GitClient).to receive(:new).and_return(git_client)
     allow(Cfn::S3Client).to receive(:new).and_return(s3_client)
+    allow(Cfn::CfnClient).to receive(:new).and_return(cfn_client)
   end
 
   context 'with valid args, options, and env' do
@@ -73,7 +76,7 @@ describe CogCmd::Cfn::Definition::Create do
         and_return(true)
 
       expect(Cfn::Definition).to receive(:create).
-        with(git_client, s3_client, {
+        with(git_client, s3_client, cfn_client, {
           name: 'flywheel',
           template: 'ec2',
           defaults: ['webapp', 'staging'],
