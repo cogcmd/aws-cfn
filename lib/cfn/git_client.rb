@@ -230,7 +230,7 @@ module Cfn
 
       author = {
         email: 'cog@operable.io',
-        name: ENV['COG_CHAT_HANDLE'],
+        name: "Cog: #{ENV['COG_CHAT_HANDLE']}",
         time: Time.now
       }
 
