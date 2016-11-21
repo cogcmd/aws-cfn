@@ -6,9 +6,13 @@ require 'cfn/git_client'
 describe CogCmd::Cfn::Template::Show do
   let(:command_name) { 'template-show' }
   let(:git_client) { double(Cfn::GitClient) }
+  let(:s3_client) { double(Cfn::S3Client) }
+  let(:cfn_client) { double(Aws::CloudFormation::Client) }
 
   before do
     allow(Cfn::GitClient).to receive(:new).and_return(git_client)
+    allow(Cfn::S3Client).to receive(:new).and_return(s3_client)
+    allow(Aws::CloudFormation::Client).to receive(:new).and_return(cfn_client)
   end
 
   context 'with valid args, options, and env' do
@@ -34,9 +38,20 @@ describe CogCmd::Cfn::Template::Show do
         with('ec2', branch: 'master').
         and_return({ name: 'ec2', body: template_body, data: template })
 
+      expect(s3_client).to receive(:create_temp_file).
+        with(template_body).
+        and_return('https://aws.amazon.com/template_url')
+
+      expect(cfn_client).to receive(:get_template_summary).
+        with(template_url: 'https://aws.amazon.com/template_url').
+        and_return({ parameters: [{ paramter_key: "Env", parameter_value: "prod" }],
+                     tags: [{ key: "Name", value: "ec2-prod" }] })
+
       run_command(args: ['ec2'])
 
-      expect(command).to respond_with([{ name: 'ec2', body: template_body, data: template }])
+      expect(command).to respond_with({ name: 'ec2',
+                                        parameters: [{ paramter_key: "Env", parameter_value: "prod" }],
+                                        tags: [{ key: "Name", value: "ec2-prod" }] })
     end
   end
 

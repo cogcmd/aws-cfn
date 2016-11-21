@@ -31,13 +31,13 @@ module Cfn
         'tags' => hash_to_kv(merged['tags'])
       }
 
-      cfn_client.validate_template(template[:body])
+      cfn_client.validate_template(template)
       timestamp = Time.now.utc.to_i
       definition_path = "#{@definition_name}/#{timestamp}"
 
       timestamp = Time.now.utc.to_i
-      definition = s3_client.create_definition(@definition_name, definition, template[:data], timestamp)
-      git_client.create_definition(@definition_name, definition, template[:data], timestamp, @branch)
+      definition = s3_client.create_definition(@definition_name, definition, template, timestamp)
+      git_client.create_definition(@definition_name, definition, template, timestamp, @branch)
 
       definition
     end
