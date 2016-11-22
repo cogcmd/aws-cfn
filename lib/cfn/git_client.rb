@@ -29,7 +29,7 @@ module Cfn
     def list_defaults(filter = '*', ref = { branch: 'master' })
       reset_hard_ref(ref)
       path_with_glob = workdir_path("defaults/#{filter}")
-      files = Dir.glob(path_with_glob)
+      files = natural_sort(Dir.glob(path_with_glob))
       files.map { |p| { name: File.basename(p, '.json') } }
     end
 
@@ -47,7 +47,7 @@ module Cfn
       files = Dir.glob(path_with_glob).map { |p| Pathname.new(p) }
       template_files = files.select { |path| ['.yml', '.yaml', '.json'].include?(path.extname.downcase) }
 
-      template_files.map do |path|
+      template_files.natural_sort.map do |path|
         folder = path.relative_path_from(base_path).dirname
         name = path.basename(path.extname)
         { name: folder.join(name) }
@@ -80,7 +80,7 @@ module Cfn
     def list_definitions(filter = '*', ref = { branch: 'master' })
       reset_hard_ref(ref)
       path_with_glob = workdir_path("definitions/#{filter}")
-      dirs = Dir.glob(path_with_glob)
+      dirs = natural_sort(Dir.glob(path_with_glob))
 
       dirs.map { |path| read_definition(File.basename(path)) }
     end
@@ -263,6 +263,10 @@ module Cfn
     def workdir_path(path)
       workdir = repository.workdir
       File.join(workdir, path)
+    end
+
+    def natural_sort(arr)
+      Naturalsorter::Sorter.sort(arr, true)
     end
   end
 end
