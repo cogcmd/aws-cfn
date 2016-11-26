@@ -530,15 +530,39 @@ commands:
       Defaults are named sets of parameters and tags applied to templates when
       creating a stack. Creating a few defaults file stores the parameters and
       tags provided as previous command input as JSON in the specified git
-      repository.
+      repository. When specifying params and tags from the previous command and
+      via options, options are merged on top of the previous command output,
+      overriding them.
     examples: |
       Create a defaults file with parameters and tags:
+
+      ```
+      defaults create staging -p "Port=80" -t "Env=staging"
+      ```
+
+      Create a defaults file from a previous command's output:
 
       ```
       seed '{ "params": { "Port": "80" }, "tags": { "Env": "staging" } }' | defaults create staging
       ```
     arguments: "<name>"
     options:
+      params:
+        type: list
+        required: false
+        short_flag: p
+        description: |
+          Parameters to include in the defaults file. Defined with the
+          following pattern: <key>=<value>. Merged with any params provided
+          from previous command output.
+      tags:
+        type: list
+        required: false
+        short_flag: t
+        description: |
+          Tags to include in the defaults file. Defined with the following
+          pattern: <key>=<value>. Merged with any tags provided from previous
+          command output.
       branch:
         type: string
         required: false
