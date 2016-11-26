@@ -1,21 +1,39 @@
+require 'cfn/command'
+require 'cfn/ref_options'
 require 'cog_cmd/cfn/changeset'
 require 'cog_cmd/cfn/helpers'
 
 module CogCmd::Cfn::Changeset
   class Create < Cog::Command
 
+    include Cfn::RefOptions
     include CogCmd::Cfn::Helpers
 
     attr_reader :stack_name
-    attr_reader :params, :tags, :notifications, :capabilities, :description, :changeset_name
+    attr_reader :definition, :params, :tags, :notifications, :capabilities, :description, :changeset_name
 
     def initialize
       # args
       @stack_name = request.args[0]
+      @definition = request.options['definition']
 
-      # options
-      @params = merge_parameters(request.options['param'])
-      @tags = process_tags(request.options['tag'])
+      if @definition
+        require_git_client!
+        require_ref_exists!
+        require_definition_exists!
+
+        definition = git_client.show_definition(@definition, { branch: 'master' })[:data]
+
+        @stack_name = request.args[0] || definition['name']
+        @template_url = definition['template_url']
+        @params = merge_parameters(definition['params'])
+        @tags = definition['tags']
+      else
+        # options
+        @params = merge_parameters(request.options['param'])
+        @tags = process_tags(request.options['tag'])
+      end
+
       @notifications = request.options['notify']
       @capabilities = process_capabilities(request.options['capabilities'])
       @description = request.options['description']
@@ -64,30 +82,31 @@ module CogCmd::Cfn::Changeset
       "changeset#{num_of_changesets}"
     end
 
+    def use_previous_value(key)
+      { parameter_key: key, use_previous_value: true }
+    end
+
     def merge_parameters(params)
+      return unless params
+
       client = Aws::CloudFormation::Client.new()
 
       # Grab the original template to merge the new params
       template_params = client.get_template_summary(stack_name: stack_name).parameters
 
-      params ||= []
-      params = params.map do |p|
-        param = p.strip.split("=")
-        { parameter_key: param[0],
-          parameter_value: param[1] }
-      end
+      # Build a list of parameter names to set 'use_previous_value' for when
+      # constructing the changeset
+      previous_params = template_params.map { |tp| tp.parameter_key }
 
-      template_params.map do |tp|
-        param = { parameter_key: tp.parameter_key }
+      params.map do |p|
+        key, value = p.strip.split("=")
 
-        if val = params.find { |p| p[:parameter_key] == tp.parameter_key }
-          param[:parameter_value] = val[:parameter_value]
-        else
-          param[:use_previous_value] = true
-        end
+        # remove keys that we received in the invocation from the list of keys
+        # that we use to set use_previous_value
+        previous_params = previous_params - [ key ]
 
-        param
-      end
+        { parameter_key: key, parameter_value: value }
+      end + previous_params.map { |key| use_previous_value(key) }
     end
 
   end

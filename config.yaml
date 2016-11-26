@@ -334,6 +334,27 @@ commands:
     description: Creates a changeset for a stack.
     arguments: "<stack-name>"
     options:
+      definition:
+        type: string
+        required: false
+        short_flag: d
+        description: Name of a definition to use as default values for updating the stack.
+      branch:
+        type: string
+        required: false
+        short_flag: b
+        description: Branch from which to read definitions. Defaults to master.
+      tag:
+        type: list
+        required: false
+        short_flag: t
+        description: Key-value pairs to associate with this stack. Can be specified
+          multiple times.
+      sha:
+        type: string
+        required: false
+        short_flag: s
+        description: Git commit SHA from which to read definitions.
       param:
         type: list
         required: false
@@ -361,7 +382,7 @@ commands:
       description:
         type: string
         required: false
-        short_flag: d
+        short_flag: D
         description: 'A description to help you identify this change set. '
       changeset-name:
         type: string
