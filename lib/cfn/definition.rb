@@ -26,7 +26,10 @@ module Cfn
           'sha' => sha
         },
         'defaults' => defaults,
-        'overrides' => params_hash,
+        'overrides' => {
+          'params' => params_hash,
+          'tags' => tags_hash
+        },
         'params' => hash_to_kv(merged['params']),
         'tags' => hash_to_kv(merged['tags'])
       }
