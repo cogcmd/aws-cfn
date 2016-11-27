@@ -1,4 +1,4 @@
-**Name:** ~$results[0].name~
+**Definition:** ~$results[0].name~
 **Template:** ~$results[0].template.name~
 **Timestamp:** ~$results[0].timestamp~
 

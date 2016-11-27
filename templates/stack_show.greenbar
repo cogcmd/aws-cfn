@@ -1,4 +1,4 @@
-**~$results[0].stack_name~**
+**Stack:** ~$results[0].stack_name~
 
 ~br~
 **Description:** ~$results[0].description~
