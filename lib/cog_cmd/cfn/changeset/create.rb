@@ -9,8 +9,8 @@ module CogCmd::Cfn::Changeset
     include Cfn::RefOptions
     include CogCmd::Cfn::Helpers
 
-    attr_reader :stack_name
-    attr_reader :definition, :params, :tags, :notifications, :capabilities, :description, :changeset_name
+    attr_reader :changeset_name, :stack_name, :template_url, :definition,
+                :description, :params, :tags, :notifications, :capabilities
 
     def initialize
       # args
@@ -29,7 +29,7 @@ module CogCmd::Cfn::Changeset
         @params = merge_parameters(definition['params'])
         @tags = definition['tags']
       else
-        # options
+        @template_url = request.options['template_url']
         @params = merge_parameters(request.options['param'])
         @tags = process_tags(request.options['tag'])
       end
@@ -60,14 +60,20 @@ module CogCmd::Cfn::Changeset
         notification_arns: notifications,
         capabilities: capabilities,
         description: description,
-        # Changing the template can muck up parameters. For now we'll always
-        # use the previous template. We can revisit and adjust how we deal with
-        # params later if needed.
-        use_previous_template: true
+        use_previous_template: @template_url.nil? ? true : false
       }.reject { |_key, value| value.nil? }
 
       resp = client.create_change_set(cs_params)
       client.describe_change_set(change_set_name: resp.id).to_h
+    rescue Aws::CloudFormation::Errors::InsufficientCapabilitiesException => ex
+      cap_name = ex.message.match(/\[(?<capability>.+)\]/)[:capability]
+      cap_option = cap_name.gsub(/^CAPABILITY_/, '').downcase
+
+      response.template = "error_stack_capability"
+      response.content = {
+        "name": stack_name,
+        "capability": cap_option
+      }
     end
 
     def get_changeset_name
@@ -91,8 +97,8 @@ module CogCmd::Cfn::Changeset
 
       client = Aws::CloudFormation::Client.new()
 
-      # Grab the original template to merge the new params
-      template_params = client.get_template_summary(stack_name: stack_name).parameters
+      # Get the current parameters from the existing stack template
+      template_params = client.describe_stacks(stack_name: stack_name).first.parameters
 
       # Build a list of parameter names to set 'use_previous_value' for when
       # constructing the changeset
@@ -109,5 +115,18 @@ module CogCmd::Cfn::Changeset
       end + previous_params.map { |key| use_previous_value(key) }
     end
 
+    def require_definition_exists!
+      unless git_client.definition_exists?(@definition, ref)
+        if branch = ref[:branch]
+          additional = "Check that the definition exists in the #{branch} branch and has been pushed to your repository's origin."
+        elsif sha = ref[:tag]
+          additional = "Check that the definition exists in the #{tag} tag and has been pushed to your repository's origin."
+        elsif sha = ref[:sha]
+          additional = "Check that the definition exists in the git commit SHA #{sha} tag and has been pushed to your repository's origin."
+        end
+
+        raise(Cog::Abort, "Definition does not exist. #{additional}")
+      end
+    endy
   end
 end

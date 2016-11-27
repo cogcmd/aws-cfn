@@ -1,6 +1,5 @@
 ---
 cog_bundle_version: 4
-
 name: cfn
 description: AWS CloudFormation
 long_description: |
@@ -56,22 +55,29 @@ config:
     can check to make sure all of them are set correctly and have the necessary
     permissions by running `check setup`.
   env:
-    - var: AWS_ACCESS_KEY_ID
-      description: ID of the access key used to authenticate with the AWS API. Required if IAM instance metadata not used.
-    - var: AWS_SECRET_ACCESS_KEY
-      description: Secret of the access key used to authenticate with the AWS API. Required if IAM instance metadata not used.
-    - var: AWS_REGION
-      description: Optional region used for all commands
-    - var: AWS_STS_ROLE_ARN
-      description: Optional STS role ARN of which to assume when making requests to the AWS API.
-    - var: S3_STACK_DEFINITON_BUCKET
-      description: Required bucket name where created definitions will be written and read from when used to create stacks.
-    - var: S3_STACK_DEFINITON_PREFIX
-      description: Optional bucket key prefix to use when storing definitions in a shared bucket.
-    - var: GIT_REMOTE_URL
-      description: Url of git repository used to read and write defaults files, templates, and definitions.
-    - var: GIT_SSH_KEY
-      description: SSH key used to authenticate with the above git repository. Must have read and write access.
+  - var: AWS_ACCESS_KEY_ID
+    description: ID of the access key used to authenticate with the AWS API. Required
+      if IAM instance metadata not used.
+  - var: AWS_SECRET_ACCESS_KEY
+    description: Secret of the access key used to authenticate with the AWS API. Required
+      if IAM instance metadata not used.
+  - var: AWS_REGION
+    description: Optional region used for all commands
+  - var: AWS_STS_ROLE_ARN
+    description: Optional STS role ARN of which to assume when making requests to
+      the AWS API.
+  - var: S3_STACK_DEFINITON_BUCKET
+    description: Required bucket name where created definitions will be written and
+      read from when used to create stacks.
+  - var: S3_STACK_DEFINITON_PREFIX
+    description: Optional bucket key prefix to use when storing definitions in a shared
+      bucket.
+  - var: GIT_REMOTE_URL
+    description: Url of git repository used to read and write defaults files, templates,
+      and definitions.
+  - var: GIT_SSH_KEY
+    description: SSH key used to authenticate with the above git repository. Must
+      have read and write access.
 homepage: https://github.com/cogcmd/aws-cfn
 author: Mark Imbriaco <mark@operable.io>
 version: 0.0.17
@@ -139,20 +145,10 @@ commands:
   template-list:
     executable: "/home/bundle/cog-command"
     description: Lists all templates, filtered by an optional glob pattern.
-    long_description:
-      The names, the relative path without the file extension of all templates
-      in all subdirectories are listed. Only json, yml, and yaml extensions are
-      supported.
-
-      When filtering the list with a pattern, only simple patterns
-      similar to a shell glob are accepted.
-
-      `*` - Matches any string of characters
-      `**` - Matches any path
-      `?` - Matches any one character
-      `[set]` - Matches any one character in the set
-      `{p,q}` - Matches either literal p or q
-      `\` - Escapes the next pattern character
+    long_description: |-
+      The names, the relative path without the file extension of all templates in all subdirectories are listed. Only json, yml, and yaml extensions are supported.
+      When filtering the list with a pattern, only simple patterns similar to a shell glob are accepted.
+      `*` - Matches any string of characters `**` - Matches any path `?` - Matches any one character `[set]` - Matches any one character in the set `{p,q}` - Matches either literal p or q `\` - Escapes the next pattern character
     examples: |
       Listing all templates:
 
@@ -338,7 +334,8 @@ commands:
         type: string
         required: false
         short_flag: d
-        description: Name of a definition to use as default values for updating the stack.
+        description: Name of a definition to use as default values for updating the
+          stack.
       branch:
         type: string
         required: false
@@ -348,25 +345,24 @@ commands:
         type: list
         required: false
         short_flag: t
-        description: Key-value pairs to associate with this stack. Can be specified
-          multiple times.
+        description: Key-value pairs, specified as 'key=value', to associate with
+          this stack.
       sha:
         type: string
         required: false
         short_flag: s
         description: Git commit SHA from which to read definitions.
+      template_url:
+        type: string
+        required: false
+        short_flag: T
+        description: URL for updated CloudFormation template.
       param:
         type: list
         required: false
         short_flag: p
         description: Parameter, specified as 'key=value', that specify input parameters
           for the change set. Can be specified multiple times.
-      tag:
-        type: list
-        required: false
-        short_flag: t
-        description: Key-value pairs, specified as 'key=value', to associate with
-          this stack.
       notify:
         type: list
         required: false
@@ -709,7 +705,7 @@ templates:
       ~end~
   stack_show:
     body: |
-      **~$results[0].stack_name~**
+      **Stack:** ~$results[0].stack_name~
 
       ~br~
       **Description:** ~$results[0].description~
@@ -835,7 +831,7 @@ templates:
       ~end~
   defaults_list:
     body: |
-      **CloudFormation Defaults:**
+      **Defaults:**
 
       ~br~
       ~each var=$results~
@@ -893,7 +889,7 @@ templates:
     body: "~json var=$results[0]~\n"
   definition_show:
     body: |
-      **Name:** ~$results[0].name~
+      **Definition:** ~$results[0].name~
       **Template:** ~$results[0].template.name~
       **Timestamp:** ~$results[0].timestamp~
 
