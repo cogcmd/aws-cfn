@@ -1,6 +1,10 @@
+
+require 'naturalsorter'
 require 'rugged'
+
 require 'json'
 require 'yaml'
+
 require 'pathname'
 require 'tmpdir'
 require 'tempfile'
@@ -47,7 +51,7 @@ module Cfn
       files = Dir.glob(path_with_glob).map { |p| Pathname.new(p) }
       template_files = files.select { |path| ['.yml', '.yaml', '.json'].include?(path.extname.downcase) }
 
-      template_files.natural_sort.map do |path|
+      natural_sort(template_files).map do |path|
         folder = path.relative_path_from(base_path).dirname
         name = path.basename(path.extname)
         { name: folder.join(name) }
