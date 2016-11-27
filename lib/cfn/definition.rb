@@ -27,8 +27,8 @@ module Cfn
         },
         'defaults' => defaults,
         'overrides' => {
-          'params' => params_hash,
-          'tags' => tags_hash
+          'params' => @params,
+          'tags' => @tags
         },
         'params' => hash_to_kv(merged['params']),
         'tags' => hash_to_kv(merged['tags'])

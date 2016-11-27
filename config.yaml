@@ -915,9 +915,18 @@ templates:
       ~end~
 
       ~br~
-      **Overrides:**
+      **Override Params:**
 
-      ~json var=$results[0].overrides~
+      ~each var=$results[0].overrides.params~
+      • ~$item~
+      ~end~
+
+      ~br~
+      **Override Tags:**
+
+      ~each var=$results[0].overrides.tags~
+      • ~$item~
+      ~end~
   error_stack_capability:
     body: 'Insufficient capabilities to create stack ~$results[0].name~. Add `-c ~$results[0].capability~`
       to your stack-create options to proceed.
