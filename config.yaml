@@ -766,9 +766,12 @@ templates:
     body: |
       **Changesets:** ~$results[0].stack_name~
 
+      ~br~
       ~each var=$results as=changeset~
-      • ~$changeset.change_set_name~ (~$changeset.execution_status~)
-      ~if cond=$changeset.description != ""~  ~$changeset.description~~end~
+      • **~$changeset.change_set_name~:** ~$changeset.execution_status~ / ~$changeset.status~
+      ~if cond=$changeset.description bound?~
+            ~$changeset.description~
+      ~end~
       ~end~
   changeset_show:
     body: |
@@ -869,8 +872,10 @@ templates:
       ~end~
   definition_list:
     body: |
-      | Definition | Template | Defaults |
-      |------------|----------|----------|
+      **CloudFormation Definitions:**
+
+      | Name | Template | Defaults |
+      |------|----------|----------|
       ~each var=$results~
       | ~$item.name~ | ~$item.data.template.name~ | ~each var=$item.data.defaults as=defaults~~$defaults.name~ ~end~ |
       ~end~
@@ -893,42 +898,64 @@ templates:
     body: |
       **Definition:** ~$results[0].name~
       **Template:** ~$results[0].template.name~
-      **Timestamp:** ~$results[0].timestamp~
+      ~if cond=$results[0].timestamp not_empty?~**Timestamp:** ~$results[0].timestamp~~end~
 
+      # ----------------------------------------------------------------------------
+      # Parameters
+      # ----------------------------------------------------------------------------
+      ~if cond=$results[0].params not_empty?~
       ~br~
       **Parameters:**
 
       ~each var=$results[0].params~
       • ~$item~
       ~end~
-
+      ~end~
+      # ----------------------------------------------------------------------------
+      # Tags
+      # ----------------------------------------------------------------------------
+      ~if cond=$results[0].tags not_empty?~
       ~br~
       **Tags:**
 
       ~each var=$results[0].tags~
       • ~$item~
       ~end~
-
+      ~end~
+      # ----------------------------------------------------------------------------
+      # Defaults
+      # ----------------------------------------------------------------------------
+      ~if cond=$results[0].defaults not_empty?~
       ~br~
       **Defaults:**
 
       ~each var=$results[0].defaults~
       • ~$item.name~
       ~end~
-
+      ~end~
+      # ----------------------------------------------------------------------------
+      # Override Params
+      # ----------------------------------------------------------------------------
+      ~if cond=$results[0].overrides.params not_empty?~
       ~br~
       **Override Params:**
 
       ~each var=$results[0].overrides.params~
       • ~$item~
       ~end~
-
+      ~end~
+      # ----------------------------------------------------------------------------
+      # Override Tags
+      # ----------------------------------------------------------------------------
+      ~if cond=$results[0].overrides.tags not_empty?~
       ~br~
       **Override Tags:**
 
       ~each var=$results[0].overrides.tags~
       • ~$item~
       ~end~
+      ~end~
+      # ----------------------------------------------------------------------------
   error_stack_capability:
     body: 'Insufficient capabilities to create stack ~$results[0].name~. Add `-c ~$results[0].capability~`
       to your stack-create options to proceed.

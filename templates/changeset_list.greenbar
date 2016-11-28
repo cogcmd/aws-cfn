@@ -1,6 +1,9 @@
 **Changesets:** ~$results[0].stack_name~
 
+~br~
 ~each var=$results as=changeset~
-• ~$changeset.change_set_name~ (~$changeset.execution_status~)
-~if cond=$changeset.description != ""~  ~$changeset.description~~end~
+• **~$changeset.change_set_name~:** ~$changeset.execution_status~ / ~$changeset.status~
+~if cond=$changeset.description bound?~
+      ~$changeset.description~
+~end~
 ~end~

@@ -8,8 +8,8 @@ module Cfn
       @definition_name = attributes.fetch(:name)
       @template_name   = attributes.fetch(:template)
       @defaults_names  = attributes.fetch(:defaults) || []
-      @params          = attributes.fetch(:params) || {}
-      @tags            = attributes.fetch(:tags) || {}
+      @params          = attributes.fetch(:params) || []
+      @tags            = attributes.fetch(:tags) || []
       @branch          = attributes.fetch(:branch)
     end
 

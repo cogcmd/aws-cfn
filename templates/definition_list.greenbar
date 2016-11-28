@@ -1,5 +1,7 @@
-| Definition | Template | Defaults |
-|------------|----------|----------|
+**CloudFormation Definitions:**
+
+| Name | Template | Defaults |
+|------|----------|----------|
 ~each var=$results~
 | ~$item.name~ | ~$item.data.template.name~ | ~each var=$item.data.defaults as=defaults~~$defaults.name~ ~end~ |
 ~end~
