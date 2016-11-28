@@ -2,5 +2,5 @@
 
 ~br~
 ~each var=$results~
-• ~$item.name~
+* ~$item.name~
 ~end~

@@ -15,7 +15,7 @@
 **Parameters:**
 
 ~each var=$changeset.parameters as=param~
-~if cond=$param.parameter_value != ""~• ~$param.parameter_key~=~$param.parameter_value~~end~
+~if cond=$param.parameter_value != ""~* ~$param.parameter_key~=~$param.parameter_value~~end~
 
 ~end~
 
@@ -26,7 +26,7 @@ Changeset still creating. Check back for detailed changes.
 ~end~
 ~if cond=$changeset.status == "CREATE_COMPLETE"~
 ~each var=$changeset.changes as=change~
-• ~$change.resource_change.logical_resource_id~ (~$change.resource_change.action~) ~if cond=$change.resource_change.replacement == "True"~_Replace_~end~
+* ~$change.resource_change.logical_resource_id~ (~$change.resource_change.action~) ~if cond=$change.resource_change.replacement == "True"~_Replace_~end~
 
 ~end~
 ~end~
@@ -36,7 +36,7 @@ Changeset still creating. Check back for detailed changes.
 **Tags:**
 
 ~each var=$changeset.tags as=tag~
-• ~$tag.key~=~$tag.value~
+* ~$tag.key~=~$tag.value~
 ~end~
 ~end~
 

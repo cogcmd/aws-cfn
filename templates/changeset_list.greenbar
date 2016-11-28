@@ -2,7 +2,7 @@
 
 ~br~
 ~each var=$results as=changeset~
-• **~$changeset.change_set_name~:** ~$changeset.execution_status~ / ~$changeset.status~
+* **~$changeset.change_set_name~:** ~$changeset.execution_status~ / ~$changeset.status~
 ~if cond=$changeset.description bound?~
       ~$changeset.description~
 ~end~
