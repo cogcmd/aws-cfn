@@ -1,5 +1,6 @@
-| Change Set Name | Status | Creation Time | Description |
-|-----------------|--------|---------------|-------------|
+**Changesets:** ~$results[0].stack_name~
+
 ~each var=$results as=changeset~
-| ~$changeset.change_set_name~ | ~$changeset.status~ | ~$changeset.creation_time~ | ~$changeset.description~ |
+• ~$changeset.change_set_name~ (~$changeset.execution_status~)
+~if cond=$changeset.description != ""~  ~$changeset.description~~end~
 ~end~

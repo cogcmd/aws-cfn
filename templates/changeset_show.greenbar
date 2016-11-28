@@ -1,48 +1,49 @@
 ~each var=$results as=changeset~
 
-~attachment title=$changeset.change_set_name timestamp=$changeset.creation_time stack=$changeset.stack_name status=$changeset.status color=darkblue~
-~$changeset.description~
+**Changeset:** ~$changeset.change_set_name~
+**Stack:** ~$changeset.stack_name~
+~if cond=$changeset.description not_empty?~
+**Description:** ~$changeset.description~
 ~end~
+~if cond=$changeset.capabilities not_empty?~
+**Capabilities:** ~$changeset.capabilities[0]~
+~end~
+**Status:** ~$changeset.status~
+**Timestamp:** ~$changeset.creation_time~
 
-~attachment title="Parameters" color=blue~
-| Key | Value |
-|-----|-------|
+~br~
+**Parameters:**
+
 ~each var=$changeset.parameters as=param~
-| ~$param.parameter_key~ | ~$param.parameter_value~ |
-~end~
+~if cond=$param.parameter_value != ""~• ~$param.parameter_key~=~$param.parameter_value~~end~
+
 ~end~
 
-~if cond=$changeset.changes not_empty?~
-~attachment title="Changes" color=blue~
-| Physical ID | Logical ID | Replacement |
-|-------------|------------|-------------|
-~each var=$changeset.changes as=change~
-| ~$change.resource_change.physical_resource_id~ | ~$change.resource_change.logical_resource_id~ | ~$change.resource_change.replacement~ |
+~br~
+**Changes:**
+~if cond=$changeset.status != "CREATE_COMPLETE"~
+Changeset still creating. Check back for detailed changes.
 ~end~
+~if cond=$changeset.status == "CREATE_COMPLETE"~
+~each var=$changeset.changes as=change~
+• ~$change.resource_change.logical_resource_id~ (~$change.resource_change.action~) ~if cond=$change.resource_change.replacement == "True"~_Replace_~end~
+
 ~end~
 ~end~
 
 ~if cond=$changeset.tags not_empty?~
-~attachment title="Tags" color=blue~
-| Key | Value |
-|-----|-------|
+~br~
+**Tags:**
+
 ~each var=$changeset.tags as=tag~
-| ~$tag.key~ | ~$tag.value~ |
-~end~
-~end~
-~end~
-
-~if cond=$changeset.capabilities not_empty?~
-~attachment title="Capabilities" color=blue~
-~each var=$changeset.capabilities as=capability~
-* ~$capability~
-~end~
+• ~$tag.key~=~$tag.value~
 ~end~
 ~end~
 
-~attachment color=lightblue~
+~br~
 To apply this changeset, run:
-cfn:changeset-apply ~$changeset.change_set_name~ ~$changeset.stack_name~
-~end~
 
+```
+cfn:changeset-apply ~$changeset.change_set_name~ ~$changeset.stack_name~
+```
 ~end~

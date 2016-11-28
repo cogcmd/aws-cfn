@@ -4,18 +4,21 @@ require 'cog_cmd/cfn/changeset'
 require 'cog_cmd/cfn/helpers'
 
 module CogCmd::Cfn::Changeset
-  class Create < Cog::Command
+  class Create < Cfn::Command
 
     include Cfn::RefOptions
     include CogCmd::Cfn::Helpers
 
-    attr_reader :changeset_name, :stack_name, :template_url, :definition,
-                :description, :params, :tags, :notifications, :capabilities
+    attr_reader :client
+    attr_reader :stack, :stack_name
+    attr_reader :changeset_name, :template_url, :definitions, :params, :tags,
+                :description, :notifications, :capabilities
 
     def initialize
-      # args
+      @client = Aws::CloudFormation::Client.new
       @stack_name = request.args[0]
       @definition = request.options['definition']
+      @stack = client.describe_stacks(stack_name: stack_name).stacks[0]
 
       if @definition
         require_git_client!
@@ -26,8 +29,8 @@ module CogCmd::Cfn::Changeset
 
         @stack_name = request.args[0] || definition['name']
         @template_url = definition['template_url']
-        @params = merge_parameters(definition['params'])
-        @tags = definition['tags']
+        @params = process_params(definition['params'])
+        @tags = process_tags(definition['tags'])
       else
         @template_url = request.options['template_url']
         @params = merge_parameters(request.options['param'])
@@ -60,8 +63,13 @@ module CogCmd::Cfn::Changeset
         notification_arns: notifications,
         capabilities: capabilities,
         description: description,
-        use_previous_template: @template_url.nil? ? true : false
       }.reject { |_key, value| value.nil? }
+
+      if @template_url.nil?
+        cs_params[:use_previous_template] = true
+      else
+        cs_params[:template_url] = @template_url
+      end
 
       resp = client.create_change_set(cs_params)
       client.describe_change_set(change_set_name: resp.id).to_h
@@ -92,27 +100,18 @@ module CogCmd::Cfn::Changeset
       { parameter_key: key, use_previous_value: true }
     end
 
-    def merge_parameters(params)
-      return unless params
-
-      client = Aws::CloudFormation::Client.new()
-
-      # Get the current parameters from the existing stack template
-      template_params = client.describe_stacks(stack_name: stack_name).first.parameters
-
-      # Build a list of parameter names to set 'use_previous_value' for when
-      # constructing the changeset
-      previous_params = template_params.map { |tp| tp.parameter_key }
-
+    def merge_parameters(params = [])
+      previous_params = @stack.parameters.map { |tp| tp.parameter_key }
       params.map do |p|
         key, value = p.strip.split("=")
-
-        # remove keys that we received in the invocation from the list of keys
-        # that we use to set use_previous_value
         previous_params = previous_params - [ key ]
-
         { parameter_key: key, parameter_value: value }
       end + previous_params.map { |key| use_previous_value(key) }
+    end
+
+    def merge_tags(tags)
+      updated_keys = tags.map { |t| t['key'] }
+      @stack.tags.reject { |t| updated_keys.include?(t['key']) } + tags
     end
 
     def require_definition_exists!
@@ -127,6 +126,6 @@ module CogCmd::Cfn::Changeset
 
         raise(Cog::Abort, "Definition does not exist. #{additional}")
       end
-    endy
+    end
   end
 end
