@@ -2,97 +2,48 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.0.17
+version: 0.5.0
+author: Operable <support@operable.io>
+homepage: https://github.com/cogcmd/aws-cfn
 docker:
   image: cogcmd/aws-cfn
-  tag: 0.0.17
-author: Mark Imbriaco <mark@operable.io>
-homepage: https://github.com/cogcmd/aws-cfn
+  tag: 0.5.0
 long_description: |
-  This bundle provides an opinioned interface to CloudFormation's raw
-  capabilities, not just to make it easier to use but, easier to use well.
-  Commands to perform all basic CloudFormation actions, such as creating and
-  listing stacks, are available, as you would expect. But, we've also built a
-  set of commands for managing a new concept, stack definitions.
+  This bundle provides an opinioned interface to CloudFormation's raw capabilities, not just to make it easier to use but, easier to use well. Commands to perform all basic CloudFormation actions, such as creating and listing stacks, are available, as you would expect. But, we've also built a set of commands for managing a new concept, stack definitions.
 
-  Stack definitions are a layer on top of CloudFormation templates aimed at
-  making them more reusable and easier to work with as a team. They're
-  comprised of a defaults file, which is a named set of CloudFormation
-  paramters and tags, a named CloudFormation template, and a set of overrides.
-  All of these layers are merged together to make up all the inputs required to
-  create a stack.
+  Stack definitions are a layer on top of CloudFormation templates aimed at making them more reusable and easier to work with as a team. They're comprised of a defaults file, which is a named set of CloudFormation paramters and tags, a named CloudFormation template, and a set of overrides. All of these layers are merged together to make up all the inputs required to create a stack.
 
-  Because most engineering and operations teams require a canonical version of
-  their infrastructure definitions to be stored in a VCS repository, templates,
-  defaults files, and stack definitions will be stored in a git repository.
-  Doing so supports several common use cases such as debugging and auditing.
+  Because most engineering and operations teams require a canonical version of their infrastructure definitions to be stored in a VCS repository, templates, defaults files, and stack definitions will be stored in a git repository. Doing so supports several common use cases such as debugging and auditing.
 
-  Putting this all together results in a reusable, repeatable workflow that can
-  easily be executed from chat, while still allowing basic CloudFormation
-  actions when necessary.
+  Putting this all together results in a reusable, repeatable workflow that can easily be executed from chat, while still allowing basic CloudFormation actions when necessary.
 config:
   notes: |
-    The commands in this bundle support a number of ways to authenticate with
-    Amazon Web Services. If you're not hosting a relay on EC2, you can provide
-    basic credentials with the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
-    environment variables. Or, if you are hosting Relay on EC2, you can keep
-    those environment variables blank and allow the commands to request
-    credentials from instance metadata. We also support an `AWS_STS_ROLE_ARN`
-    environment variable if you'd like to assume a role for all AWS requests.
-    You can read more about how IAM instance metadata and STS role ARNs work at
-    the following documentation page:
-
-    http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html
-
-    For access to the git repository, you'll need to provide a key that has
-    read and write access to all branches to be used by the command. If you're
-    having trouble providing the key in your dynamic config file, make sure
-    that row like the following:
-
-    ```
-    - |
-        GIT_SSH_KEY=-----BEGIN RSA PRIVATE KEY-----
-        66HcO6zqknSn5b+kbn5TKiU/TUxjE1wUYZqiEBI+9t7kZWT5H3aTi5zhhHti0xGF
-        vhI8N1p1ZRP8EeVcRASGeCjVt58llQhNpWP9bArz0B1vU5QvFZJ0gnnk5LI3uFYr
-        ...
-    ```
-
-    Once you've set all of your environment variables with dynamic config, you
-    can check to make sure all of them are set correctly and have the necessary
-    permissions by running `check setup`.
+    This bundle requires access to an Amazon Web Services account and a Git repository. Detailed instructions for configuring this access are
+    available in the README in the GitHub repository located at the URL specified in the **Homepage** section below.
   env:
   - var: AWS_ACCESS_KEY_ID
-    description: ID of the access key used to authenticate with the AWS API. Required
-      if IAM instance metadata not used.
+    description: ID of the access key used to authenticate with the AWS API. Required if IAM instance metadata not used.
   - var: AWS_SECRET_ACCESS_KEY
-    description: Secret of the access key used to authenticate with the AWS API. Required
-      if IAM instance metadata not used.
+    description: Secret of the access key used to authenticate with the AWS API. Required if IAM instance metadata not used.
   - var: AWS_REGION
     description: Optional region used for all commands
   - var: AWS_STS_ROLE_ARN
-    description: Optional STS role ARN of which to assume when making requests to
-      the AWS API.
+    description: Optional STS role ARN of which to assume when making requests to the AWS API.
   - var: S3_STACK_DEFINITON_BUCKET
-    description: Required bucket name where created definitions will be written and
-      read from when used to create stacks.
+    description: Required bucket name where created definitions will be written and read from when used to create stacks.
   - var: S3_STACK_DEFINITON_PREFIX
-    description: Optional bucket key prefix to use when storing definitions in a shared
-      bucket.
+    description: Optional bucket key prefix to use when storing definitions in a shared bucket.
   - var: GIT_REMOTE_URL
-    description: Url of git repository used to read and write defaults files, templates,
-      and definitions.
+    description: Url of git repository used to read and write defaults files, templates, and definitions.
   - var: GIT_SSH_KEY
-    description: SSH key used to authenticate with the above git repository. Must
-      have read and write access.
+    description: SSH key used to authenticate with the above git repository. Must have read and write access.
 commands:
   template-show:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Shows contents of a template.
-    long_description: |
-      Templates can either be shown by passing the name of the template or the
-      full url if the `--s3` option is specified. When showing a template by
-      name, the relative path without the file extension is used. Only json,
-      yml, and yaml extensions are supported.
+    long_description: 'Templates can either be shown by passing the name of the template or the full url if the `--s3` option is specified. When showing a template by name, the relative path without the file extension is used. Only json, yml, and yaml extensions are supported.
+
+'
     exammples: |
       Showing a template by name:
 
@@ -123,8 +74,7 @@ commands:
       s3:
         type: bool
         required: false
-        description: Show template from an S3 URL instead of Git. <name> should be
-          the URL.
+        description: Show template from an S3 URL instead of Git. <name> should be the URL.
       branch:
         type: string
         required: false
@@ -143,24 +93,32 @@ commands:
     rules:
     - must have cfn:template-show
   template-list:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Lists all templates, filtered by an optional glob pattern.
     long_description: |-
       The names, the relative path without the file extension of all templates in all subdirectories are listed. Only json, yml, and yaml extensions are supported.
+
       When filtering the list with a pattern, only simple patterns similar to a shell glob are accepted.
-      `*` - Matches any string of characters `**` - Matches any path `?` - Matches any one character `[set]` - Matches any one character in the set `{p,q}` - Matches either literal p or q `\` - Escapes the next pattern character
+
+      `*` - Matches any string of characters
+
+      `**` - Matches any path
+
+      `?` - Matches any one character
+
+      `[set]` - Matches any one character in the set
+
+      `{p,q}` - Matches either literal p or q
+
+      `\` - Escapes the next pattern character
     examples: |
       Listing all templates:
 
-      ```
       template list
-      ```
 
       Listing all templates in a subdirectory that start with "webapp":
 
-      ```
       template list "apps/warehouse/webapp*"
-      ```
     arguments: "[pattern]"
     options:
       branch:
@@ -181,34 +139,23 @@ commands:
     rules:
     - allow
   stack-create:
-    executable: "/home/bundle/cog-command"
-    description: Creates a new stack based on an existing template and returns the
-      newly created stack.
-    long_description: |
-      Although this command can be used on it's own to fully define and create
-      a stack with a template url just as you would with the awscli tool, it is
-      entended to be used with a stack definition. This can be accomplished by
-      first creating a stack definition (see `definition-create`) and then
-      either defining that definition by name with the `--definition` option,
-      or by pipeing that definition to the `stack-create` command.
+    executable: "/home/bundle/aws-cfn/cog-command"
+    description: Creates a new stack based on an existing template and returns the newly created stack.
+    long_description: 'Although this command can be used on it''s own to fully define and create a stack with a template url just as you would with the AWS CLI tool, it is  entended to be used with a stack definition. This can be accomplished by first creating a stack definition (see `definition-create`) and then either defining that definition by name with the `--definition` option, or by pipeing that definition to the `stack-create` command.
+
+'
     examples: |
       Creating a stack from a definition with a single parameter:
 
-      ```
       stack create webapp3 -d webapp -p "SshKey=web-team"
-      ```
 
       Creating a stack with a definition in a pipeline:
 
-      ```
       definition show webapp3 | stack create $name $template_url -p $params -t $tags -p "SshKey=web-team"
-      ```
 
       Creating a stack without a definition:
 
-      ```
       stack create webapp3 https://s3.amazonaws.com/bucket/webapp3.yml -p "SshKey=web-team" -p "Port=8080" -t "Name=webapp3"
-      ```
     arguments: "<stack-name> <template-url> | [<stack-name>] --definition <definition-name>"
     options:
       definition:
@@ -225,8 +172,7 @@ commands:
         type: list
         required: false
         short_flag: t
-        description: Key-value pairs to associate with this stack. Can be specified
-          multiple times.
+        description: Key-value pairs to associate with this stack. Can be specified multiple times.
       sha:
         type: string
         required: false
@@ -236,8 +182,7 @@ commands:
         type: list
         required: false
         short_flag: p
-        description: Key-value pairs specified as 'key=value', that specify input
-          parameters for your stack. Can be specified multiple times.
+        description: Key-value pairs specified as 'key=value', that specify input parameters for your stack. Can be specified multiple times.
       policy:
         type: string
         required: false
@@ -247,20 +192,17 @@ commands:
         type: list
         required: false
         short_flag: n
-        description: The Simple Notification Service (SNS) topic ARNs to publish stack
-          related events. Can be specified multiple times.
+        description: The Simple Notification Service (SNS) topic ARNs to publish stack related events. Can be specified multiple times.
       on-failure:
         type: string
         required: false
         short_flag: f
-        description: 'Determines what action will be taken if stack creation fails.
-          Can be one of: rollback, delete or keep.'
+        description: 'Determines what action will be taken if stack creation fails. Can be one of: rollback, delete or keep.'
       timeout:
         type: int
         required: false
         short_flag: e
-        description: The amount of time, specified in minutes, that can pass before
-          the stack status becomes CREATE_FAILED.
+        description: The amount of time, specified in minutes, that can pass before the stack status becomes CREATE_FAILED.
       capabilities:
         type: list
         required: false
@@ -269,64 +211,72 @@ commands:
     rules:
     - must have cfn:stack
   stack-delete:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Deletes a stack.
     arguments: "<stack-name>"
     rules:
     - must have cfn:stack
   stack-events:
-    executable: "/home/bundle/cog-command"
-    description: Lists events for a stack. Returns all stack related events for a
-      specified stack in reverse chronological order.
+    executable: "/home/bundle/aws-cfn/cog-command"
+    description: Lists events for a stack. Returns all stack related events for a specified stack in reverse chronological order.
     arguments: "<stack-name>"
+    options:
+      page:
+        type: int
+        required: false
+        short_flag: p
+        description: Events are paginated 10 per page. This option allows you to view a specific page.
     rules:
     - must have cfn:stack
   stack-list:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Lists stack summaries.
     long_description: |-
       Lists stack summaries.
+
       The filter string can be one or more cloudformation stack status strings which include:
+
       CREATE_IN_PROGRESS, CREATE_FAILED, CREATE_COMPLETE, ROLLBACK_IN_PROGRESS, ROLLBACK_FAILED, ROLLBACK_COMPLETE, DELETE_IN_PROGRESS, DELETE_FAILED, DELETE_COMPLETE, UPDATE_IN_PROGRESS, UPDATE_COMPLETE_CLEANUP_IN_PROGRESS, UPDATE_COMPLETE, UPDATE_ROLLBACK_IN_PROGRESS, UPDATE_ROLLBACK_FAILED, UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS, UPDATE_ROLLBACK_COMPLETE
 
       Additionally a few special filter strings that correspond to a subset of the standard filter strings may be used:
+
       ACTIVE, COMPLETE, FAILED, DELETED, IN_PROGRESS
     examples: |
       Listing all stacks:
 
-      ```
       stack list
-      ```
 
       Listing all stacks that have failed:
 
-      ```
       stack list -f FAILED
-      ```
     options:
       filter:
         type: list
         required: false
         short_flag: f
-        description: Filter results based on a filter string. Acceptable filter strings
-          are listed in the description. Can be specified more than once. Defaults
-          to 'ACTIVE'.
+        description: Filter results based on a filter string. Acceptable filter strings are listed in the description. Can be specified more than once. Defaults to 'ACTIVE'.
     rules:
     - must have cfn:stack
   stack-resources:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Lists stack resources.
     arguments: "<stack-name>"
+    options:
+      page:
+        type: int
+        required: false
+        short_flag: p
+        description: Resources are paginated 10 per page. This option allows you to view a specific page.
     rules:
     - must have cfn:stack
   stack-show:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Shows details for a stack.
     arguments: "<stack-name>"
     rules:
     - must have cfn:stack
   changeset-create:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Creates a changeset for a stack.
     arguments: "<stack-name>"
     options:
@@ -334,8 +284,7 @@ commands:
         type: string
         required: false
         short_flag: d
-        description: Name of a definition to use as default values for updating the
-          stack.
+        description: Name of a definition to use as default values for updating the stack.
       branch:
         type: string
         required: false
@@ -345,8 +294,7 @@ commands:
         type: list
         required: false
         short_flag: t
-        description: Key-value pairs, specified as 'key=value', to associate with
-          this stack.
+        description: Key-value pairs, specified as 'key=value', to associate with this stack.
       sha:
         type: string
         required: false
@@ -361,15 +309,12 @@ commands:
         type: list
         required: false
         short_flag: p
-        description: Parameter, specified as 'key=value', that specify input parameters
-          for the change set. Can be specified multiple times.
+        description: Parameter, specified as 'key=value', that specify input parameters for the change set. Can be specified multiple times.
       notify:
         type: list
         required: false
         short_flag: n
-        description: The Amazon Resource Names (ARNs) of Amazon Simple Notification
-          Service (Amazon SNS) topics that AWS CloudFormation associates with the
-          stack.
+        description: The Amazon Resource Names (ARNs) of Amazon Simple Notification Service (Amazon SNS) topics that AWS CloudFormation associates with the stack.
       capabilities:
         type: list
         required: false
@@ -387,69 +332,60 @@ commands:
     rules:
     - must have cfn:changeset
   changeset-list:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Lists cloudformation changesets.
     arguments: "<stack-name>"
     rules:
     - must have cfn:changeset
   changeset-delete:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Deletes cloudformation changesets.
     arguments: "<changeset-name> <stack-name>"
     rules:
     - must have cfn:changeset
   changeset-show:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Shows a cloudformation changeset.
     arguments: "<changeset-name> <stack-name>"
     rules:
     - must have cfn:changeset
   changeset-apply:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Applies a cloudformation changeset.
     arguments: "<changeset-name> <stack-name>"
     rules:
     - must have cfn:changeset
   definition-create:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Creates a stack definition.
-    long_description: |
-      Definitions are defined with a name, a template, a set of defaults files,
-      and a set of overrides (tags and parameters). These layers are then all
-      merged together in the above order and stored in the defined git
-      repository for use with the `stack-create` command.
+    long_description: 'Definitions are defined with a name, a template, a set of defaults files, and a set of overrides (tags and parameters). These layers are then all merged together in the above order and stored in the defined git repository for use with the `stack-create` command.
+
+'
     examples: |
       Creating a simple definition without overrides:
 
-      ```
       definition create webapp-prod webapp
-      ```
 
       Creating a definition with a few overrides:
 
-      ```
       definition create webapp-staging webapp -p "Port=8080" -p "InstanceType=t2.medium" -t "Env=staging"
-      ```
     arguments: "<definition-name> <template-name>"
     options:
       defaults:
         type: list
         required: false
         short_flag: d
-        description: List of defaults files to use. Defaults are merged together in
-          the order they were specified.
+        description: List of defaults files to use. Defaults are merged together in the order they were specified.
       params:
         type: list
         required: false
         short_flag: p
-        description: 'Stack parameters which override parameters defined in any defaults
-          files specified. Defined with the following pattern: <key>=<value>.'
+        description: Stack parameters which override parameters defined in any defaults files specified. These should be provided as `<key>=<value>` strings.
       tags:
         type: list
         required: false
         short_flag: t
-        description: 'Stack tags which override tags defined in any defaults files
-          specified. Defined with the following pattern: <key>=<value>.'
+        description: Stack tags which override tags defined in any defaults files specified. These should be provided as `<key>=<value>` strings.
       branch:
         type: string
         required: false
@@ -458,31 +394,30 @@ commands:
     rules:
     - must have cfn:definition-create
   definition-list:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Lists all definitions, filtered by an optional glob pattern.
     long_description: |
       The names of each definition are listed.
 
-      When filtering the list with a pattern, only simple patterns
-      similar to a shell glob are accepted.
+      When filtering the list with a pattern, only simple patterns similar to a shell glob are accepted.
 
       `*` - Matches any string of characters
+
       `?` - Matches any one character
+
       `[set]` - Matches any one character in the set
+
       `{p,q}` - Matches either literal p or q
+
       `\` - Escapes the next pattern character
     examples: |
       Listing all definitions:
 
-      ```
       definition list
-      ```
 
       Listing all definitions that start with "webapp":
 
-      ```
       definition list "webapp*"
-      ```
     arguments: "[pattern]"
     options:
       branch:
@@ -503,24 +438,19 @@ commands:
     rules:
     - allow
   definition-show:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Shows contents of a definition.
-    long_description: |
-      The most recently created stack definition with the name specified is
-      found and returned as json. Keys `params` and `tags` are formatted to be
-      used in a pipeline. See examples for usage.
+    long_description: 'The most recently created stack definition with the name specified is found and returned as json. Keys `params` and `tags` are formatted to be used in a pipeline. See examples for usage.
+
+'
     examples: |
       Show a definition:
 
-      ```
       definition show webapp
-      ```
 
       Show a definition and use it in a pipeline with `stack-create`:
 
-      ```
       definition show webapp3 | stack create $name $template_url -p $params -t $tags -p "SshKey=web-team"
-      ```
     arguments: "<name>"
     options:
       branch:
@@ -541,79 +471,67 @@ commands:
     rules:
     - must have cfn:definition-show
   defaults-create:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Creates a new defaults file.
-    long_description: |
-      Defaults are named sets of parameters and tags applied to templates when
-      creating a stack. Creating a few defaults file stores the parameters and
-      tags provided as previous command input as JSON in the specified git
-      repository. When specifying params and tags from the previous command and
-      via options, options are merged on top of the previous command output,
-      overriding them.
+    long_description: 'Defaults are named sets of parameters and tags applied to templates when creating a stack. Creating a few defaults file stores the parameters and tags provided as previous command input as JSON in the specified git repository. When specifying params and tags from the previous command and via options, options are merged on top of the previous command output, overriding them.
+
+'
     examples: |
       Create a defaults file with parameters and tags:
 
-      ```
       defaults create staging -p "Port=80" -t "Env=staging"
-      ```
 
       Create a defaults file from a previous command's output:
 
-      ```
       seed '{ "params": { "Port": "80" }, "tags": { "Env": "staging" } }' | defaults create staging
-      ```
     arguments: "<name>"
     options:
       params:
         type: list
         required: false
         short_flag: p
-        description: |
-          Parameters to include in the defaults file. Defined with the
-          following pattern: <key>=<value>. Merged with any params provided
-          from previous command output.
+        description: 'Parameters to include in the defaults file. These should be provided as `<key>=<value>` strings.
+
+'
       tags:
         type: list
         required: false
         short_flag: t
-        description: |
-          Tags to include in the defaults file. Defined with the following
-          pattern: <key>=<value>. Merged with any tags provided from previous
-          command output.
+        description: 'Tags to include in the defaults file. These should be provided as `<key>=<value>` strings.
+
+'
       branch:
         type: string
         required: false
         short_flag: b
-        description: Branch of which to commit the new defaults file. Defaults to
-          master.
+        description: Branch of which to commit the new defaults file. Defaults to master.
     rules:
     - must have cfn:defaults-create
   defaults-list:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Lists all defaults files, filtered by an optional glob pattern.
     long_description: |
       The names of each defaults file are listed.
 
-      When filtering the list with a pattern, only simple patterns
-      similar to a shell glob are accepted.
+      When filtering the list with a pattern, only simple patterns similar to a shell glob are accepted.
 
       `*` - Matches any string of characters
+
       `?` - Matches any one character
+
       `[set]` - Matches any one character in the set
+
       `{p,q}` - Matches either literal p or q
+
       `\` - Escapes the next pattern character
     examples: |
       Listing all defaults files:
 
-      ```
       defaults list
-      ```
 
       Listing all defaults files that start with "webapp":
 
-      ```
       defaults list "webapp*"
-      ```
     arguments: "[pattern]"
     options:
       branch:
@@ -634,17 +552,15 @@ commands:
     rules:
     - allow
   defaults-show:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Shows contents of a defaults file.
-    long_description: |
-      The name and the parsed JSON data are returned for use in other pipelines
-      or for viewing in chat.
+    long_description: 'The name and the parsed JSON data are returned for use in other pipelines or for viewing in chat.
+
+'
     examples: |
       Show a defaults file:
 
-      ```
       defaults show staging
-      ```
     arguments: "<name>"
     options:
       branch:
@@ -665,13 +581,11 @@ commands:
     rules:
     - must have cfn:defaults-show
   check-setup:
-    executable: "/home/bundle/cog-command"
+    executable: "/home/bundle/aws-cfn/cog-command"
     description: Checks that all configuration is set correctly
-    long_description: |
-      This command is meant to be a sanity check for users once they have
-      installed and configured the bundle. It will inspect provided environment
-      variables and try to make sure that the accounts used have all the
-      necessary permissions.
+    long_description: 'This command is meant to be a sanity check for users once they have installed and configured the bundle. It will inspect provided environment variables and try to make sure that the accounts used have all the necessary permissions.
+
+'
     rules:
     - allow
 permissions:
@@ -706,8 +620,6 @@ templates:
   stack_show:
     body: |
       **Stack:** ~$results[0].stack_name~
-
-      ~br~
       **Description:** ~$results[0].description~
       **Stack Status:** ~$results[0].stack_status~
       **Last Update:** ~$results[0].last_updated_time~
@@ -745,22 +657,26 @@ templates:
 
       ~end~
   stack_event_list:
-    body: |
-      | Timestamp | Status | Resource Type | Logical ID |
-      |-----------|--------|---------------|------------|
-      ~each var=$results as=event~
-      | ~$event.timestamp~ | ~$event.resource_status~ | ~$event.resource_type~ | ~$event.logical_resource_id~ |
-      ~end~
+    body: "**Stack Events:** ~$results[0].meta.stack_name~\n**Result Page:** ~$results[0].meta.page~\n\n| Timestamp | Status | Resource |\n|-----------|--------|----------|\n~each var=$results as=event~\n| ~$event.timestamp~ | ~$event.resource_status~ | ~$event.logical_resource_id~ |\n|                    |                          | ~$event.resource_type~       | \n~end~\n"
   stack_list:
-    body: "| Name | Status | Description |\n|------|--------|-------------|\n~each
-      var=$results as=stack~\n| ~$stack.stack_name~ | ~$stack.stack_status~ | ~$stack.template_description~
-      | \n~end~\n"
+    body: |
+      **CloudFormation Stacks:**
+
+      | Name | Status | Description |
+      |------|--------|-------------|
+      ~each var=$results as=stack~
+      | ~$stack.stack_name~ | ~$stack.stack_status~ | ~$stack.template_description~ |
+      ~end~
   stack_resource_list:
     body: |
-      | Type | Status | Logical ID | Physical ID |
-      |------|--------|------------|-------------|
+      **Stack Resources:** ~$results[0].meta.stack_name~
+      **Page:** ~$results[0].meta.page~
+
+      | Name | Status | Resource |
+      |------|--------|----------|
       ~each var=$results as=resource~
-      | ~$resource.resource_type~ | ~$resource.resource_status~ | ~$resource.logical_resource_id~ | ~$resource.physical_resource_id~ |
+      | ~$resource.logical_resource_id~ |  ~$resource.resource_status~ | ~$resource.resource_type~        |
+      |                                 |                              | ~$resource.physical_resource_id~ |
       ~end~
   changeset_list:
     body: |
@@ -827,7 +743,7 @@ templates:
   changeset_delete:
     body: |
       ~each var=$results as=changeset~
-      Successfully deleted ~$changeset.changeset_name~ for stack ~$changeset.stack_name~.
+      Successfully deleted changeset ~$changeset.changeset_name~ for stack ~$changeset.stack_name~.
       ~end~
   defaults_create:
     body: |
@@ -957,13 +873,10 @@ templates:
       ~end~
       # ----------------------------------------------------------------------------
   error_stack_capability:
-    body: 'Insufficient capabilities to create stack ~$results[0].name~. Add `-c ~$results[0].capability~`
-      to your stack-create options to proceed.
+    body: 'Insufficient capabilities to create stack ~$results[0].name~. Add `-c ~$results[0].capability~` to your stack-create options to proceed.
 
 '
   stack_delete:
     body: "**~$results[0].stack_name~**: ~$results[0].stack_status~\n"
   changeset_missing_stack_name:
-    body: 'Error: Unable to list stacks.
-
-'
+    body: 'Error: Unable to list stacks.'
