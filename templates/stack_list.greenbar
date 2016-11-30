@@ -1,5 +1,7 @@
+**CloudFormation Stacks:**
+
 | Name | Status | Description |
 |------|--------|-------------|
 ~each var=$results as=stack~
-| ~$stack.stack_name~ | ~$stack.stack_status~ | ~$stack.template_description~ | 
+| ~$stack.stack_name~ | ~$stack.stack_status~ | ~$stack.template_description~ |
 ~end~

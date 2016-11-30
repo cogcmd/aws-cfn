@@ -19,4 +19,9 @@ end
 
 require 'cog'
 
+# Catch generic AWS exceptions and return just the message.
+Cog.error_handler.add(/Aws::.*/) do |ex, cmd|
+  Cog.return_error("#{cmd.name} error: #{ex.message}.")
+end
+
 Cog.bundle('cfn')

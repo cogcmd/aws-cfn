@@ -6,6 +6,6 @@
 **Parameters:**
 
 ~each var=$results[0].parameters~
-• ~$item.parameter_key~ (~$item.parameter_type~) ~if cond=$item.default_value != ""~[~$item.default_value~]~end~
+* ~$item.parameter_key~ (~$item.parameter_type~) ~if cond=$item.default_value != ""~[~$item.default_value~]~end~
 
 ~end~

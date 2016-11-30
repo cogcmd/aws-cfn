@@ -1,5 +1,9 @@
-| Type | Status | Logical ID | Physical ID |
-|------|--------|------------|-------------|
+**Stack Resources:** ~$results[0].meta.stack_name~
+**Page:** ~$results[0].meta.page~
+
+| Name | Status | Resource |
+|------|--------|----------|
 ~each var=$results as=resource~
-| ~$resource.resource_type~ | ~$resource.resource_status~ | ~$resource.logical_resource_id~ | ~$resource.physical_resource_id~ |
+| ~$resource.logical_resource_id~ |  ~$resource.resource_status~ | ~$resource.resource_type~        |
+|                                 |                              | ~$resource.physical_resource_id~ |
 ~end~

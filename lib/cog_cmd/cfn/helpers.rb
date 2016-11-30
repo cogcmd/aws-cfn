@@ -46,6 +46,14 @@ module CogCmd::Cfn::Helpers
     param
   end
 
+  def process_params(params)
+    return unless params
+    params.map do |p|
+      key, value = p.strip.split("=")
+      { parameter_key: key, parameter_value: value }
+    end
+  end
+
   def process_tags(tags)
     return unless tags
     tags.map do |t|

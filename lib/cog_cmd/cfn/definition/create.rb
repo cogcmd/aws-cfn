@@ -30,7 +30,7 @@ module CogCmd::Cfn::Definition
         branch: branch
       })
 
-      response.template = 'definition_create'
+      response.template = 'definition_show'
       response.content = [definition]
     end
 

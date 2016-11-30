@@ -1,5 +1,5 @@
 **CloudFormation Templates:**
 ~br~
 ~each var=$results as=template~
-• ~$template.name~
+* ~$template.name~
 ~end~

@@ -7,7 +7,7 @@
 None
 ~end~
 ~each var=$results[0].param_list~
-• ~$item~
+* ~$item~
 ~end~
 
 ~br~
@@ -17,5 +17,5 @@ None
 None
 ~end~
 ~each var=$results[0].tag_list~
-• ~$item~
+* ~$item~
 ~end~

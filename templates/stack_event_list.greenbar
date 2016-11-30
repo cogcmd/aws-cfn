@@ -1,5 +1,9 @@
-| Timestamp | Status | Resource Type | Logical ID |
-|-----------|--------|---------------|------------|
+**Stack Events:** ~$results[0].meta.stack_name~
+**Result Page:** ~$results[0].meta.page~
+
+| Timestamp | Status | Resource |
+|-----------|--------|----------|
 ~each var=$results as=event~
-| ~$event.timestamp~ | ~$event.resource_status~ | ~$event.resource_type~ | ~$event.logical_resource_id~ |
+| ~$event.timestamp~ | ~$event.resource_status~ | ~$event.logical_resource_id~ |
+|                    |                          | ~$event.resource_type~       | 
 ~end~

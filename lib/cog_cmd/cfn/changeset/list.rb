@@ -11,10 +11,13 @@ module CogCmd::Cfn::Changeset
     end
 
     def run_command
-      raise(Cog::Abort, "You must specify the stack name.") unless stack_name
+      raise(Cog::Error, "Error: You must specify the stack name.") if stack_name.nil?
 
       response.template = 'changeset_list'
       response.content = list_change_sets
+    rescue Aws::CloudFormation::Errors::ValidationError
+      response.template = nil
+      response.content = "Error: Unable to list templates for stack #{stack_name}."
     end
 
     private

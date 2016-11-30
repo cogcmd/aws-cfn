@@ -15,8 +15,6 @@ module CogCmd::Cfn::Stack
     def run_command
       raise(Cog::Abort, "You must specify a stack name.") unless stack_name
 
-      response.log(:info, "stack: #{describe_stacks.to_json}")
-
       response.template = 'stack_show'
       response.content = describe_stacks
     end
