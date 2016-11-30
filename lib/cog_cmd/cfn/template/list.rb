@@ -12,6 +12,10 @@ module CogCmd::Cfn::Template
 
       templates = git_client.list_templates(filter, ref)
 
+      if templates.empty?
+        raise(Cog::Abort, "#{name}: No templates found in repository.")
+      end
+
       response.template = 'template_list'
       response.content = templates
     end

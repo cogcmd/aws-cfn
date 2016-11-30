@@ -12,6 +12,10 @@ module CogCmd::Cfn::Definition
 
       definitions = git_client.list_definitions(filter, ref)
 
+      if definitions.empty?
+        raise(Cog::Abort, "#{name}: No definitions found. You can use cfn:definition-create to create one.")
+      end
+
       response.template = 'definition_list'
       response.content = definitions
     end

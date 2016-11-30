@@ -24,8 +24,14 @@ module CogCmd::Cfn::Stack
     end
 
     def run_command
+      stacks = list_stacks
+
+      if stacks.empty?
+        raise(Cog::Abort, "#{name}: No stacks found. You can use cfn:stack-create to create one.")
+      end
+
       response.template = 'stack_list'
-      response.content = list_stacks
+      response.content = stacks
     end
 
     private
