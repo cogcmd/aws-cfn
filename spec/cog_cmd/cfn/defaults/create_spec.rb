@@ -25,13 +25,16 @@ describe CogCmd::Cfn::Defaults::Create do
         and_return(true)
 
       expect(git_client).to receive(:create_defaults).
-        with('webapp', { 'params' => { 'port' => 80 } }, 'master').
-        and_return([{ 'params' => { 'port' => 80 } }])
+        with('webapp', { 'params' => { 'port' => 80 }, 'tags' => {} }, 'master').
+        and_return([{ 'params' => { 'port' => 80 }, 'tags' => {} }])
 
       run_command(args: ['webapp'])
 
       expect(command).to respond_with([
-        { 'params' => { 'port' => 80 } }
+        {
+          'params' => { 'port' => 80 },
+          'tags' => {}
+        }
       ])
     end
   end
@@ -118,7 +121,7 @@ describe CogCmd::Cfn::Defaults::Create do
     it 'returns an error if the json structure does not have the right keys' do
       expect {
         run_command(args: ['webapp'])
-      }.to raise_error(Cog::Abort, 'Input must include at least a "params" or "tags" key.')
+      }.to raise_error(Cog::Abort, 'Defaults must include at least a "params" or "tags" key.')
     end
   end
 end
