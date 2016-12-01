@@ -41,7 +41,7 @@ commands:
   template-show:
     executable: "/home/bundle/cog-command"
     description: Shows contents of a template.
-    long_description: 'Templates can either be shown by passing the name of the template or the full url if the `--s3` option is specified. When showing a template by name, the relative path without the file extension is used. Only json, yml, and yaml extensions are supported.'
+    long_description: Templates can either be shown by passing the name of the template or the full url if the `--s3` option is specified. When showing a template by name, the relative path without the file extension is used. Only json, yml, and yaml extensions are supported.
     examples: |
       Showing a template by name:
       template show webapp
@@ -124,7 +124,7 @@ commands:
   stack-create:
     executable: "/home/bundle/cog-command"
     description: Creates a new stack based on an existing template and returns the newly created stack.
-    long_description: 'Although this command can be used on it''s own to fully define and create a stack with a template url just as you would with the AWS CLI tool, it is  entended to be used with a stack definition. This can be accomplished by first creating a stack definition (see `definition-create`) and then either defining that definition by name with the `--definition` option, or by pipeing that definition to the `stack-create` command.'
+    long_description: Although this command can be used on it's own to fully define and create a stack with a template url just as you would with the AWS CLI tool, it is  entended to be used with a stack definition. This can be accomplished by first creating a stack definition (see `definition-create`) and then either defining that definition by name with the `--definition` option, or by piping that definition to the `stack-create` command and binding options and arguments to variables.
     examples: |
       Creating a stack from a definition with a single parameter:
       stack create webapp3 -d webapp -p "SshKey=web-team"
@@ -334,7 +334,7 @@ commands:
   definition-create:
     executable: "/home/bundle/cog-command"
     description: Creates a stack definition.
-    long_description: 'Definitions are defined with a name, a template, a set of defaults files, and a set of overrides (tags and parameters). These layers are then all merged together in the above order and stored in the defined git repository for use with the `stack-create` command.'
+    long_description: Definitions are defined with a name, a template, a set of defaults files, and a set of overrides (tags and parameters). These layers are then all merged together in the above order and stored in the defined git repository for use with the `stack-create` command.
     examples: |
       Creating a simple definition without overrides:
       definition create webapp-prod webapp
@@ -410,7 +410,7 @@ commands:
   definition-show:
     executable: "/home/bundle/cog-command"
     description: Shows contents of a definition.
-    long_description: 'The most recently created stack definition with the name specified is found and returned as json. Keys `params` and `tags` are formatted to be used in a pipeline. See examples for usage.'
+    long_description: The most recently created stack definition with the name specified is found and returned as json. Keys `params` and `tags` are formatted to be used in a pipeline. See examples for usage.
     examples: |
       Show a definition:
       definition show webapp
@@ -439,7 +439,7 @@ commands:
   defaults-create:
     executable: "/home/bundle/cog-command"
     description: Creates a new defaults file.
-    long_description: 'Defaults are named sets of parameters and tags applied to templates when creating a stack. Creating a few defaults file stores the parameters and tags provided as previous command input as JSON in the specified git repository. When specifying params and tags from the previous command and via options, options are merged on top of the previous command output, overriding them.'
+    long_description: Defaults are named sets of parameters and tags applied to templates when creating a stack. Creating a few defaults file stores the parameters and tags provided as previous command input as JSON in the specified git repository. When specifying params and tags from the previous command and via options, options are merged on top of the previous command output, overriding them.
     examples: |
       Create a defaults file with parameters and tags:
       defaults create staging -p "Port=80" -t "Env=staging"
@@ -452,12 +452,12 @@ commands:
         type: list
         required: false
         short_flag: p
-        description: 'Parameters to include in the defaults file. These should be provided as `<key>=<value>` strings.'
+        description: Parameters to include in the defaults file. These should be provided as `<key>=<value>` strings.
       tags:
         type: list
         required: false
         short_flag: t
-        description: 'Tags to include in the defaults file. These should be provided as `<key>=<value>` strings.'
+        description: Tags to include in the defaults file. These should be provided as `<key>=<value>` strings.
       branch:
         type: string
         required: false
@@ -510,7 +510,7 @@ commands:
   defaults-show:
     executable: "/home/bundle/cog-command"
     description: Shows contents of a defaults file.
-    long_description: 'The name and the parsed JSON data are returned for use in other pipelines or for viewing in chat.'
+    long_description: The name and the parsed JSON data are returned for use in other pipelines or for viewing in chat.
     examples: |
       Show a defaults file:
       defaults show staging
@@ -536,7 +536,7 @@ commands:
   check-setup:
     executable: "/home/bundle/cog-command"
     description: Checks that all configuration is set correctly
-    long_description: 'This command is meant to be a sanity check for users once they have installed and configured the bundle. It will inspect provided environment variables and try to make sure that the accounts used have all the necessary permissions.'
+    long_description: This command is meant to be a sanity check for users once they have installed and configured the bundle. It will inspect provided environment variables and try to make sure that the accounts used have all the necessary permissions.
     rules:
     - allow
 permissions:
@@ -573,7 +573,7 @@ templates:
       **Stack:** ~$results[0].stack_name~
       **Description:** ~$results[0].description~
       **Stack Status:** ~$results[0].stack_status~
-      **Last Update:** ~$results[0].last_updated_time~
+      ~if cond=$results[0].last_updated_time not_empty?~**Last Update:** ~$results[0].last_updated_time~~end~
 
       ~br~
       **Parameters:**
@@ -703,7 +703,7 @@ templates:
       ~end~
   defaults_list:
     body: |
-      **Defaults:**
+      **CloudFormation Defaults:**
 
       ~br~
       ~each var=$results~
@@ -824,8 +824,12 @@ templates:
       ~end~
       # ----------------------------------------------------------------------------
   error_stack_capability:
-    body: 'Insufficient capabilities to create stack ~$results[0].name~. Add `-c ~$results[0].capability~` to your stack-create options to proceed.'
+    body: 'Insufficient capabilities to create stack ~$results[0].name~. Add `-c ~$results[0].capability~` to your stack-create options to proceed.
+
+'
   stack_delete:
-    body: "**~$results[0].stack_name~**: ~$results[0].stack_status~\n"
+    body: |
+      **Stack:** ~$results[0].stack_name~
+      **Status:** ~$results[0].stack_status~
   changeset_missing_stack_name:
     body: 'Error: Unable to list stacks.'
