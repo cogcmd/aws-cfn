@@ -1,1 +1,2 @@
-**~$results[0].stack_name~**: ~$results[0].stack_status~
+**Stack:** ~$results[0].stack_name~
+**Status:** ~$results[0].stack_status~

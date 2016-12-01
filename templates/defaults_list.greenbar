@@ -1,4 +1,4 @@
-**Defaults:**
+**CloudFormation Defaults:**
 
 ~br~
 ~each var=$results~

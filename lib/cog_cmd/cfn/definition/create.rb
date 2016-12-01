@@ -65,6 +65,8 @@ module CogCmd::Cfn::Definition
     end
 
     def require_defaults_exist!
+      return if defaults.nil?
+
       defaults.each do |defaults_name|
         unless git_client.defaults_exists?(defaults_name, { branch: branch })
           raise(Cog::Abort, "Defaults file #{defaults_name} does not exist. Check that the defaults file exists in the #{branch} branch and has been pushed to your repository's origin.")

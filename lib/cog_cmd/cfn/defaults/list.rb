@@ -12,6 +12,10 @@ module CogCmd::Cfn::Defaults
 
       defaults = git_client.list_defaults(filter, ref)
 
+      if defaults.empty?
+        raise(Cog::Abort, "#{name}: No defaults found. You can use cfn:defaults-create to create some.")
+      end
+
       response.template = 'defaults_list'
       response.content = defaults
     end

@@ -13,6 +13,13 @@ module CogCmd::Cfn::Changeset
     def run_command
       raise(Cog::Error, "Error: You must specify the stack name.") if stack_name.nil?
 
+      changesets = list_change_sets
+
+      if changesets.empty?
+        raise(Cog::Abort, "#{name}: No changesets found for #{stack_name}. You can use cfn:changeset-create to create some.")
+      end
+
+
       response.template = 'changeset_list'
       response.content = list_change_sets
     rescue Aws::CloudFormation::Errors::ValidationError
