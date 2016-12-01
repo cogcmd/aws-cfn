@@ -17,6 +17,23 @@ module Cfn
       @client.validate_template(template_body: template_body)
     end
 
+    def describe_stack(stack_name)
+      result = @client.describe_stacks(stack_name: stack_name).stacks[0].to_h
+
+      sort_order = {
+        :parameters => :parameter_key,
+        :tags => :key,
+        :outputs => :output_key
+      }
+
+      sort_order.keys.each do |type|
+        next unless result[type]
+        result[type] = result[type].sort_by { |map| map[sort_order[type]] }
+      end
+
+      result
+    end
+
     def update_aws_credentials(aws_sts_role_arn)
       Aws.config.update(
         credentials: Aws::AssumeRoleCredentials.new(

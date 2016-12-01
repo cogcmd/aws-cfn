@@ -54,10 +54,10 @@ module CogCmd::Cfn::Stack
     private
 
     def create_stack
-      client = Aws::CloudFormation::Client.new()
+      client = Aws::CloudFormation::Client.new
 
       params = {
-        stack_name: stack_name,
+        stack_name: @stack_name,
         template_url: template_url,
         parameters: process_parameters(stack_params),
         tags: process_tags(tags),
@@ -69,7 +69,7 @@ module CogCmd::Cfn::Stack
       }.reject { |_key, value| value.nil? }
 
       client.create_stack(params)
-      client.describe_stacks(stack_name: stack_name).stacks[0].to_h
+      cfn_client.describe_stack(@stack_name)
     rescue Aws::CloudFormation::Errors::InsufficientCapabilitiesException => ex
       cap_name = ex.message.match(/\[(?<capability>.+)\]/)[:capability]
       cap_option = cap_name.gsub(/^CAPABILITY_/, '').downcase

@@ -1,7 +1,7 @@
 **Stack:** ~$results[0].stack_name~
 **Description:** ~$results[0].description~
 **Stack Status:** ~$results[0].stack_status~
-**Last Update:** ~$results[0].last_updated_time~
+~if cond=$results[0].last_updated_time not_empty?~**Last Update:** ~$results[0].last_updated_time~~end~
 
 ~br~
 **Parameters:**
