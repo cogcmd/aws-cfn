@@ -28,15 +28,14 @@ module CogCmd::Cfn::Changeset
         definition = git_client.show_definition(@definition, { branch: 'master' })[:data]
 
         @stack_name = request.args[0] || definition['name']
-        @template_url = definition['template_url']
         @params = process_params(definition['params'])
         @tags = process_tags(definition['tags'])
       else
-        @template_url = request.options['template_url']
         @params = merge_parameters(request.options['param'])
         @tags = process_tags(request.options['tag'])
       end
 
+      @template_url = request.options['template_url']
       @notifications = request.options['notify']
       @capabilities = process_capabilities(request.options['capabilities'])
       @description = request.options['description']
