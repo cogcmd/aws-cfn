@@ -2,12 +2,12 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.5.2
+version: 0.5.5
 author: Operable <support@operable.io>
 homepage: https://github.com/cogcmd/aws-cfn
 docker:
   image: cogcmd/aws-cfn
-  tag: 0.5.2
+  tag: 0.5.5
 long_description: |
   This bundle provides an opinioned interface to CloudFormation's raw capabilities, not just to make it easier to use but, easier to use well. Commands to perform all basic CloudFormation actions, such as creating and listing stacks, are available, as you would expect. But, we've also built a set of commands for managing a new concept, stack definitions.
 
@@ -608,7 +608,16 @@ templates:
 
       ~end~
   stack_event_list:
-    body: "**Stack Events:** ~$results[0].meta.stack_name~\n**Result Page:** ~$results[0].meta.page~\n\n| Timestamp | Status | Resource |\n|-----------|--------|----------|\n~each var=$results as=event~\n| ~$event.timestamp~ | ~$event.resource_status~ | ~$event.logical_resource_id~ |\n|                    |                          | ~$event.resource_type~       | \n~end~\n"
+    body: |
+      **Stack Events:** ~$results[0].meta.stack_name~
+      **Result Page:** ~$results[0].meta.page~
+
+      ~br~
+      ~each var=$results as=event~
+      **~$event.timestamp~**: ~$event.logical_resource_id~ (~$event.resource_type~)
+      • ~$event.resource_status~~if cond=$event.resource_status_reason not_empty?~: ~$event.resource_status_reason~~end~
+      ~br~
+      ~end~
   stack_list:
     body: |
       **CloudFormation Stacks:**
