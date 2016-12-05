@@ -28,7 +28,7 @@ module CogCmd::Cfn::Changeset
         definition = git_client.show_definition(@definition, { branch: 'master' })[:data]
 
         @stack_name = request.args[0] || definition['name']
-        @params = process_params(definition['params'])
+        @params = merge_parameters(definition['params'])
         @tags = process_tags(definition['tags'])
       else
         @params = merge_parameters(request.options['param'])

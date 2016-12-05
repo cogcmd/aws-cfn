@@ -2,12 +2,12 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.5.1
+version: 0.5.2
 author: Operable <support@operable.io>
 homepage: https://github.com/cogcmd/aws-cfn
 docker:
   image: cogcmd/aws-cfn
-  tag: 0.5.1
+  tag: 0.5.2
 long_description: |
   This bundle provides an opinioned interface to CloudFormation's raw capabilities, not just to make it easier to use but, easier to use well. Commands to perform all basic CloudFormation actions, such as creating and listing stacks, are available, as you would expect. But, we've also built a set of commands for managing a new concept, stack definitions.
 
