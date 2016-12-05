@@ -1,9 +1,9 @@
 **Stack Events:** ~$results[0].meta.stack_name~
 **Result Page:** ~$results[0].meta.page~
 
-| Timestamp | Status | Resource |
-|-----------|--------|----------|
+~br~
 ~each var=$results as=event~
-| ~$event.timestamp~ | ~$event.resource_status~ | ~$event.logical_resource_id~ |
-|                    |                          | ~$event.resource_type~       | 
+**~$event.timestamp~**: ~$event.logical_resource_id~ (~$event.resource_type~)
+• ~$event.resource_status~~if cond=$event.resource_status_reason not_empty?~: ~$event.resource_status_reason~~end~
+~br~
 ~end~
