@@ -38,7 +38,7 @@ module CogCmd::Cfn::Stack
 
     def list_stacks
       client = Aws::CloudFormation::Client.new
-      params[:stack_status_filter] = filters unless filters.empty?
+      params = filters.empty? ? {} : { stack_status_filter: filters }
       client.list_stacks(params).stack_summaries.map(&:to_h)
     end
 
