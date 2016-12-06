@@ -3,7 +3,6 @@
 ~br~
 ~each var=$results as=changeset~
 * **~$changeset.change_set_name~:** ~$changeset.execution_status~ / ~$changeset.status~
-~if cond=$changeset.description bound?~
+~if cond=$changeset.description not_empty?~
       ~$changeset.description~
-~end~
-~end~
+~end~~end~

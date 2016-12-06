@@ -2,12 +2,12 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.5.5
-author: Operable <support@operable.io>
-homepage: https://github.com/cogcmd/aws-cfn
+version: 0.5.6
 docker:
   image: cogcmd/aws-cfn
-  tag: 0.5.5
+  tag: 0.5.6
+author: Operable <support@operable.io>
+homepage: https://github.com/cogcmd/aws-cfn
 long_description: |
   This bundle provides an opinioned interface to CloudFormation's raw capabilities, not just to make it easier to use but, easier to use well. Commands to perform all basic CloudFormation actions, such as creating and listing stacks, are available, as you would expect. But, we've also built a set of commands for managing a new concept, stack definitions.
 
@@ -566,7 +566,6 @@ templates:
 
       ~each var=$results[0].parameters~
       * ~$item.parameter_key~ (~$item.parameter_type~) ~if cond=$item.default_value != ""~[~$item.default_value~]~end~
-
       ~end~
   stack_show:
     body: |
@@ -583,7 +582,6 @@ templates:
       ~end~
       ~each var=$results[0].parameters~
       * ~$item.parameter_key~=~$item.parameter_value~
-
       ~end~
 
       ~br~
@@ -594,7 +592,6 @@ templates:
       ~end~
       ~each var=$results[0].outputs as=item~
       * ~$item.output_key~=~$item.output_value~
-
       ~end~
 
       ~br~
@@ -605,7 +602,6 @@ templates:
       ~end~
       ~each var=$results[0].tags as=item~
       * ~$item.key~=~$item.value~
-
       ~end~
   stack_event_list:
     body: |
@@ -645,10 +641,9 @@ templates:
       ~br~
       ~each var=$results as=changeset~
       * **~$changeset.change_set_name~:** ~$changeset.execution_status~ / ~$changeset.status~
-      ~if cond=$changeset.description bound?~
+      ~if cond=$changeset.description not_empty?~
             ~$changeset.description~
-      ~end~
-      ~end~
+      ~end~~end~
   changeset_show:
     body: |
       ~each var=$results as=changeset~
@@ -669,7 +664,6 @@ templates:
 
       ~each var=$changeset.parameters as=param~
       ~if cond=$param.parameter_value != ""~* ~$param.parameter_key~=~$param.parameter_value~~end~
-
       ~end~
 
       ~br~
@@ -680,7 +674,6 @@ templates:
       ~if cond=$changeset.status == "CREATE_COMPLETE"~
       ~each var=$changeset.changes as=change~
       * ~$change.resource_change.logical_resource_id~ (~$change.resource_change.action~) ~if cond=$change.resource_change.replacement == "True"~_Replace_~end~
-
       ~end~
       ~end~
 
