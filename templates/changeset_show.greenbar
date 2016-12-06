@@ -2,7 +2,7 @@
 
 **Changeset:** ~$changeset.change_set_name~
 **Stack:** ~$changeset.stack_name~
-~if cond=$changeset.description not_empty?~**Description:** ~$changeset.description~~br~~end~~if cond=$changeset.capabilities not_empty?~**Capabilities:** ~$changeset.capabilities[0]~~br~end~**Status:** ~$changeset.status~
+~if cond=$changeset.description not_empty?~**Description:** ~$changeset.description~~br~~end~~if cond=$changeset.capabilities not_empty?~**Capabilities:** ~$changeset.capabilities[0]~~br~~end~**Status:** ~$changeset.status~
 **Timestamp:** ~$changeset.creation_time~
 
 **Parameters:**
