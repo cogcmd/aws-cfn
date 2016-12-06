@@ -16,9 +16,7 @@ module CogCmd::Cfn::Changeset
 
     def initialize
       @client = Aws::CloudFormation::Client.new
-      @stack_name = request.args[0]
       @definition = request.options['definition']
-      @stack = client.describe_stacks(stack_name: stack_name).stacks[0]
 
       if @definition
         require_git_client!
@@ -28,12 +26,16 @@ module CogCmd::Cfn::Changeset
         definition = git_client.show_definition(@definition, { branch: 'master' })[:data]
 
         @stack_name = request.args[0] || definition['name']
-        @params = merge_parameters(definition['params'])
+        @change_params = definition['params']
         @tags = process_tags(definition['tags'])
       else
-        @params = merge_parameters(request.options['param'])
+        @stack_name = request.args[0]
+        @change_params = request.options['param']
         @tags = process_tags(request.options['tag'])
       end
+
+      @stack = client.describe_stacks(stack_name: stack_name).stacks[0]
+      @params = merge_parameters(@change_params)
 
       @template_url = request.options['template_url']
       @notifications = request.options['notify']
@@ -43,7 +45,9 @@ module CogCmd::Cfn::Changeset
     end
 
     def run_command
-      raise(Cog::Abort, "You must specify the stack name.") unless stack_name
+      if @stack_name.empty? || @stack.nil?
+        raise(Cog::Abort, "You must specify the name of an existing stack.")
+      end
 
       response.template = 'changeset_show'
       response.content = create_changeset
