@@ -1,21 +1,15 @@
 **Defaults:** ~$results[0].meta.name~
 
-~br~
 **Params:**
-
-~if cond=$results[0].param_list empty?~
-None
-~end~
+~if cond=$results[0].param_list empty?~None~end~
 ~each var=$results[0].param_list~
 * ~$item~
+    paragraph2
+    paragraph3
 ~end~
 
-~br~
 **Tags:**
-
-~if cond=$results[0].tag_list empty?~
-None
-~end~
+~if cond=$results[0].tag_list empty?~None~end~
 ~each var=$results[0].tag_list~
 * ~$item~
 ~end~

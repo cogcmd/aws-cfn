@@ -2,7 +2,6 @@
 **Description:** ~$results[0].description~
 ~if cond=$results[0].capabilities bound?~**Capabilities:** ~$results[0].capabilities[0]~~end~
 
-~br~
 **Parameters:**
 
 ~each var=$results[0].parameters~
