@@ -78,7 +78,7 @@ module CogCmd::Cfn::Changeset
       end
 
       resp = client.create_change_set(cs_params)
-      client.describe_change_set(change_set_name: resp.id).to_h
+      cfn_client.describe_change_set(change_set_name: resp.id).to_h
     rescue Aws::CloudFormation::Errors::InsufficientCapabilitiesException => ex
       cap_name = ex.message.match(/\[(?<capability>.+)\]/)[:capability]
       cap_option = cap_name.gsub(/^CAPABILITY_/, '').downcase

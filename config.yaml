@@ -643,6 +643,7 @@ templates:
       **Timestamp:** ~$changeset.creation_time~
 
       **Parameters:**
+
       ~each var=$changeset.parameters as=param~
       ~if cond=$param.parameter_value != ""~* ~$param.parameter_key~=~$param.parameter_value~~end~
       ~end~
