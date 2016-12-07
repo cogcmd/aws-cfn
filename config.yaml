@@ -2,10 +2,10 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.5.8
+version: 0.5.9
 docker:
   image: cogcmd/aws-cfn
-  tag: 0.5.8
+  tag: 0.5.9
 author: Operable <support@operable.io>
 homepage: https://github.com/cogcmd/aws-cfn
 long_description: |
@@ -186,6 +186,11 @@ commands:
         required: false
         short_flag: c
         description: 'Can be one of: iam or named_iam.'
+      verbose:
+        type: bool
+        required: false
+        short_flag: v
+        description: Display verbose stack details, including parameters and outputs.
     rules:
     - must have cfn:stack
   stack-delete:
@@ -249,6 +254,12 @@ commands:
     executable: "/home/bundle/cog-command"
     description: Shows details for a stack.
     arguments: "<stack-name>"
+    options:
+      verbose:
+        type: bool
+        required: false
+        short_flag: v
+        description: Display verbose stack details, including parameters and outputs.
     rules:
     - must have cfn:stack
   changeset-create:
@@ -573,20 +584,6 @@ templates:
       **Stack Status:** ~$results[0].stack_status~
       ~if cond=$results[0].last_updated_time not_empty?~**Last Update:** ~$results[0].last_updated_time~~end~
 
-      **Parameters:**
-      ~if cond=$results[0].parameters empty?~None~end~
-
-      ~each var=$results[0].parameters~
-      * ~$item.parameter_key~=~$item.parameter_value~
-      ~end~
-
-      **Outputs:**
-      ~if cond=$results[0].outputs empty?~None~end~
-
-      ~each var=$results[0].outputs as=item~
-      * ~$item.output_key~=~$item.output_value~
-      ~end~
-
       **Tags:**
       ~if cond=$results[0].tags empty?~None~end~
 
@@ -807,3 +804,30 @@ templates:
       **Status:** ~$results[0].stack_status~
   changeset_missing_stack_name:
     body: 'Error: Unable to list stacks.'
+  stack_show_verbose:
+    body: |
+      **Stack:** ~$results[0].stack_name~
+      **Description:** ~$results[0].description~
+      **Stack Status:** ~$results[0].stack_status~
+      ~if cond=$results[0].last_updated_time not_empty?~**Last Update:** ~$results[0].last_updated_time~~end~
+
+      **Parameters:**
+      ~if cond=$results[0].parameters empty?~None~end~
+
+      ~each var=$results[0].parameters~
+      * ~$item.parameter_key~=~$item.parameter_value~
+      ~end~
+
+      **Outputs:**
+      ~if cond=$results[0].outputs empty?~None~end~
+
+      ~each var=$results[0].outputs as=item~
+      * ~$item.output_key~=~$item.output_value~
+      ~end~
+
+      **Tags:**
+      ~if cond=$results[0].tags empty?~None~end~
+
+      ~each var=$results[0].tags as=item~
+      * ~$item.key~=~$item.value~
+      ~end~
