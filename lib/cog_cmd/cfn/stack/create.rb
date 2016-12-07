@@ -13,6 +13,7 @@ module CogCmd::Cfn::Stack
     attr_reader :stack_params, :tags, :policy, :notify, :on_failure, :timeout, :capabilities
 
     def initialize
+      @cog_template = request.options['verbose'] ? 'stack_show_verbose' : 'stack_show'
       @definition = request.options['definition']
 
       if @definition
@@ -47,7 +48,7 @@ module CogCmd::Cfn::Stack
       raise(Cog::Abort, "You must specify a stack name AND a template name.") unless stack_name
       raise(Cog::Abort, "You must specify a stack name AND a template name.") unless template_url
 
-      response.template = 'stack_show'
+      response.template = @cog_template
       response.content = create_stack
     end
 
