@@ -2,37 +2,27 @@
 
 **Changeset:** ~$changeset.change_set_name~
 **Stack:** ~$changeset.stack_name~
-~if cond=$changeset.description not_empty?~
-**Description:** ~$changeset.description~
-~end~
-~if cond=$changeset.capabilities not_empty?~
-**Capabilities:** ~$changeset.capabilities[0]~
-~end~
-**Status:** ~$changeset.status~
+~if cond=$changeset.description not_empty?~**Description:** ~$changeset.description~~br~~end~~if cond=$changeset.capabilities not_empty?~**Capabilities:** ~$changeset.capabilities[0]~~br~~end~**Status:** ~$changeset.status~
 **Timestamp:** ~$changeset.creation_time~
 
-~br~
 **Parameters:**
 
 ~each var=$changeset.parameters as=param~
 ~if cond=$param.parameter_value != ""~* ~$param.parameter_key~=~$param.parameter_value~~end~
-
 ~end~
 
-~br~
 **Changes:**
 ~if cond=$changeset.status != "CREATE_COMPLETE"~
 Changeset still creating. Check back for detailed changes.
 ~end~
 ~if cond=$changeset.status == "CREATE_COMPLETE"~
+
 ~each var=$changeset.changes as=change~
 * ~$change.resource_change.logical_resource_id~ (~$change.resource_change.action~) ~if cond=$change.resource_change.replacement == "True"~_Replace_~end~
-
 ~end~
 ~end~
 
 ~if cond=$changeset.tags not_empty?~
-~br~
 **Tags:**
 
 ~each var=$changeset.tags as=tag~
@@ -40,7 +30,6 @@ Changeset still creating. Check back for detailed changes.
 ~end~
 ~end~
 
-~br~
 To apply this changeset, run:
 
 ```

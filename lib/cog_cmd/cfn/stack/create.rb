@@ -20,7 +20,7 @@ module CogCmd::Cfn::Stack
         require_ref_exists!
         require_definition_exists!
 
-        definition = git_client.show_definition(@definition, { branch: 'master' })[:data]
+        definition = git_client.show_definition(@definition, ref)[:data]
 
         @stack_name = request.args[0] || definition['name']
         @template_url = definition['template_url']

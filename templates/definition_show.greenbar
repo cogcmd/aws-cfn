@@ -6,51 +6,50 @@
 # Parameters
 # ----------------------------------------------------------------------------
 ~if cond=$results[0].params not_empty?~
-~br~
 **Parameters:**
 
 ~each var=$results[0].params~
 * ~$item~
 ~end~
 ~end~
+
 # ----------------------------------------------------------------------------
 # Tags
 # ----------------------------------------------------------------------------
 ~if cond=$results[0].tags not_empty?~
-~br~
 **Tags:**
 
 ~each var=$results[0].tags~
 * ~$item~
 ~end~
 ~end~
+
 # ----------------------------------------------------------------------------
 # Defaults
 # ----------------------------------------------------------------------------
 ~if cond=$results[0].defaults not_empty?~
-~br~
 **Defaults:**
 
 ~each var=$results[0].defaults~
 * ~$item.name~
 ~end~
 ~end~
+
 # ----------------------------------------------------------------------------
 # Override Params
 # ----------------------------------------------------------------------------
 ~if cond=$results[0].overrides.params not_empty?~
-~br~
 **Override Params:**
 
 ~each var=$results[0].overrides.params~
 * ~$item~
 ~end~
 ~end~
+
 # ----------------------------------------------------------------------------
 # Override Tags
 # ----------------------------------------------------------------------------
 ~if cond=$results[0].overrides.tags not_empty?~
-~br~
 **Override Tags:**
 
 ~each var=$results[0].overrides.tags~

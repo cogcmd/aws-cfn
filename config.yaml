@@ -2,12 +2,12 @@
 cog_bundle_version: 4
 name: cfn
 description: AWS CloudFormation
-version: 0.5.5
-author: Operable <support@operable.io>
-homepage: https://github.com/cogcmd/aws-cfn
+version: 0.5.8
 docker:
   image: cogcmd/aws-cfn
-  tag: 0.5.5
+  tag: 0.5.8
+author: Operable <support@operable.io>
+homepage: https://github.com/cogcmd/aws-cfn
 long_description: |
   This bundle provides an opinioned interface to CloudFormation's raw capabilities, not just to make it easier to use but, easier to use well. Commands to perform all basic CloudFormation actions, such as creating and listing stacks, are available, as you would expect. But, we've also built a set of commands for managing a new concept, stack definitions.
 
@@ -551,7 +551,7 @@ templates:
   template_list:
     body: |
       **CloudFormation Templates:**
-      ~br~
+
       ~each var=$results as=template~
       * ~$template.name~
       ~end~
@@ -561,12 +561,10 @@ templates:
       **Description:** ~$results[0].description~
       ~if cond=$results[0].capabilities bound?~**Capabilities:** ~$results[0].capabilities[0]~~end~
 
-      ~br~
       **Parameters:**
 
       ~each var=$results[0].parameters~
       * ~$item.parameter_key~ (~$item.parameter_type~) ~if cond=$item.default_value != ""~[~$item.default_value~]~end~
-
       ~end~
   stack_show:
     body: |
@@ -575,48 +573,36 @@ templates:
       **Stack Status:** ~$results[0].stack_status~
       ~if cond=$results[0].last_updated_time not_empty?~**Last Update:** ~$results[0].last_updated_time~~end~
 
-      ~br~
       **Parameters:**
+      ~if cond=$results[0].parameters empty?~None~end~
 
-      ~if cond=$results[0].parameters empty?~
-      None
-      ~end~
       ~each var=$results[0].parameters~
       * ~$item.parameter_key~=~$item.parameter_value~
-
       ~end~
 
-      ~br~
       **Outputs:**
+      ~if cond=$results[0].outputs empty?~None~end~
 
-      ~if cond=$results[0].outputs empty?~
-      None
-      ~end~
       ~each var=$results[0].outputs as=item~
       * ~$item.output_key~=~$item.output_value~
-
       ~end~
 
-      ~br~
       **Tags:**
+      ~if cond=$results[0].tags empty?~None~end~
 
-      ~if cond=$results[0].tags empty?~
-      None
-      ~end~
       ~each var=$results[0].tags as=item~
       * ~$item.key~=~$item.value~
-
       ~end~
   stack_event_list:
     body: |
       **Stack Events:** ~$results[0].meta.stack_name~
       **Result Page:** ~$results[0].meta.page~
 
-      ~br~
       ~each var=$results as=event~
-      **~$event.timestamp~**: ~$event.logical_resource_id~ (~$event.resource_type~)
-      • ~$event.resource_status~~if cond=$event.resource_status_reason not_empty?~: ~$event.resource_status_reason~~end~
-      ~br~
+      **~$event.timestamp~**
+       - ~$event.logical_resource_id~ (~$event.resource_type~)
+       - ~$event.resource_status~~if cond=$event.resource_status_reason not_empty?~: ~$event.resource_status_reason~~end~
+
       ~end~
   stack_list:
     body: |
@@ -642,50 +628,38 @@ templates:
     body: |
       **Changesets:** ~$results[0].stack_name~
 
-      ~br~
       ~each var=$results as=changeset~
       * **~$changeset.change_set_name~:** ~$changeset.execution_status~ / ~$changeset.status~
-      ~if cond=$changeset.description bound?~
+      ~if cond=$changeset.description not_empty?~
             ~$changeset.description~
-      ~end~
-      ~end~
+      ~end~~end~
   changeset_show:
     body: |
       ~each var=$results as=changeset~
 
       **Changeset:** ~$changeset.change_set_name~
       **Stack:** ~$changeset.stack_name~
-      ~if cond=$changeset.description not_empty?~
-      **Description:** ~$changeset.description~
-      ~end~
-      ~if cond=$changeset.capabilities not_empty?~
-      **Capabilities:** ~$changeset.capabilities[0]~
-      ~end~
-      **Status:** ~$changeset.status~
+      ~if cond=$changeset.description not_empty?~**Description:** ~$changeset.description~~br~~end~~if cond=$changeset.capabilities not_empty?~**Capabilities:** ~$changeset.capabilities[0]~~br~~end~**Status:** ~$changeset.status~
       **Timestamp:** ~$changeset.creation_time~
 
-      ~br~
       **Parameters:**
 
       ~each var=$changeset.parameters as=param~
       ~if cond=$param.parameter_value != ""~* ~$param.parameter_key~=~$param.parameter_value~~end~
-
       ~end~
 
-      ~br~
       **Changes:**
       ~if cond=$changeset.status != "CREATE_COMPLETE"~
       Changeset still creating. Check back for detailed changes.
       ~end~
       ~if cond=$changeset.status == "CREATE_COMPLETE"~
+
       ~each var=$changeset.changes as=change~
       * ~$change.resource_change.logical_resource_id~ (~$change.resource_change.action~) ~if cond=$change.resource_change.replacement == "True"~_Replace_~end~
-
       ~end~
       ~end~
 
       ~if cond=$changeset.tags not_empty?~
-      ~br~
       **Tags:**
 
       ~each var=$changeset.tags as=tag~
@@ -693,7 +667,6 @@ templates:
       ~end~
       ~end~
 
-      ~br~
       To apply this changeset, run:
 
       ```
@@ -714,7 +687,6 @@ templates:
     body: |
       **CloudFormation Defaults:**
 
-      ~br~
       ~each var=$results~
       * ~$item.name~
       ~end~
@@ -722,22 +694,16 @@ templates:
     body: |
       **Defaults:** ~$results[0].meta.name~
 
-      ~br~
       **Params:**
-
-      ~if cond=$results[0].param_list empty?~
-      None
-      ~end~
+      ~if cond=$results[0].param_list empty?~None~end~
       ~each var=$results[0].param_list~
       * ~$item~
+          paragraph2
+          paragraph3
       ~end~
 
-      ~br~
       **Tags:**
-
-      ~if cond=$results[0].tag_list empty?~
-      None
-      ~end~
+      ~if cond=$results[0].tag_list empty?~None~end~
       ~each var=$results[0].tag_list~
       * ~$item~
       ~end~
@@ -780,51 +746,50 @@ templates:
       # Parameters
       # ----------------------------------------------------------------------------
       ~if cond=$results[0].params not_empty?~
-      ~br~
       **Parameters:**
 
       ~each var=$results[0].params~
       * ~$item~
       ~end~
       ~end~
+
       # ----------------------------------------------------------------------------
       # Tags
       # ----------------------------------------------------------------------------
       ~if cond=$results[0].tags not_empty?~
-      ~br~
       **Tags:**
 
       ~each var=$results[0].tags~
       * ~$item~
       ~end~
       ~end~
+
       # ----------------------------------------------------------------------------
       # Defaults
       # ----------------------------------------------------------------------------
       ~if cond=$results[0].defaults not_empty?~
-      ~br~
       **Defaults:**
 
       ~each var=$results[0].defaults~
       * ~$item.name~
       ~end~
       ~end~
+
       # ----------------------------------------------------------------------------
       # Override Params
       # ----------------------------------------------------------------------------
       ~if cond=$results[0].overrides.params not_empty?~
-      ~br~
       **Override Params:**
 
       ~each var=$results[0].overrides.params~
       * ~$item~
       ~end~
       ~end~
+
       # ----------------------------------------------------------------------------
       # Override Tags
       # ----------------------------------------------------------------------------
       ~if cond=$results[0].overrides.tags not_empty?~
-      ~br~
       **Override Tags:**
 
       ~each var=$results[0].overrides.tags~

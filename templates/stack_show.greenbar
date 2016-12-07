@@ -3,35 +3,23 @@
 **Stack Status:** ~$results[0].stack_status~
 ~if cond=$results[0].last_updated_time not_empty?~**Last Update:** ~$results[0].last_updated_time~~end~
 
-~br~
 **Parameters:**
+~if cond=$results[0].parameters empty?~None~end~
 
-~if cond=$results[0].parameters empty?~
-None
-~end~
 ~each var=$results[0].parameters~
 * ~$item.parameter_key~=~$item.parameter_value~
-
 ~end~
 
-~br~
 **Outputs:**
+~if cond=$results[0].outputs empty?~None~end~
 
-~if cond=$results[0].outputs empty?~
-None
-~end~
 ~each var=$results[0].outputs as=item~
 * ~$item.output_key~=~$item.output_value~
-
 ~end~
 
-~br~
 **Tags:**
+~if cond=$results[0].tags empty?~None~end~
 
-~if cond=$results[0].tags empty?~
-None
-~end~
 ~each var=$results[0].tags as=item~
 * ~$item.key~=~$item.value~
-
 ~end~

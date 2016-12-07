@@ -1,4 +1,5 @@
 require 'aws-sdk'
+require 'naturalsorter'
 require 'time'
 
 module Cfn
@@ -32,6 +33,15 @@ module Cfn
       end
 
       result
+    end
+
+    def describe_change_set(change_set_name:, stack_name: nil)
+      options = { change_set_name: change_set_name }
+      options[:stack_name] = stack_name unless stack_name.nil?
+
+      resp = @client.describe_change_set(options)
+      sorted_params = Naturalsorter::Sorter.sort_by_method(resp.parameters, "parameter_key", true)
+      resp.to_h.merge(parameters: sorted_params.map(&:to_h))
     end
 
     def update_aws_credentials(aws_sts_role_arn)

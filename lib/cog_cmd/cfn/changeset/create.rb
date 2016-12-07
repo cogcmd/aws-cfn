@@ -1,7 +1,10 @@
+
 require 'cfn/command'
 require 'cfn/ref_options'
 require 'cog_cmd/cfn/changeset'
 require 'cog_cmd/cfn/helpers'
+
+require 'time'
 
 module CogCmd::Cfn::Changeset
   class Create < Cfn::Command
@@ -16,9 +19,7 @@ module CogCmd::Cfn::Changeset
 
     def initialize
       @client = Aws::CloudFormation::Client.new
-      @stack_name = request.args[0]
       @definition = request.options['definition']
-      @stack = client.describe_stacks(stack_name: stack_name).stacks[0]
 
       if @definition
         require_git_client!
@@ -28,12 +29,16 @@ module CogCmd::Cfn::Changeset
         definition = git_client.show_definition(@definition, { branch: 'master' })[:data]
 
         @stack_name = request.args[0] || definition['name']
-        @params = merge_parameters(definition['params'])
+        @change_params = definition['params']
         @tags = process_tags(definition['tags'])
       else
-        @params = merge_parameters(request.options['param'])
+        @stack_name = request.args[0]
+        @change_params = request.options['param']
         @tags = process_tags(request.options['tag'])
       end
+
+      @stack = client.describe_stacks(stack_name: stack_name).stacks[0]
+      @params = merge_parameters(@change_params)
 
       @template_url = request.options['template_url']
       @notifications = request.options['notify']
@@ -43,7 +48,9 @@ module CogCmd::Cfn::Changeset
     end
 
     def run_command
-      raise(Cog::Abort, "You must specify the stack name.") unless stack_name
+      if @stack_name.empty? || @stack.nil?
+        raise(Cog::Abort, "You must specify the name of an existing stack.")
+      end
 
       response.template = 'changeset_show'
       response.content = create_changeset
@@ -71,7 +78,7 @@ module CogCmd::Cfn::Changeset
       end
 
       resp = client.create_change_set(cs_params)
-      client.describe_change_set(change_set_name: resp.id).to_h
+      cfn_client.describe_change_set(change_set_name: resp.id).to_h
     rescue Aws::CloudFormation::Errors::InsufficientCapabilitiesException => ex
       cap_name = ex.message.match(/\[(?<capability>.+)\]/)[:capability]
       cap_option = cap_name.gsub(/^CAPABILITY_/, '').downcase
@@ -87,12 +94,10 @@ module CogCmd::Cfn::Changeset
       # If the user specifies a changeset-name just return that
       return request.options['changeset-name'] if request.options['changeset-name']
 
-      # If the user doesn't specify a changeset-name then we generate one based on the number
-      # of changesets already created.
-      client = Aws::CloudFormation::Client.new()
-      num_of_changesets = client.list_change_sets({ stack_name: stack_name }).summaries.length
-
-      "changeset#{num_of_changesets}"
+      # If the user doesn't specify a changeset-name then we generate one
+      # based on the current time in slightly modified ISO 8601 format
+      timestamp = Time.now.utc.iso8601.gsub(/[:\-]/, "")
+      "cog-#{timestamp}"
     end
 
     def use_previous_value(key)

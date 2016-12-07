@@ -2,10 +2,8 @@
 **Description:** ~$results[0].description~
 ~if cond=$results[0].capabilities bound?~**Capabilities:** ~$results[0].capabilities[0]~~end~
 
-~br~
 **Parameters:**
 
 ~each var=$results[0].parameters~
 * ~$item.parameter_key~ (~$item.parameter_type~) ~if cond=$item.default_value != ""~[~$item.default_value~]~end~
-
 ~end~
