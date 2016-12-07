@@ -1,13 +1,12 @@
-# cfn - AWS CloudFormation (0.5.0)
+# cfn - AWS CloudFormation
 
-This bundle provides an opinioned interface to CloudFormation's raw capabilities, not just to make it easier to use but, easier to use well. Commands to perform all basic CloudFormation actions, such as creating and listing stacks, are available, as you would expect. But, we've also built a set of commands for managing a new concept, stack definitions.
+This bundle provides an opinionated interface to CloudFormation's raw capabilities, not just to make it easier to use but, easier to use well. Commands to perform all basic CloudFormation actions, such as creating and listing stacks, are available, as you would expect. But, we've also built a set of commands for managing a new concept, stack definitions.
 
-Stack definitions are a layer on top of CloudFormation templates aimed at making them more reusable and easier to work with as a team. They're comprised of a defaults file, which is a named set of CloudFormation paramters and tags, a named CloudFormation template, and a set of overrides. All of these layers are merged together to make up all the inputs required to create a stack.
+Stack definitions are a layer on top of CloudFormation templates aimed at making them more reusable and easier to work with as a team. They're comprised of a defaults file, which is a named set of CloudFormation parameters and tags, a named CloudFormation template, and a set of overrides. All of these layers are merged together to make up all the inputs required to create a stack.
 
 Because most engineering and operations teams require a canonical version of their infrastructure definitions to be stored in a VCS repository, templates, defaults files, and stack definitions will be stored in a git repository. Doing so supports several common use cases such as debugging and auditing.
 
 Putting this all together results in a reusable, repeatable workflow that can easily be executed from chat, while still allowing basic CloudFormation actions when necessary.
-
 
 ## Installation
 
@@ -95,9 +94,7 @@ about each command see the `help` builtin command: `help cfn:<command_name>`.
 
 ## Configuration
 
-This bundle requires access to an Amazon Web Services account and a Git repository. Detailed instructions for configuring this access are
-available in the README in the GitHub repository located at the URL specified in the **Homepage** section below.
-
+This bundle requires access to an Amazon Web Services account and a Git repository. The following configuration variables may be defined using Cog dynamic configuration:
 
 * `AWS_ACCESS_KEY_ID`
   > ID of the access key used to authenticate with the AWS API. Required if IAM instance metadata not used.

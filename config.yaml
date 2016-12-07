@@ -9,9 +9,9 @@ docker:
 author: Operable <support@operable.io>
 homepage: https://github.com/cogcmd/aws-cfn
 long_description: |
-  This bundle provides an opinioned interface to CloudFormation's raw capabilities, not just to make it easier to use but, easier to use well. Commands to perform all basic CloudFormation actions, such as creating and listing stacks, are available, as you would expect. But, we've also built a set of commands for managing a new concept, stack definitions.
+  This bundle provides an opinionated interface to CloudFormation's raw capabilities, not just to make it easier to use but, easier to use well. Commands to perform all basic CloudFormation actions, such as creating and listing stacks, are available, as you would expect. But, we've also built a set of commands for managing a new concept, stack definitions.
 
-  Stack definitions are a layer on top of CloudFormation templates aimed at making them more reusable and easier to work with as a team. They're comprised of a defaults file, which is a named set of CloudFormation paramters and tags, a named CloudFormation template, and a set of overrides. All of these layers are merged together to make up all the inputs required to create a stack.
+  Stack definitions are a layer on top of CloudFormation templates aimed at making them more reusable and easier to work with as a team. They're comprised of a defaults file, which is a named set of CloudFormation parameters and tags, a named CloudFormation template, and a set of overrides. All of these layers are merged together to make up all the inputs required to create a stack.
 
   Because most engineering and operations teams require a canonical version of their infrastructure definitions to be stored in a VCS repository, templates, defaults files, and stack definitions will be stored in a git repository. Doing so supports several common use cases such as debugging and auditing.
 
