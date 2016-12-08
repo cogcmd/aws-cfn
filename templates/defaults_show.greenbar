@@ -4,8 +4,6 @@
 ~if cond=$results[0].param_list empty?~None~end~
 ~each var=$results[0].param_list~
 * ~$item~
-    paragraph2
-    paragraph3
 ~end~
 
 **Tags:**
