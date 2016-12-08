@@ -16,15 +16,13 @@ module Cfn
 
     def create_definition(name, definition, template, timestamp)
       path = "definition/#{name}/#{timestamp}"
-      path = "#{prefix}/#{path}" if prefix
-
       template_path = "#{path}/template.yaml"
       definition_path = "#{path}/definition.yaml"
 
-      @client.put_object(bucket: bucket, key: "#{path}/template.yaml", body: template)
-
       definition['template_url'] = url_for(template_path)
-      @client.put_object(bucket: bucket, key: "#{path}/definition.yaml", body: definition.to_yaml)
+
+      create_file(template_path, template)
+      create_file(definition_path, definition.to_yaml)
 
       definition
     end
@@ -49,7 +47,7 @@ module Cfn
     end
 
     def create_file(key, body, params = {})
-      key = "#{prefix}/#{key}" if
+      key = "#{prefix}/#{key}" unless prefix.nil?
       params.merge!(bucket: bucket, key: key, body: body)
       @client.put_object(params)
       params
@@ -69,6 +67,7 @@ module Cfn
     end
 
     def url_for(path)
+      path = "#{prefix}/#{path}" unless prefix.nil?
       "https://s3.amazonaws.com/#{bucket}/#{path}"
     end
 
