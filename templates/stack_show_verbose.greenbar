@@ -1,0 +1,25 @@
+**Stack:** ~$results[0].stack_name~
+**Description:** ~$results[0].description~
+**Stack Status:** ~$results[0].stack_status~
+~if cond=$results[0].last_updated_time not_empty?~**Last Update:** ~$results[0].last_updated_time~~end~
+
+**Parameters:**
+~if cond=$results[0].parameters empty?~None~end~
+
+~each var=$results[0].parameters~
+* ~$item.parameter_key~=~$item.parameter_value~
+~end~
+
+**Outputs:**
+~if cond=$results[0].outputs empty?~None~end~
+
+~each var=$results[0].outputs as=item~
+* ~$item.output_key~=~$item.output_value~
+~end~
+
+**Tags:**
+~if cond=$results[0].tags empty?~None~end~
+
+~each var=$results[0].tags as=item~
+* ~$item.key~=~$item.value~
+~end~
