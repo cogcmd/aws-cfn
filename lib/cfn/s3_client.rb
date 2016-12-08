@@ -49,7 +49,7 @@ module Cfn
     end
 
     def create_file(key, body, params = {})
-      key = "#{prefix}/#{key}" if
+      key = "#{prefix}/#{key}" unless prefix.nil?
       params.merge!(bucket: bucket, key: key, body: body)
       @client.put_object(params)
       params
