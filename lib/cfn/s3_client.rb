@@ -48,8 +48,14 @@ module Cfn
 
     def create_file(key, body, params = {})
       key = "#{prefix}/#{key}" unless prefix.nil?
-      params.merge!(bucket: bucket, key: key, body: body)
-      @client.put_object(params)
+      params.merge!(bucket: bucket, key: key)
+
+      put_params = params.merge(body: body)
+      @client.put_object(put_params)
+
+      acl_params = params.merge(acl: "bucket-owner-full-control")
+      @client.put_object_acl(acl_params)
+
       params
     end
 
